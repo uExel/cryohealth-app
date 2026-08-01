@@ -1,6 +1,6 @@
 # cryohealth-app
 
-{{ONE_LINE_WHAT_THIS_REPO_IS_FOR — the purpose, not the stack; the stack is visible in the tree}}
+Offline-first Android app for Gilgit-Baltistan: GLOF hazard alerts for everyone, IMCI triage for health workers. PRD in uExel/cryo-harness; design contract in docs/design/.
 
 ## Working here
 - Start sessions with /uexel:orient, end with /uexel:handoff. Pipeline:
@@ -11,13 +11,16 @@
 ## Map
 <!-- One line per top-level folder whose purpose a newcomer can't infer from its name.
      Delete rows that are obvious — every line here loads in every session. -->
-- {{DIR}} — {{WHY_IT_EXISTS}}
+- src/design — generated from the Claude Design project; never hand-edit values (docs/design/README.md)
+- docs/design — the design contract (DESIGN_SYSTEM.md is binding, §1 especially)
 
 ## Gotchas
 <!-- Only repo-wide traps that bite in ANY directory. Local conventions and test/lint
      commands go in that directory's own CLAUDE.md. Date rules that exist to work around
      a current limitation: "added YYYY-MM for <x> — re-evaluate on next model release". -->
-- {{GOTCHA}}
+- Red means CRITICAL and nothing else — never errors, never delete.
+- Dosing/diagnosis text comes from lookup tables only, never from a language model.
+- Fonts must stay registered under the exact family names src/design/theme.ts emits.
 
 ## gstack (REQUIRED — global install)
 
