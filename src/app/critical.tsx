@@ -1,7 +1,7 @@
 /** CRITICAL interstitial. Appears instantly (Stack animation: 'none'); no close X —
  *  dismiss is an explicit acknowledgement. Announces itself to the screen reader. */
 import React, { useEffect, useRef } from 'react';
-import { AccessibilityInfo, findNodeHandle, Pressable, Text, View } from 'react-native';
+import { AccessibilityInfo, findNodeHandle, Platform, Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { TriangleAlert } from 'lucide-react-native';
 import { useStyles } from '../design/styles';
@@ -15,6 +15,7 @@ export default function Critical() {
   const headRef = useRef<Text>(null);
 
   useEffect(() => {
+    if (Platform.OS === 'web') return; // findNodeHandle is native-only; web relies on role="alert"
     const node = findNodeHandle(headRef.current);
     if (node) AccessibilityInfo.setAccessibilityFocus(node);
   }, []);
