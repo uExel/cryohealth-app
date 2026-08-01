@@ -70,9 +70,11 @@ const FAMILY = {
 } as const;
 
 /** Archivo is loaded as a variable/named-instance family. On Android the weight
- *  must come from the family name, not fontWeight. */
+ *  must come from the family name, not fontWeight.
+ *  note 2026-08: web added to the named-family branch — expo-font registers one weight
+ *  per family name, so the iOS-style branch gave web synthetic bold. */
 const face = (weight: 400 | 600 | 800): TextStyle =>
-  Platform.OS === 'android'
+  Platform.OS === 'android' || Platform.OS === 'web'
     ? { fontFamily: weight === 800 ? 'Archivo-ExtraBold' : weight === 600 ? 'Archivo-SemiBold' : 'Archivo-Regular' }
     : { fontFamily: 'Archivo', fontWeight: String(weight) as TextStyle['fontWeight'] };
 

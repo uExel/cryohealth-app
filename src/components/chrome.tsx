@@ -8,14 +8,30 @@ import { bannerFor, useTheme } from '../design/theme';
 import { useStyles } from '../design/styles';
 import { useApp } from '../state/app';
 
-/** Glacier peak crossed by a pulse trace; equal stroke weights, no fill (DESIGN_SYSTEM §12). */
+/** Glacier peak crossed by a pulse trace — exact paths from the design reference
+ *  (CryoHealth Screen.dc.html). One colour, both strokes equal; stroke steps up as
+ *  the mark shrinks (DESIGN_SYSTEM §12: 3.4 ≥44px, 4.2 ~26px, 5.4 ~17px). */
 export const Logo = ({ size = 26, color }: { size?: number; color?: string }) => {
   const t = useTheme();
+  const stroke = size >= 44 ? 3.4 : size >= 22 ? 4.2 : 5.4;
+  const c = color ?? t.color.accent;
   return (
-    <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <Path d="M3 26 L13 8 L19 18 L24 10 L29 26" stroke={color ?? t.color.accent} strokeWidth={4.2} strokeLinejoin="round" strokeLinecap="round" />
-      <Path d="M2 20 h7 l3 -5 4 8 3 -4 h11" stroke={color ?? t.color.text} strokeWidth={4.2} strokeLinejoin="round" strokeLinecap="round" />
+    <Svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+      <Path d="M24 7 43 40H5L24 7Z" stroke={c} strokeWidth={stroke} strokeLinejoin="round" />
+      <Path d="M2 30h8l3.5-6.5L18 37l4.5-9 2.6 4H46" stroke={c} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
+  );
+};
+
+/** One word: CRYO 800 + HEALTH 400, tracking −0.03em (DESIGN_SYSTEM §12). */
+export const Wordmark = ({ size = 40, color }: { size?: number; color?: string }) => {
+  const t = useTheme();
+  const c = color ?? t.color.text;
+  return (
+    <Text style={{ fontSize: size, lineHeight: size, letterSpacing: -0.03 * size, color: c }}>
+      <Text style={{ fontFamily: 'Archivo-ExtraBold' }}>CRYO</Text>
+      <Text style={{ fontFamily: 'Archivo-Regular' }}>HEALTH</Text>
+    </Text>
   );
 };
 

@@ -30,8 +30,8 @@ export default function Permission() {
           </Text>
         )}
         <View style={{ marginTop: 'auto', marginBottom: t.space.xxl, gap: 10 }}>
-          <BtnPrimary label="Allow alerts" onPress={() => router.replace('/(tabs)')} />
-          <BtnText label="Not now — I will check each morning" onPress={() => router.replace('/(tabs)')} />
+          <BtnPrimary label="Allow alerts" onPress={() => router.replace('/home')} />
+          <BtnText label="Not now — I will check each morning" onPress={() => router.replace('/home')} />
         </View>
       </View>
     </BareScreen>

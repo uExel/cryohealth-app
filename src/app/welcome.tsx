@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { BareScreen, Logo } from '../components/chrome';
+import { BareScreen, Logo, Wordmark } from '../components/chrome';
 import { BtnPrimary, BtnSecondary, BtnText } from '../components/ui';
 import { useStyles } from '../design/styles';
 import { useTheme } from '../design/theme';
@@ -13,7 +13,8 @@ export default function Welcome() {
   return (
     <BareScreen>
       <View style={[s.padXWide, { flex: 1, paddingTop: 84, gap: 12 }]}>
-        <Logo size={34} />
+        <Logo size={52} />
+        <Wordmark size={28} />
         <Text style={s.title1}>Alerts work without an account</Text>
         <Text style={s.body}>
           Pick your valley and CryoHealth starts warning you. No phone number, no sign up.
@@ -28,7 +29,7 @@ export default function Welcome() {
             </View>
             <BtnText label="Change" />
           </View>
-          <BtnPrimary label="Start with alerts" onPress={() => router.replace('/(tabs)')} />
+          <BtnPrimary label="Start with alerts" onPress={() => router.replace('/home')} />
           <BtnSecondary label="Log in" onPress={() => router.push('/login')} />
           <BtnText label="Register as LHW" onPress={() => router.push('/signup')} />
         </View>

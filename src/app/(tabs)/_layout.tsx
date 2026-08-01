@@ -7,7 +7,7 @@ import { useTheme } from '../../design/theme';
 import { useStyles } from '../../design/styles';
 
 const TABS = [
-  { name: 'index', label: 'HOME', Icon: House },
+  { name: 'home', label: 'HOME', Icon: House },
   { name: 'alerts', label: 'ALERTS', Icon: Bell, badge: 1 },
   { name: 'health', label: 'HEALTH', Icon: HeartPulse },
   { name: 'map', label: 'LAKES', Icon: Mountain },

@@ -1,4 +1,4 @@
-# HANDOFF — cryohealth-app — 2026-08-01 23:10 PKT
+# HANDOFF — cryohealth-app — 2026-08-02 00:05 PKT
 Session: design-implementation  Model: fable-5  Branch: main  Goal: #1  Task: #2 (partial)
 
 ## State
@@ -11,12 +11,14 @@ clean. Design contract copied to docs/design/. NOT yet: offline store (Watermelo
 real IMCI engine, FCM, real API — that is the rest of task #2 and G1.
 
 ## Done this session
-- Full design implementation (this commit)
+- Full design implementation; then v2 after review: real logo paths + wordmark from the
+  reference, splash screen + entry flow (splash → welcome → home), true Archivo weights
+  on web (face() platform fix), web a11y guard on critical
 
 ## Not done / deferred
 - Offline store + sync engine (task #2 remainder) — mock.ts stands in
 - RTL mirroring + full Urdu translation — lang toggle + key strings only
-- Splash screen asset + app icons — Expo defaults still in place
+- Native app icons (Expo defaults); in-app splash now real
 
 ## Next action
 npx expo start --android and walk the 17 screens against the design gallery.

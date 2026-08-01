@@ -29,10 +29,10 @@ export default function Verify() {
           label="Verify"
           onPress={() => {
             setMode('chw');
-            router.replace('/(tabs)');
+            router.replace('/home');
           }}
         />
-        <BtnText label="No SMS? Use alerts without an account" onPress={() => router.replace('/(tabs)')} />
+        <BtnText label="No SMS? Use alerts without an account" onPress={() => router.replace('/home')} />
         <View style={{ flex: 1 }} />
         <Text style={[s.footnote, { marginBottom: t.space.xxl }]}>Registration is the one flow that needs signal.</Text>
       </View>

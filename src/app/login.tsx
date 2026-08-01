@@ -18,7 +18,7 @@ export default function Login() {
   return (
     <BareScreen>
       <ScrollView style={s.scroll} contentContainerStyle={[s.padXWide, { paddingTop: 64, gap: 14 }]} keyboardShouldPersistTaps="handled">
-        <Logo size={30} />
+        <Logo size={44} />
         <Text style={s.title1}>Log in</Text>
         <Text style={s.callout}>Health workers only. Alerts need no login.</Text>
         <Field label="LHW ID or mobile" placeholder="44-2291" />
@@ -35,14 +35,14 @@ export default function Login() {
           label="Log in"
           onPress={() => {
             setMode('chw');
-            router.replace('/(tabs)');
+            router.replace('/home');
           }}
         />
         <View style={{ flexDirection: 'row', gap: 18 }}>
           <BtnText label="Forgot PIN" />
           <BtnText label="Register" onPress={() => router.push('/signup')} />
         </View>
-        <BtnText label="Continue without an account" onPress={() => router.replace('/(tabs)')} />
+        <BtnText label="Continue without an account" onPress={() => router.replace('/home')} />
       </ScrollView>
     </BareScreen>
   );
