@@ -4,6 +4,7 @@ import { Modal, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Phone, X, ChevronRight, Settings2 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { bannerFor, useTheme } from '../design/theme';
 import { useStyles } from '../design/styles';
 import { useApp } from '../state/app';
@@ -39,32 +40,40 @@ export const AppBar = ({ title, sub }: { title: string; sub?: string }) => {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { lang, setLang, setSosOpen } = useApp();
   return (
-    <View style={s.appBar}>
-      <Logo />
-      <View style={{ flex: 1 }}>
-        <Text style={s.appBarTitle}>{title}</Text>
-        {sub ? <Text style={s.appBarSub}>{sub}</Text> : null}
+    // Safe-area top inset varies by device (notch/Dynamic Island height differs
+    // across iPhone models) — padding it here, on a wrapper separate from the
+    // fixed-height row below, keeps the row's own height/alignment untouched
+    // while still clearing the status bar on every device, not just whichever
+    // one this was last measured against.
+    <View style={{ paddingTop: insets.top, backgroundColor: t.color.bg }}>
+      <View style={s.appBar}>
+        <Logo />
+        <View style={{ flex: 1 }}>
+          <Text style={s.appBarTitle}>{title}</Text>
+          {sub ? <Text style={s.appBarSub}>{sub}</Text> : null}
+        </View>
+        <Pressable accessibilityLabel="Settings" style={s.btnIcon} onPress={() => router.push('/settings')}>
+          <Settings2 size={18} color={t.color.text} strokeWidth={2.2} />
+        </Pressable>
+        <Pressable
+          accessibilityLabel="Switch language"
+          style={s.btnIcon}
+          onPress={() => setLang(lang === 'en' ? 'ur' : 'en')}
+        >
+          <Text style={[s.footnote, { color: t.color.text }]}>{lang === 'en' ? 'اردو' : 'EN'}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityLabel="SOS — emergency options"
+          style={[s.btnDanger, { minHeight: t.size.minTouch, paddingHorizontal: 12 }]}
+          onPress={() => setSosOpen(true)}
+        >
+          <Phone size={15} color="#fff" strokeWidth={2.4} />
+          <Text style={s.btnDangerLabel}>SOS</Text>
+        </Pressable>
       </View>
-      <Pressable accessibilityLabel="Settings" style={s.btnIcon} onPress={() => router.push('/settings')}>
-        <Settings2 size={18} color={t.color.text} strokeWidth={2.2} />
-      </Pressable>
-      <Pressable
-        accessibilityLabel="Switch language"
-        style={s.btnIcon}
-        onPress={() => setLang(lang === 'en' ? 'ur' : 'en')}
-      >
-        <Text style={[s.footnote, { color: t.color.text }]}>{lang === 'en' ? 'اردو' : 'EN'}</Text>
-      </Pressable>
-      <Pressable
-        accessibilityLabel="SOS — emergency options"
-        style={[s.btnDanger, { minHeight: t.size.minTouch, paddingHorizontal: 12 }]}
-        onPress={() => setSosOpen(true)}
-      >
-        <Phone size={15} color="#fff" strokeWidth={2.4} />
-        <Text style={s.btnDangerLabel}>SOS</Text>
-      </Pressable>
     </View>
   );
 };

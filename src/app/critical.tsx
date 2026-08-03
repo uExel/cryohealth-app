@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AccessibilityInfo, findNodeHandle, Platform, Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TriangleAlert } from 'lucide-react-native';
 import { useStyles } from '../design/styles';
 import { useTheme } from '../design/theme';
@@ -12,6 +13,7 @@ export default function Critical() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const headRef = useRef<Text>(null);
 
   useEffect(() => {
@@ -21,7 +23,10 @@ export default function Critical() {
   }, []);
 
   return (
-    <View style={s.critical}>
+    // s.critical's own paddingTop was a fixed guess (56px) tied to whichever device it
+    // was last measured against — this is a fullScreenModal with no navigator safe-area
+    // handling, so it's overridden here with the real per-device inset + breathing room.
+    <View style={[s.critical, { paddingTop: insets.top + t.space.lg }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <TriangleAlert size={18} color="#fff" strokeWidth={2.8} />
         <Text style={{ ...t.type.label, color: 'rgba(255,255,255,0.85)', letterSpacing: 2 }}>CRITICAL</Text>
