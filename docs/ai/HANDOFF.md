@@ -45,3 +45,31 @@ tests: none yet (no test runner in scaffold)  review: pending  qa: pending on-de
 
 ## Addendum — 2026-08-03 (harness maintenance)
 cryo-harness renamed to uxl-harness across the org (github.com/uExel/uxl-harness); this repo's .claude/settings.json marketplace pointer updated to match.
+
+## Addendum — 2026-08-03 (TestFlight setup)
+Reason: the installed Expo Go app hadn't been updated in ~10 months and only supported
+SDK 54, while this project is on SDK 57 — Expo Go could never load it, so TestFlight is
+now the real path to a device build.
+
+Set up EAS Build + Submit for iOS:
+- app.json: ios.bundleIdentifier = com.uexel.cryohealth; ios.infoPlist.
+  ITSAppUsesNonExemptEncryption = false (standard HTTPS only, avoids a manual App Store
+  Connect export-compliance prompt)
+- eas.json (new): development/preview/production build profiles; submit.production.ios.
+  ascAppId = 6797512420 (CryoHealth on App Store Connect), so future submits don't need
+  an interactive Apple ID prompt to resolve which app to target
+- Linked to EAS project @uexel/cryohealth (extra.eas.projectId in app.json)
+- Production iOS build (SDK 57, build number 2) completed successfully via
+  `eas build --platform ios --profile production` (Shaan ran this interactively — Apple
+  ID auth and Distribution Certificate/Provisioning Profile generation aren't something
+  I can do on his behalf)
+- Submitted to App Store Connect via `eas submit --platform ios --latest` (also run
+  interactively by Shaan, same reason) — confirmation that it's live under TestFlight is
+  in App Store Connect itself, not verifiable from the CLI in this eas-cli version (no
+  submission:list/view command) and browser access wasn't available this session
+
+## Not done / deferred (added this session)
+- Adding TestFlight testers (internal/external) — manual App Store Connect step, no CLI
+  equivalent
+- Android distribution — this session was iOS/TestFlight-only; eas.json's build
+  profiles are iOS-agnostic but no Android submit config or Play Console setup exists
