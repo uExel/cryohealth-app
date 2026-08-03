@@ -42,3 +42,6 @@ tests: none yet (no test runner in scaffold)  review: pending  qa: pending on-de
 
 ## Resume with
 /uexel:orient   (then: finish task #2 — WatermelonDB offline store behind src/lib/mock.ts interfaces)
+
+## Addendum — 2026-08-03 (harness maintenance)
+cryo-harness renamed to uxl-harness across the org (github.com/uExel/uxl-harness); this repo's .claude/settings.json marketplace pointer updated to match.
