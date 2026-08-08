@@ -17,23 +17,28 @@ migration `1786204276808-AlertChipsAndChecklist`, not yet run against a live DB 
 Docker in this environment) and bumping the local WatermelonDB schema to v2 (with a
 proper `addColumns` migration, not just a version bump) to carry `nameUr`, `elevationM`,
 `bodyUr`, `downstreamSummary`, `windowStart/End`, `chips`, `checklist`. Typecheck is
-clean; CryoHealth-api's build + full jest suite (28 tests) pass. Nothing this session has
-been committed in either repo — nor was the pre-existing auth/sync work from before this
-session.
+clean; CryoHealth-api's build + full jest suite (28 tests) pass. This repo's changes
+(both the pre-existing auth/sync plumbing and this session's fixes/wiring) are now
+committed as a single commit (`3a8f9d5`), since they were too intertwined in the same
+files to cleanly separate. CryoHealth-api's `Alert.chips`/`checklist` work is still
+uncommitted in that sibling repo.
 
 ## Done this session
 - Fixed WatermelonDB decorator build config: `tsconfig.json` (`experimentalDecorators`)
-  + new `babel.config.js` (`@babel/plugin-proposal-decorators`, legacy mode) — no commit
-- Wired `case.tsx` to `ChwCaseModel.create` + `runSync` (was a no-op) — no commit
-- Added `src/lib/format.ts` (relativeTime, TIER_LABEL_UR) — no commit
+  + new `babel.config.js` (`@babel/plugin-proposal-decorators`, legacy mode)
+- Wired `case.tsx` to `ChwCaseModel.create` + `runSync` (was a no-op)
+- Added `src/lib/format.ts` (relativeTime, TIER_LABEL_UR)
 - Rewired `home.tsx`, `map.tsx`, `alerts.tsx`, `alert/[id].tsx`, `critical.tsx` onto live
   WatermelonDB data via `withObservables`; `hazard.tsx`'s `AlertCard` now takes a proper
-  `AlertCardData` type instead of importing `Alert` from mock.ts — no commit
+  `AlertCardData` type instead of importing `Alert` from mock.ts
 - CryoHealth-api (sibling repo): `Alert.chips`/`Alert.checklist` jsonb columns + migration
-  + `IssueAlertDto`/`alerts.service.ts` wiring — no commit, see that repo's own HANDOFF
+  + `IssueAlertDto`/`alerts.service.ts` wiring — still uncommitted, see that repo's HANDOFF
 - CryoHealth-app: `src/lib/db/schema.ts` v1→v2 + `src/lib/db/migrations.ts` (new file) +
-  `LakeModel`/`AlertModel` + `sync.ts` pull mapping extended for the new fields — no commit
+  `LakeModel`/`AlertModel` + `sync.ts` pull mapping extended for the new fields
 - Both `CLAUDE.md` files (this repo and CryoHealth-api) updated to reflect current state
+- Committed this repo's full working tree (pre-existing auth/sync plumbing + this
+  session's fixes) as `3a8f9d5` "feat: wire mobile app to CryoHealth-api — auth, offline
+  sync, live data", on top of the earlier docs-only handoff commit `267ce7d`
 
 ## Not done / deferred
 - `settings.tsx`'s `VALLEYS` mock picker — not safety-critical, explicitly deferred by
@@ -44,8 +49,7 @@ session.
 - The new `AlertChipsAndChecklist` migration has never been run against a live Postgres —
   no Docker in this dev environment; needs `docker compose up -d db && npm run
   migration:run` in CryoHealth-api on a machine that has Docker
-- Nothing in either repo has been committed — nor was the pre-existing (pre-session)
-  auth/sync/cases work
+- CryoHealth-api's `Alert.chips`/`checklist` work is still uncommitted in that repo
 
 ## Next action
 `docker compose up -d db && npm run migration:run` in CryoHealth-api (needs Docker), then
@@ -83,8 +87,8 @@ src/lib/db/models/LakeModel.ts, src/lib/db/models/AlertModel.ts, src/lib/sync.ts
 
 ## Verification status
 tests: none in this repo (no test runner in scaffold)  review: pending  qa: not run on
-device/simulator this session — typecheck clean only
+device/simulator this session — typecheck clean only  commit: `3a8f9d5` (this repo)
 
 ## Resume with
 /uexel:orient   (then: run the migration on a Docker-capable machine, seed, and walk the
-app on a device before committing any of this)
+app on a device — none of this has been QA'd on-device yet despite being committed)
