@@ -5,16 +5,32 @@ import { AccessibilityInfo, findNodeHandle, Platform, Pressable, Text, View } fr
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TriangleAlert } from 'lucide-react-native';
+import withObservables from '@nozbe/with-observables';
+import { Q } from '@nozbe/watermelondb';
 import { useStyles } from '../design/styles';
 import { useTheme } from '../design/theme';
-import { CRITICAL } from '../lib/mock';
+import { database } from '../lib/db';
+import { AlertModel } from '../lib/db/models/AlertModel';
 
-export default function Critical() {
+/** Generic critical-alert chrome — not per-alert data, so unlike the rows below it's
+ *  fine as fixed copy (same wording for any critical alert by design). */
+const HEAD = 'MOVE TO HIGH GROUND NOW';
+const HEAD_UR = 'فوراً اونچی جگہ پر جائیں';
+const HONEST = 'This warning may not have made a sound if your phone is silent.';
+
+function Critical({ alerts }: { alerts: AlertModel[] }) {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const headRef = useRef<Text>(null);
+  const alert = alerts[0];
+
+  const rows: [string, string][] = [];
+  if (alert?.downstreamSummary) rows.push(['WHERE', alert.downstreamSummary]);
+  const window = [alert?.windowStart, alert?.windowEnd].filter(Boolean).join(' – ');
+  if (window) rows.push(['WHEN', window]);
+  if (alert?.chips?.length) rows.push(['TAKE', alert.chips.join(', ')]);
 
   useEffect(() => {
     if (Platform.OS === 'web') return; // findNodeHandle is native-only; web relies on role="alert"
@@ -32,24 +48,22 @@ export default function Critical() {
         <Text style={{ ...t.type.label, color: 'rgba(255,255,255,0.85)', letterSpacing: 2 }}>CRITICAL</Text>
       </View>
       <Text ref={headRef} accessibilityRole="alert" style={[s.criticalHead, { marginTop: 14 }]}>
-        {CRITICAL.head}
+        {HEAD}
       </Text>
-      <Text style={s.criticalUrdu}>{CRITICAL.headUr}</Text>
+      <Text style={s.criticalUrdu}>{HEAD_UR}</Text>
       <View style={s.criticalRule} />
       <View style={{ gap: 13, flex: 1 }}>
-        {CRITICAL.rows.map(([k, v]) => (
+        {rows.map(([k, v]) => (
           <View key={k} style={{ flexDirection: 'row', alignItems: 'baseline' }}>
             <Text style={s.criticalKey}>{k}</Text>
             <Text style={s.criticalVal}>{v}</Text>
           </View>
         ))}
-        <Text style={{ ...t.type.footnote, color: 'rgba(255,255,255,0.8)', marginTop: 'auto' }}>
-          {CRITICAL.honest}
-        </Text>
+        <Text style={{ ...t.type.footnote, color: 'rgba(255,255,255,0.8)', marginTop: 'auto' }}>{HONEST}</Text>
       </View>
       <Pressable
         style={{ minHeight: t.size.controlPrimary, backgroundColor: '#ffffff', justifyContent: 'center', paddingHorizontal: t.space.lg }}
-        onPress={() => router.replace('/alert/1')}
+        onPress={() => (alert ? router.replace(`/alert/${alert.remoteId}`) : router.back())}
       >
         <Text style={{ ...t.type.headline, fontSize: 16, color: t.color.tier.critical }}>See what to do</Text>
       </Pressable>
@@ -62,3 +76,10 @@ export default function Critical() {
     </View>
   );
 }
+
+export default withObservables([], () => ({
+  alerts: database
+    .get<AlertModel>('alerts')
+    .query(Q.where('tier', 'critical'), Q.where('status', 'active'), Q.sortBy('issued_at', Q.desc), Q.take(1))
+    .observe(),
+}))(Critical);

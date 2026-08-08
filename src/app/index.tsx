@@ -7,16 +7,26 @@ import { useRouter } from 'expo-router';
 import { WifiOff, RefreshCw } from 'lucide-react-native';
 import { Logo, Wordmark } from '../components/chrome';
 import { useApp } from '../state/app';
+import { useAuthStore } from '../state/auth';
 
 export default function Splash() {
   const router = useRouter();
-  const { net } = useApp();
+  const { net, setMode } = useApp();
+  const authStatus = useAuthStore((s) => s.status);
   const offline = net === 'offline' || net === 'failed' || net === 'stale';
 
   useEffect(() => {
-    const id = setTimeout(() => router.replace('/welcome'), 1800);
+    const id = setTimeout(() => {
+      // A restored session (SecureStore) skips straight past welcome/login.
+      if (authStatus === 'authenticated') {
+        setMode('chw');
+        router.replace('/home');
+      } else {
+        router.replace('/welcome');
+      }
+    }, 1800);
     return () => clearTimeout(id);
-  }, [router]);
+  }, [router, authStatus, setMode]);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#0a4d76' }}>

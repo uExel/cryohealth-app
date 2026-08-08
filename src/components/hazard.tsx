@@ -5,7 +5,19 @@ import { Check, CircleAlert, TriangleAlert, Clock3 } from 'lucide-react-native';
 import { freshnessFor, Tier, TIER_LABEL, useTheme } from '../design/theme';
 import { tierBadgeStyle, tierColor, useStyles } from '../design/styles';
 import { useApp } from '../state/app';
-import { Alert } from '../lib/mock';
+
+/** Presentational contract for AlertCard — screens map their data source (live
+ *  AlertModel today) onto this, rather than AlertCard depending on a data layer. */
+export type AlertCardData = {
+  id: string;
+  tier: Tier;
+  when: string;
+  title: string;
+  place?: string;
+  chips?: string[];
+  cleared?: boolean;
+  acked?: string;
+};
 
 /** Tier icons are fixed (DESIGN_SYSTEM §11); critical uses the heavier stroke. */
 export const TierIcon = ({ tier, size = 14, color }: { tier: Tier; size?: number; color: string }) => {
@@ -77,7 +89,7 @@ export const HazardRow = ({ name, detail, tier, onPress }: { name: string; detai
   );
 };
 
-export const AlertCard = ({ a, onPress }: { a: Alert; onPress?: () => void }) => {
+export const AlertCard = ({ a, onPress }: { a: AlertCardData; onPress?: () => void }) => {
   const t = useTheme();
   const s = useStyles();
   return (
@@ -92,8 +104,8 @@ export const AlertCard = ({ a, onPress }: { a: Alert; onPress?: () => void }) =>
           <Text style={s.alertMeta}>{a.when}</Text>
         </View>
         <Text style={[s.alertTitle, { marginTop: 7 }]} numberOfLines={2}>{a.title}</Text>
-        <Text style={[s.callout, { marginTop: 3 }]}>{a.place}</Text>
-        {a.chips.length ? (
+        {a.place ? <Text style={[s.callout, { marginTop: 3 }]}>{a.place}</Text> : null}
+        {a.chips?.length ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 9 }}>
             {a.chips.map((c) => (
               <View key={c} style={s.alertChip}>
