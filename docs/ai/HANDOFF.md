@@ -1,89 +1,90 @@
-# HANDOFF — cryohealth-app — 2026-08-02 00:05 PKT
-Session: design-implementation  Model: fable-5  Branch: main  Goal: #1  Task: #2 (partial)
+# HANDOFF — cryohealth-app — 2026-08-08 21:15 PKT
+Session: live-data-wiring  Model: claude-sonnet-5  Branch: main  Goal: none  Task: none (ad hoc)
 
 ## State
-Expo SDK 57 (expo-router, TS strict) app implementing the "Cryo Health Mobile App Design"
-project: design system installed verbatim at src/design/ (theme.ts + styles.ts, two dated
-RN-0.86 compat patches), all 17 designed screens built with mock data (src/lib/mock.ts),
-light+dark themes, en/ur strings on home + critical, 5-tab chrome with SOS sheet, sync
-banner with all 5 net states, CRITICAL interstitial (instant, a11y-focused). Typecheck
-clean. Design contract copied to docs/design/. NOT yet: offline store (WatermelonDB),
-real IMCI engine, FCM, real API — that is the rest of task #2 and G1.
+Auth/sync plumbing (api-client, WatermelonDB, zustand auth store, sync engine) already
+existed uncommitted in the working tree at session start (from a prior Copilot Chat
+session) but was silently broken: WatermelonDB's `@field`/`@json` model decorators need
+`experimentalDecorators` + a Babel plugin, neither configured — `npm run typecheck` had
+24 errors and the app likely couldn't bundle. That's fixed. `case.tsx`'s "Save case
+offline" button was a no-op (`router.back()` only) — now writes a real queued
+`ChwCaseModel` row and triggers sync. Screens (`home`, `map`, `alerts`,
+`alert/[id]`, `critical`) now read live WatermelonDB data via `withObservables` instead
+of `src/lib/mock.ts`; mock.ts is still used only by Guidance/Learn/IMCI (intentional —
+see CLAUDE.md) and `settings.tsx`'s valley picker (deferred, not safety data). This
+required extending CryoHealth-api's `Alert` entity with `chips`/`checklist` columns (new
+migration `1786204276808-AlertChipsAndChecklist`, not yet run against a live DB — no
+Docker in this environment) and bumping the local WatermelonDB schema to v2 (with a
+proper `addColumns` migration, not just a version bump) to carry `nameUr`, `elevationM`,
+`bodyUr`, `downstreamSummary`, `windowStart/End`, `chips`, `checklist`. Typecheck is
+clean; CryoHealth-api's build + full jest suite (28 tests) pass. Nothing this session has
+been committed in either repo — nor was the pre-existing auth/sync work from before this
+session.
 
 ## Done this session
-- Full design implementation; then v2 after review: real logo paths + wordmark from the
-  reference, splash screen + entry flow (splash → welcome → home), true Archivo weights
-  on web (face() platform fix), web a11y guard on critical
+- Fixed WatermelonDB decorator build config: `tsconfig.json` (`experimentalDecorators`)
+  + new `babel.config.js` (`@babel/plugin-proposal-decorators`, legacy mode) — no commit
+- Wired `case.tsx` to `ChwCaseModel.create` + `runSync` (was a no-op) — no commit
+- Added `src/lib/format.ts` (relativeTime, TIER_LABEL_UR) — no commit
+- Rewired `home.tsx`, `map.tsx`, `alerts.tsx`, `alert/[id].tsx`, `critical.tsx` onto live
+  WatermelonDB data via `withObservables`; `hazard.tsx`'s `AlertCard` now takes a proper
+  `AlertCardData` type instead of importing `Alert` from mock.ts — no commit
+- CryoHealth-api (sibling repo): `Alert.chips`/`Alert.checklist` jsonb columns + migration
+  + `IssueAlertDto`/`alerts.service.ts` wiring — no commit, see that repo's own HANDOFF
+- CryoHealth-app: `src/lib/db/schema.ts` v1→v2 + `src/lib/db/migrations.ts` (new file) +
+  `LakeModel`/`AlertModel` + `sync.ts` pull mapping extended for the new fields — no commit
+- Both `CLAUDE.md` files (this repo and CryoHealth-api) updated to reflect current state
 
 ## Not done / deferred
-- Offline store + sync engine (task #2 remainder) — mock.ts stands in
-- RTL mirroring + full Urdu translation — lang toggle + key strings only
-- Native app icons (Expo defaults); in-app splash now real
+- `settings.tsx`'s `VALLEYS` mock picker — not safety-critical, explicitly deferred by
+  Shaan when asked how to handle the mock→live gap
+- Alert acknowledgement (`alert/[id].tsx`'s ack button) — still local React state only;
+  no `AlertAck` WatermelonDB table or backend endpoint exists (the web dashboard's
+  `alert_acknowledgements` table has no CryoHealth-api controller or mobile client)
+- The new `AlertChipsAndChecklist` migration has never been run against a live Postgres —
+  no Docker in this dev environment; needs `docker compose up -d db && npm run
+  migration:run` in CryoHealth-api on a machine that has Docker
+- Nothing in either repo has been committed — nor was the pre-existing (pre-session)
+  auth/sync/cases work
 
 ## Next action
-npx expo start --android and walk the 17 screens against the design gallery.
+`docker compose up -d db && npm run migration:run` in CryoHealth-api (needs Docker), then
+in CryoHealth-app: `npx expo start --android` and walk home/map/alerts/critical against a
+seeded backend (`npm run seed:lakes && npm run seed:users` in CryoHealth-api first) to
+confirm the live-data wiring renders correctly end to end — none of this has been run on
+a device or simulator this session.
 
 ## Open questions for a human
-- Design shows 5 tabs with Settings via app bar — confirmed OK? — blocking: no
+- Should alert chips/checklist be authorable from the `cryohealth` web dashboard's issue
+  form too, or only via CryoHealth-api's `IssueAlertDto` directly? — blocking: no
+- Alert acknowledgement sync (backend endpoint + WatermelonDB table) — worth building, or
+  is local-only fine for the current prototype stage? — blocking: no
 
 ## Failed approaches (do not retry)
-- Importing BottomTabBarProps from @react-navigation/bottom-tabs: conflicts with
-  expo-router's bundled copy — type the tab bar structurally instead.
+- First draft of `alert/[id].tsx` double-wrapped the route component in `withObservables`
+  around a component that took no props — the HOC's triggering prop (`id`) never reached
+  it. Fix: keep the default export a plain component that reads `useLocalSearchParams()`
+  and renders a separately-`withObservables`-wrapped inner component with `id` passed as
+  a prop.
+- `alerts.tsx`'s FreshRow stamp was briefly built as a separate helper component using
+  `require('../../components/hazard')` inline instead of a top-level import — worked but
+  was needless; replaced with a normal import.
 
 ## Loops run
-- typecheck fix loop: 3/3, passed, verifier: npx tsc --noEmit
+- none (no /uexel:plan → /uexel:build loop this session; ad hoc)
 
 ## Files touched
-src/design/, src/components/, src/app/, src/state/, src/lib/, docs/design/, CLAUDE.md,
-app.json, package.json
+tsconfig.json, babel.config.js (new), package.json, package-lock.json, CLAUDE.md,
+src/app/case.tsx, src/app/critical.tsx, src/app/alert/[id].tsx,
+src/app/(tabs)/home.tsx, src/app/(tabs)/map.tsx, src/app/(tabs)/alerts.tsx,
+src/components/hazard.tsx, src/lib/format.ts (new), src/lib/api-types.ts,
+src/lib/db/schema.ts, src/lib/db/migrations.ts (new), src/lib/db/index.ts,
+src/lib/db/models/LakeModel.ts, src/lib/db/models/AlertModel.ts, src/lib/sync.ts
 
 ## Verification status
-tests: none yet (no test runner in scaffold)  review: pending  qa: pending on-device
+tests: none in this repo (no test runner in scaffold)  review: pending  qa: not run on
+device/simulator this session — typecheck clean only
 
 ## Resume with
-/uexel:orient   (then: finish task #2 — WatermelonDB offline store behind src/lib/mock.ts interfaces)
-
-## Addendum — 2026-08-03 (harness maintenance)
-cryo-harness renamed to uxl-harness across the org (github.com/uExel/uxl-harness); this repo's .claude/settings.json marketplace pointer updated to match.
-
-## Addendum — 2026-08-03 (TestFlight setup)
-Reason: the installed Expo Go app hadn't been updated in ~10 months and only supported
-SDK 54, while this project is on SDK 57 — Expo Go could never load it, so TestFlight is
-now the real path to a device build.
-
-Set up EAS Build + Submit for iOS:
-- app.json: ios.bundleIdentifier = com.uexel.cryohealth; ios.infoPlist.
-  ITSAppUsesNonExemptEncryption = false (standard HTTPS only, avoids a manual App Store
-  Connect export-compliance prompt)
-- eas.json (new): development/preview/production build profiles; submit.production.ios.
-  ascAppId = 6797512420 (CryoHealth on App Store Connect), so future submits don't need
-  an interactive Apple ID prompt to resolve which app to target
-- Linked to EAS project @uexel/cryohealth (extra.eas.projectId in app.json)
-- Production iOS build (SDK 57, build number 2) completed successfully via
-  `eas build --platform ios --profile production` (Shaan ran this interactively — Apple
-  ID auth and Distribution Certificate/Provisioning Profile generation aren't something
-  I can do on his behalf)
-- Submitted to App Store Connect via `eas submit --platform ios --latest` (also run
-  interactively by Shaan, same reason) — confirmation that it's live under TestFlight is
-  in App Store Connect itself, not verifiable from the CLI in this eas-cli version (no
-  submission:list/view command) and browser access wasn't available this session
-
-## Not done / deferred (added this session)
-- Adding TestFlight testers (internal/external) — manual App Store Connect step, no CLI
-  equivalent
-- Android distribution — this session was iOS/TestFlight-only; eas.json's build
-  profiles are iOS-agnostic but no Android submit config or Play Console setup exists
-
-## Addendum — 2026-08-03 (App Store Connect API key)
-Wired up so future `eas submit --platform ios --non-interactive` never needs an
-interactive Apple ID prompt. eas.json's submit.production.ios now has ascApiKeyId +
-ascApiKeyIssuerId (both identifiers, not secret material — safe to commit). The actual
-private key (`AuthKey_9S38M2924M.p8`, generated by Shaan in App Store Connect ->
-Users and Access -> Integrations, App Manager role) is deliberately NOT in this repo or
-eas.json at all — it lives at ~/.appstoreconnect/private_keys/ (outside any git tree,
-chmod 600) and is referenced only via the EXPO_ASC_API_KEY_PATH env var, set in
-~/.zshrc, since a local file path is machine-specific and doesn't belong in shared
-config. Not end-to-end tested this session — eas submit has no dry-run flag, and
-re-submitting the already-uploaded build (1.0.0, build 2) just to verify risked an
-error or a confusing duplicate for no real benefit. Real verification happens on the
-next actual build+submit after a version bump.
+/uexel:orient   (then: run the migration on a Docker-capable machine, seed, and walk the
+app on a device before committing any of this)
