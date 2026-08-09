@@ -8,11 +8,11 @@ const sanitizeStrings = (raw: unknown) =>
 export class AlertModel extends Model {
   static table = "alerts";
 
-  @field("remote_id") remoteId!: string;
+  @field("remote_id") remoteId: string;
   @field("lake_id") lakeId?: string;
-  @field("tier") tier!: Tier;
-  @field("title") title!: string;
-  @field("body") body!: string;
+  @field("tier") tier: Tier;
+  @field("title") title: string;
+  @field("body") body: string;
   @field("body_ur") bodyUr?: string;
   @field("downstream_summary") downstreamSummary?: string;
   @field("window_start") windowStart?: string;
@@ -21,7 +21,7 @@ export class AlertModel extends Model {
    *  alerts today; a missing value means "not provided", never render a placeholder. */
   @json("chips_json", sanitizeStrings) chips?: string[];
   @json("checklist_json", sanitizeStrings) checklist?: string[];
-  @field("status") status!: "active" | "cleared";
-  @field("issued_at") issuedAt!: string;
-  @field("synced_at") syncedAt!: number;
+  @field("status") status: "active" | "cleared";
+  @field("issued_at") issuedAt: string;
+  @field("synced_at") syncedAt: number;
 }

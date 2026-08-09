@@ -16,6 +16,8 @@
 *.p12
 *.p8
 *.pem
+/credentials.json
+/credentials/
 *.tsbuildinfo
 .DS_Store
 .env

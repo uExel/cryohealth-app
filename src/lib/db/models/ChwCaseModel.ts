@@ -11,11 +11,11 @@ export type CaseSyncState = 'queued' | 'synced';
 export class ChwCaseModel extends Model {
   static table = 'chw_cases';
 
-  @field('client_case_id') clientCaseId!: string;
-  @field('captured_at') capturedAt!: string;
-  @json('payload_json', sanitizePayload) payload!: Record<string, unknown>;
+  @field('client_case_id') clientCaseId: string;
+  @field('captured_at') capturedAt: string;
+  @json('payload_json', sanitizePayload) payload: Record<string, unknown>;
   @field('outcome') outcome?: string;
-  @field('device_id') deviceId!: string;
-  @field('sync_state') syncState!: CaseSyncState;
-  @field('created_at') createdAt!: number;
+  @field('device_id') deviceId: string;
+  @field('sync_state') syncState: CaseSyncState;
+  @field('created_at') createdAt: number;
 }
