@@ -9,17 +9,23 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.cryohealth.io"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.cryohealth.io"
+      }
     }
   },
   "submit": {
     "production": {
       "ios": {
         "ascAppId": "6797512420",
-        "ascApiKeyId": "9S38M2924M",
+        "ascApiKeyId": "MSSQV8JS2P",
         "ascApiKeyIssuerId": "1598fbdf-0504-488c-8c8a-a9f956ef3aa9"
       }
     }
