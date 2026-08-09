@@ -160,13 +160,13 @@
     "semantic_hash": "e1e23f4d37aa9c51e0b0e3b0779e8dc3"
   },
   "tsconfig.json": {
-    "mtime": 1786268906.910439,
-    "ast_hash": "9c03a365cb0f6980a2efb99772587e28",
+    "mtime": 1786203935.386864,
+    "ast_hash": "fa97be9176f63eaa759bd599b59b32f8",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
-    "mtime": 1786268914.5189908,
-    "ast_hash": "e7ebfeedca1aa83546864eaa38c40924",
+    "mtime": 1786263205.9420464,
+    "ast_hash": "e67b0427ce6b9360e2bc5b1c171e2388",
     "semantic_hash": ""
   },
   "babel.config.js": {
@@ -215,18 +215,18 @@
     "semantic_hash": ""
   },
   "src/lib/db/models/AlertModel.ts": {
-    "mtime": 1786268855.1710243,
-    "ast_hash": "23177b88bf8f57e78a66aa09742d0db6",
+    "mtime": 1786204779.1721458,
+    "ast_hash": "db03bf5efc24b3d0a8bfc5cf88505e52",
     "semantic_hash": ""
   },
   "src/lib/db/models/ChwCaseModel.ts": {
-    "mtime": 1786268901.3408797,
-    "ast_hash": "91360679d6fe9668a74e6da391b5ffe3",
+    "mtime": 1786201817.1012068,
+    "ast_hash": "02cacfb568cae881f379386e55cbfb18",
     "semantic_hash": ""
   },
   "src/lib/db/models/LakeModel.ts": {
-    "mtime": 1786268901.3376703,
-    "ast_hash": "85787884805b24db3c5645e38b12366b",
+    "mtime": 1786204458.7214456,
+    "ast_hash": "7b5036ab652e919a5adabeb9895555cc",
     "semantic_hash": ""
   },
   "src/lib/db/schema.ts": {
@@ -335,8 +335,8 @@
     "semantic_hash": ""
   },
   "docs/ai/HANDOFF.md": {
-    "mtime": 1786268084.4215722,
-    "ast_hash": "495eb4fff6900fa19f31597966bc349d",
+    "mtime": 1786205373.0670867,
+    "ast_hash": "ab80d576b554d4be1bf17313a930376a",
     "semantic_hash": ""
   },
   "docs/ai/LEARNINGS.md": {
@@ -477,16 +477,6 @@
   "assets/images/tutorial-web.png": {
     "mtime": 1786170054.6912773,
     "ast_hash": "c62d22797f3002396754d8cc55b0ae1a",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-08-08-live-data-wiring-handoff.md": {
-    "mtime": 1786205373.0670867,
-    "ast_hash": "ab80d576b554d4be1bf17313a930376a",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-08-09-testflight-submission-setup-handoff.md": {
-    "mtime": 1786263634.8042939,
-    "ast_hash": "8b421660b1952a262cec6e794459543b",
     "semantic_hash": ""
   }
 }
