@@ -9,6 +9,17 @@ Offline-first Android app for Gilgit-Baltistan: GLOF hazard alerts for everyone,
 - Task state lives in GitHub issues — labels + milestones, no boards.
 - Shared AI working files: docs/ai/ (PLAN, TODO, HANDOFF, LEARNINGS, sessions, decisions).
 
+## Commands (`npm`, Expo)
+
+```bash
+npm install
+npm start            # Expo dev server; npm run android / ios / web for a target directly
+npm run lint
+npm run typecheck     # tsc --noEmit
+```
+
+No test script defined in this repo.
+
 ## Map
 
 <!-- One line per top-level folder whose purpose a newcomer can't infer from its name.
