@@ -1,11 +1,11 @@
 import { Q } from "@nozbe/watermelondb";
 import NetInfo from "@react-native-community/netinfo";
 import type { NetState } from "../design/theme";
+import { createCase, fetchAlerts, fetchLakes } from "./cryohealth-api";
 import { database } from "./db";
 import { AlertModel } from "./db/models/AlertModel";
 import { ChwCaseModel } from "./db/models/ChwCaseModel";
 import { LakeModel } from "./db/models/LakeModel";
-import { createCase, fetchAlerts, fetchLakes } from "./cryohealth-api";
 
 const PULL_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -16,6 +16,13 @@ async function pullLakesAndAlerts() {
     fetchLakes(1, 100),
     fetchAlerts(1, 100),
   ]);
+  console.log(
+    "[sync] fetched",
+    lakesPage.items.length,
+    "lakes,",
+    alertsPage.items.length,
+    "alerts",
+  );
 
   await database.write(async () => {
     const lakesCollection = database.get<LakeModel>("lakes");
@@ -24,6 +31,13 @@ async function pullLakesAndAlerts() {
       lakesCollection.query().fetch(),
       alertsCollection.query().fetch(),
     ]);
+    console.log(
+      "[sync] destroying",
+      existingLakes.length,
+      "existing lakes,",
+      existingAlerts.length,
+      "existing alerts",
+    );
     const now = Date.now();
 
     await database.batch(
@@ -64,6 +78,13 @@ async function pullLakesAndAlerts() {
         }),
       ),
     );
+    console.log(
+      "[sync] wrote",
+      lakesPage.items.length,
+      "lakes,",
+      alertsPage.items.length,
+      "alerts to db",
+    );
   });
 }
 
@@ -98,15 +119,21 @@ async function pushQueuedCases() {
 let syncInFlight = false;
 
 export async function runSync(setNet: (n: NetState) => void) {
-  if (syncInFlight) return;
+  if (syncInFlight) {
+    console.log("[sync] already in flight, skipping");
+    return;
+  }
   syncInFlight = true;
   setNet("syncing");
+
   try {
     await pushQueuedCases();
     await pullLakesAndAlerts();
     setNet("online");
+    console.log("[sync] complete, status = online");
   } catch (err) {
     console.warn("Sync failed", err);
+    console.warn("Sync failed stack:", (err as Error)?.stack);
     setNet("failed");
   } finally {
     syncInFlight = false;
@@ -117,6 +144,12 @@ export async function runSync(setNet: (n: NetState) => void) {
  *  from the root layout; returns an unsubscribe function. */
 export function startSyncEngine(setNet: (n: NetState) => void) {
   const unsubscribeNetInfo = NetInfo.addEventListener((state) => {
+    console.log(
+      "[sync] netinfo change, isConnected =",
+      state.isConnected,
+      "type =",
+      state.type,
+    );
     if (state.isConnected) {
       void runSync(setNet);
     } else {
