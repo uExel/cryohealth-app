@@ -1,88 +1,89 @@
 # HANDOFF — CryoHealth-app — 2026-09-22 PKT
-Session: task5-build  Model: claude-sonnet-5  Branch: main  Goal: #1  Task: #5
+Session: task5-verify-fixloop  Model: claude-sonnet-5  Branch: main  Goal: #1  Task: #5
 
 ## State
-Task #5 is **built through Step 7 of 8, GATE-approved, code-complete and
-typecheck/lint-verified.** `/uexel:gate` ran, approved, recorded on both #5 and
-CryoHealth-api#19. `/uexel:build` executed steps 1-7: schema change + seed in
-CryoHealth-api (companion issue #19), then `ApiProtocol` type, WatermelonDB schema
-v2→v3, isolated sync pull, complaint→slug routing, and the full Guidance screen
-rewire with `GUIDANCE` deleted from `mock.ts`. **Step 8 (offline/airplane-mode proof)
-is blocked**: no device or emulator is attached in this environment (`adb devices`
-empty, no `simctl` on this machine) to actually run the app. `/uexel:verify` has not
-been run yet — holding for a decision on Step 8 first (see Next action).
+Task #5 is **built (all 7 code steps + Step 8 disclosed as a gap), fix-looped once
+against real `/uexel:verify` findings, second verify pass in progress.** First verify
+(after the build documented in `docs/ai/sessions/2026-09-22-task5-build-handoff.md`)
+found 3 findings, none hypothetical: a real safety gap (public mode could see CHW dosing
+content), a real crash bug (malformed `steps` payload), and a missing-test gap. All three
+fixed this session (`a12af4a` here, `2d62417`/`e79866c` in CryoHealth-api). A second
+`/uexel:verify` is running now to independently confirm the fixes — **result not in as
+this file is written**. Do not push or consider this done until that lands clean.
 
 ## Done this session
-- `/uexel:gate` reviewed and approved (comments on
-  [#5](https://github.com/uExel/cryohealth-app/issues/5#issuecomment-5779837518) and
-  [CryoHealth-api#19](https://github.com/uExel/CryoHealth-api/issues/19#issuecomment-5779840650))
-- `/uexel:build` steps 1-7, one commit each:
-  - CryoHealth-api `b197c55` (nullable `steps` jsonb + DTO validation) — discarded an
-    unsafe `migration:generate` auto-diff that picked up ~15 columns/constraints of
-    unrelated pre-existing schema drift across `lakes`/`districts`/`glaciers`/
-    `chw_profiles`; hand-wrote a minimal single-column migration instead
-  - CryoHealth-api `1094ea2` (seed real `steps` — 4 CHW / 3 public steps for the
-    pneumonia protocol; `glof-evacuation-checklist` kept `steps: null` by judgment
-    call, its source has no per-item structure to transcribe)
-  - This repo `05fe09f` (chore: `eslint.config.js` — this repo had **no ESLint config
-    at all** before this session; `npm run lint` auto-generated one on its first ever
-    real run. Surfaced one pre-existing, unrelated lint error, `src/app/alert/[id].tsx:28` — not fixed, out of scope)
-  - This repo `4b2e7ec`, `108bedb`, `b1ed775`, `c382c62`, `779e3cf` (Steps 3, 4, 5, 6, 7)
-- `docs/ai/TODO.md` kept current per step
+- Ran `/uexel:verify` (uexel-verifier agent) against the Step 1-7 diff. Verdict:
+  **findings, not a pass.** Posted in full on
+  [#5](https://github.com/uExel/cryohealth-app/issues/5#issuecomment-5780408277).
+  - Finding 1 (safety): `guidance.tsx`'s body-fallback path ignored `mode`, so public
+    mode rendered the same content as CHW mode when a protocol had no `steps` yet — for
+    the pneumonia protocol this meant a drug/dose line was CHW-only content that public
+    mode could still see via the fallback.
+  - Finding 2 (correctness): `chw`/`pub` in `steps` were each individually optional
+    (class-validator skips `undefined` without `@IsDefined()`), and a bare array passed
+    where an object was required. A malformed payload synced to a device would crash
+    the Guidance screen on `undefined.map(...)`.
+  - Finding 3 (tests): no test covered the new validation boundary.
+- Fix loop, iteration 1 (all 3 findings, one commit each side):
+  - CryoHealth-api `2d62417`: `@IsDefined`/`@IsArray`/`@ArrayMinSize(1)` on
+    `steps.chw`/`.pub`, `@IsObject()` on `steps`; new `protocol-steps.dto.spec.ts` (11
+    cases, closes finding 3).
+  - CryoHealth-api `e79866c`: populated `steps` for `glof-evacuation-checklist` (closes
+    finding 1 at the data layer — it was the one seeded row still relying on the unsafe
+    fallback). Curated both protocols' `source` text (a lower-severity note from the
+    same verify pass — dropped an internal file-path leak).
+  - This repo `a12af4a`: `guidance.tsx` body-fallback now only renders in CHW mode;
+    public mode with no `steps` shows a new `NotYetAvailablePublic` state instead
+    (defense-in-depth for finding 1, holds even for a future protocol authored with only
+    `body`). `ProtocolModel.sanitizeSteps` now validates both `chw`/`pub` are non-empty
+    arrays before accepting (defense-in-depth for finding 2). Also normalizes a
+    repeated `?slug=` deep-link param.
+- Launched a second `/uexel:verify` pass to confirm the fixes — pending.
 
 ## Not done / deferred
-- **Step 8, blocked**: airplane-mode proof needs a real device/emulator. See Next
-  action for the two ways to unblock it.
-- `src/app/alert/[id].tsx:28` unescaped-apostrophe lint error — pre-existing, unrelated
-  to #5, surfaced while adding `eslint.config.js`, not fixed (scope discipline)
+- Second verify's result — the actual next thing to happen
+- Step 8 (airplane-mode proof) remains a disclosed gap — no device/emulator attached in
+  this environment; unchanged from the build session
+- `src/app/alert/[id].tsx:28` unescaped-apostrophe lint error — pre-existing, unrelated,
+  still not fixed (scope discipline)
 - EAS TestFlight build/submit confirmation — unrelated, carried over since 2026-08-09
 
 ## Next action
-Human decides how to close Step 8 — two options, both reasonable:
-1. **Provide device/emulator access** (or run it yourself) and report back whether
-   airplane-mode Guidance rendering holds after a sync; then `/uexel:verify` can judge
-   the complete plan.
-2. **Accept the gap as disclosed**, the way `cryohealth`'s task #6-#11 sessions
-   accepted a missing-Playwright-binaries gap rather than blocking — proceed to
-   `/uexel:verify` now with Step 8 named as an open manual-QA item in the verifier's
-   brief, not swept under a false "done."
-Either way, say which, and I'll proceed accordingly.
+Read the second verify's verdict (posted as a comment on #5 and CryoHealth-api#19 when
+it lands). If pass or acknowledged: both repos are ready to push, but **CryoHealth-api
+pushing triggers a live production deploy** (migration + seed against production
+Postgres) — get explicit human confirmation before that push specifically, separate from
+this repo's push. If findings remain: continue the fix loop (iteration 2 of 3 max).
 
 ## Open questions for a human
-- Step 8 path (device access vs. disclosed gap) — blocking: yes, for `/uexel:verify`
-- `alert/[id].tsx` pre-existing lint error — worth its own small chore issue? —
-  blocking: no
+- Second verify pending — blocking: yes, for push/deploy
+- Push confirmation for CryoHealth-api specifically (production deploy) — blocking: yes,
+  even after a clean verify — this was set explicitly as a separate gate this session
 
 ## Failed approaches (do not retry)
 - Bumping `@nozbe/with-observables` to fix the React 19 peer conflict — no version
   declares React 19 as a peer; `.npmrc` legacy-peer-deps is correct
 - Fixing the "Definitely assigned fields" Babel error via `babel.config.js` plugin
   options — the actual fix is removing the `!` from the source fields themselves
-- `migration:generate` in CryoHealth-api against the current dev DB — picks up
-  unrelated pre-existing schema drift (~15 columns/constraints across four other
-  tables); always hand-write a minimal migration for a single additive column instead
-  and diff-review it before running
+- `migration:generate` in CryoHealth-api against the current dev DB — picks up unrelated
+  pre-existing schema drift; always hand-write a minimal migration instead
 
 ## Loops run
-- none — every step's verification (typecheck/lint/build/test/curl) passed on the
-  first attempt; no fix-loop iterations were needed
+- Fix loop for `/uexel:verify` findings on #5/CryoHealth-api#19: iteration 1 of 3 max,
+  fixed all 3 findings (2 real bugs + 1 test gap), re-verify launched. Verifier:
+  uexel-verifier agent. Rubrics: code-review.md, api-design.md.
 
 ## Files touched
-CryoHealth-api: `src/protocols/**`, `src/database/migrations/1790093553705-*.ts`,
-`scripts/seed-dev-data.ts`. This repo: `src/lib/api-types.ts`,
-`src/lib/cryohealth-api.ts`, `src/lib/db/{schema,migrations,index}.ts`,
-`src/lib/db/models/ProtocolModel.ts` (new), `src/lib/sync.ts`,
-`src/lib/complaint-map.ts` (new), `src/app/(tabs)/health.tsx`, `src/app/guidance.tsx`,
-`src/components/guidance.tsx`, `src/lib/mock.ts`, `CLAUDE.md`, `eslint.config.js` (new),
-`docs/ai/{PLAN,TODO,HANDOFF}.md`.
+This session: `src/app/guidance.tsx`, `src/lib/db/models/ProtocolModel.ts` (this repo);
+`src/protocols/dto/*.ts` (new: `protocol-steps.dto.spec.ts`), `scripts/seed-dev-data.ts`
+(CryoHealth-api). Docs: `docs/ai/HANDOFF.md`,
+`docs/ai/sessions/2026-09-22-task5-build-handoff.md` (new, archived from the build
+session).
 
 ## Verification status
-tests: CryoHealth-api 28/28 passing · this repo has no test runner (pre-existing)
-typecheck: clean (both repos) · lint: clean except one pre-existing, unrelated error
-build: clean (CryoHealth-api) · live API checks: migration applied, seed counts
-correct (4/3), data-contract confirmed matching the screen's selection logic
-qa: **not run** — no device/emulator attached; Step 8 blocked, see Next action
-review: `/uexel:verify` not yet run — holding for the Step 8 decision above
+typecheck: clean · lint: clean except the one pre-existing, unrelated error · tests
+(CryoHealth-api): 39/39 · independent re-verify: **pending**, this is the actual
+verification status until that lands.
 
 ## Resume with
-/uexel:orient   (then: resolve Step 8 per Next action, then /uexel:verify)
+/uexel:orient   (then: check the second /uexel:verify verdict on #5)
