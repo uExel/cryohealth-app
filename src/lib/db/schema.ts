@@ -1,9 +1,10 @@
 import { appSchema, tableSchema } from "@nozbe/watermelondb";
 
-/** Local cache/queue schema. `lakes`/`alerts` are read-through caches replaced on each
- *  pull sync; `chw_cases` is the only locally-authored table (queued until pushed). */
+/** Local cache/queue schema. `lakes`/`alerts`/`protocols` are read-through caches
+ *  replaced on each pull sync; `chw_cases` is the only locally-authored table (queued
+ *  until pushed). */
 export const schema = appSchema({
-  version: 2,
+  version: 3,
   tables: [
     tableSchema({
       name: "lakes",
@@ -52,6 +53,22 @@ export const schema = appSchema({
         // 'queued' | 'synced' — mirrors the backend ChwCase.syncState values.
         { name: "sync_state", type: "string" },
         { name: "created_at", type: "number" },
+      ],
+    }),
+    tableSchema({
+      name: "protocols",
+      columns: [
+        { name: "remote_id", type: "string", isIndexed: true },
+        { name: "slug", type: "string", isIndexed: true },
+        { name: "title", type: "string" },
+        { name: "category", type: "string" },
+        { name: "body", type: "string" },
+        { name: "source", type: "string" },
+        { name: "is_disaster", type: "boolean" },
+        // Absent (null) when the API row has no structured steps yet — the app falls
+        // back to rendering `body` line-by-line in that case (cryohealth-app#5).
+        { name: "steps_json", type: "string", isOptional: true },
+        { name: "synced_at", type: "number" },
       ],
     }),
   ],
