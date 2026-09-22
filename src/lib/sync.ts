@@ -5,7 +5,13 @@ import { database } from "./db";
 import { AlertModel } from "./db/models/AlertModel";
 import { ChwCaseModel } from "./db/models/ChwCaseModel";
 import { LakeModel } from "./db/models/LakeModel";
-import { createCase, fetchAlerts, fetchLakes } from "./cryohealth-api";
+import { ProtocolModel } from "./db/models/ProtocolModel";
+import {
+  createCase,
+  fetchAlerts,
+  fetchLakes,
+  fetchProtocols,
+} from "./cryohealth-api";
 
 const PULL_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -67,6 +73,40 @@ async function pullLakesAndAlerts() {
   });
 }
 
+/** Wholesale-replace the local protocols cache. Isolated from pullLakesAndAlerts on
+ *  purpose (R2, docs/ai/planning/task-5-findings.md): a 404/absent endpoint on an
+ *  un-migrated API must degrade to "keep the last cached protocols", never fail the
+ *  whole sync the way a thrown Promise.all member would. */
+async function pullProtocols() {
+  try {
+    const protocols = await fetchProtocols();
+    await database.write(async () => {
+      const collection = database.get<ProtocolModel>("protocols");
+      const existing = await collection.query().fetch();
+      const now = Date.now();
+
+      await database.batch(
+        ...existing.map((r) => r.prepareDestroyPermanently()),
+        ...protocols.map((p) =>
+          collection.prepareCreate((rec) => {
+            rec.remoteId = p.id;
+            rec.slug = p.slug;
+            rec.title = p.title;
+            rec.category = p.category;
+            rec.body = p.body;
+            rec.source = p.source;
+            rec.isDisaster = p.isDisaster;
+            rec.steps = p.steps;
+            rec.syncedAt = now;
+          }),
+        ),
+      );
+    });
+  } catch (err) {
+    console.warn("Protocol sync failed, keeping last cached rows", err);
+  }
+}
+
 /** Push locally-queued CHW cases. clientCaseId makes retries idempotent server-side,
  *  so a failed push is simply left queued for the next sync pass. */
 async function pushQueuedCases() {
@@ -104,6 +144,7 @@ export async function runSync(setNet: (n: NetState) => void) {
   try {
     await pushQueuedCases();
     await pullLakesAndAlerts();
+    await pullProtocols();
     setNet("online");
   } catch (err) {
     console.warn("Sync failed", err);
