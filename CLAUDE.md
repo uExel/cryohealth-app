@@ -59,9 +59,13 @@ No test script defined in this repo.
   placeholders. Any of them can be `undefined` on a given record — screens must render
   that as "not provided" (hide the row), never a guessed value. `mock.ts`'s `GUIDANCE`
   was deleted (cryohealth-app#5) — Guidance now reads `protocols` (a third
-  WatermelonDB read-through cache, schema v3), falling back to line-by-line `body`
-  rendering when a row has no structured `steps` yet, and to a "no stored protocol"
-  screen when the tapped complaint has no matching `slug` at all — never to any other
+  WatermelonDB read-through cache, schema v3). When a row has no structured `steps`
+  yet, **CHW mode** falls back to line-by-line `body` rendering; **public mode never
+  does** — `body` can contain CHW-only content (e.g. dosing) with no way to tell from a
+  freeform field, so public mode shows a "not available yet" state instead of guessing
+  (found the hard way in `/uexel:verify`, see PLAN.md's history for #5). Also falls back
+  to a "no stored protocol" screen when the tapped complaint has no matching `slug` at
+  all — never to any other
   protocol's content.
 - Alert acknowledgement (`alert/[id].tsx`'s "Acknowledge & log action" button) is still
   local React state only — no `AlertAck` WatermelonDB table or backend endpoint exists
