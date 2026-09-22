@@ -3,6 +3,7 @@ import type {
   ApiAlert,
   ApiCase,
   ApiLake,
+  ApiProtocol,
   CreateCaseInput,
   LoginResponse,
   PageResult,
@@ -22,3 +23,7 @@ export const createCase = (input: CreateCaseInput) =>
 
 export const fetchMyCases = (page = 1, pageSize = 100) =>
   apiFetch<PageResult<ApiCase>>(`/cases?page=${page}&pageSize=${pageSize}`);
+
+/** Bare array, not paginated — matches the API's actual response shape. */
+export const fetchProtocols = () =>
+  apiFetch<ApiProtocol[]>('/protocols', { auth: false });

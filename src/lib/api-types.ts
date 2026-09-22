@@ -65,3 +65,32 @@ export type CreateCaseInput = {
   outcome?: string;
   deviceId: string;
 };
+
+export type ApiProtocolStep = {
+  label: string;
+  head: string;
+  why: string;
+  tier: Tier;
+  numbered?: boolean;
+};
+
+export type ApiProtocolSteps = {
+  chw: ApiProtocolStep[];
+  pub: ApiProtocolStep[];
+};
+
+/** `GET /protocols` returns a bare array with camelCase `isDisaster` — not a
+ *  `PageResult<T>`, and not the cryohealth dashboard's snake_case `is_disaster`
+ *  (that's an artifact of it reading Postgres directly). */
+export type ApiProtocol = {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  body: string;
+  source: string;
+  isDisaster: boolean;
+  steps?: ApiProtocolSteps;
+  createdAt: string;
+  updatedAt: string;
+};
