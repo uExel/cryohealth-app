@@ -1,6 +1,6 @@
 import {
-  schemaMigrations,
   addColumns,
+  schemaMigrations,
 } from "@nozbe/watermelondb/Schema/migrations";
 
 /** v1 -> v2: nameUr/elevationM/updatedAt on lakes, bodyUr/downstreamSummary/chips/checklist
@@ -16,7 +16,7 @@ export const migrations = schemaMigrations({
           columns: [
             { name: "name_ur", type: "string", isOptional: true },
             { name: "elevation_m", type: "number", isOptional: true },
-            { name: "updated_at", type: "string" },
+            { name: "source_updated_at", type: "string" },
           ],
         }),
         addColumns({

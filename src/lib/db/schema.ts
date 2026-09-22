@@ -18,7 +18,7 @@ export const schema = appSchema({
         { name: "elevation_m", type: "number", isOptional: true },
         { name: "lat", type: "number" },
         { name: "lng", type: "number" },
-        { name: "updated_at", type: "string" },
+        { name: "source_updated_at", type: "string" },
         { name: "synced_at", type: "number" },
       ],
     }),
