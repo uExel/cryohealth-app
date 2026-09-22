@@ -50,15 +50,19 @@ No test script defined in this repo.
   babel.config.js** — neither was configured when the models were first added (models
   existed, typecheck/bundle were both silently broken). Both are now set; don't remove
   them.
-- **`src/lib/mock.ts` is now only used by Guidance/Learn/IMCI screens** (intentional —
-  that content stays lookup-table/mock by design, see the rule above) **and
-  `settings.tsx`'s valley picker** (deferred, not safety data). Home, map, alerts, alert
-  detail, and critical all read live WatermelonDB data via `withObservables`
+- **`src/lib/mock.ts` is now only used by Learn** (`LESSONS`) **and `settings.tsx`'s
+  valley picker** (deferred, not safety data). Home, map, alerts, alert detail, critical,
+  and Guidance all read live WatermelonDB data via `withObservables`
   (`@nozbe/with-observables`, `src/lib/db/models/*`) — narrative/bilingual fields
   (`nameUr`, `bodyUr`, `chips`, `checklist`, `windowStart/End`) are real CryoHealth-api
   columns now (see that repo's `alerts.chips`/`alerts.checklist`), not client-side
   placeholders. Any of them can be `undefined` on a given record — screens must render
-  that as "not provided" (hide the row), never a guessed value.
+  that as "not provided" (hide the row), never a guessed value. `mock.ts`'s `GUIDANCE`
+  was deleted (cryohealth-app#5) — Guidance now reads `protocols` (a third
+  WatermelonDB read-through cache, schema v3), falling back to line-by-line `body`
+  rendering when a row has no structured `steps` yet, and to a "no stored protocol"
+  screen when the tapped complaint has no matching `slug` at all — never to any other
+  protocol's content.
 - Alert acknowledgement (`alert/[id].tsx`'s "Acknowledge & log action" button) is still
   local React state only — no `AlertAck` WatermelonDB table or backend endpoint exists
   yet, unlike case sync. Don't assume it persists or syncs.

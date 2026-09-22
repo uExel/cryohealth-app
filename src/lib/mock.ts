@@ -102,32 +102,6 @@ export const LESSONS: Lesson[] = [
 /** Assistant entry chips */
 export const COMMON_COMPLAINTS = ['Child breathing fast', 'Watery diarrhoea', 'Fever 3 days', 'Very cold, shivering'];
 
-/**
- * Guidance content levels (DESIGN_SYSTEM §4 GuidanceCard): CHW gets the IMCI
- * classification and dose; public gets no classification, no medicine, no dose.
- * All dosing text comes from lookup tables — never from a language model.
- */
-export const GUIDANCE = {
-  input: 'Child breathing fast · age 2 years',
-  chw: {
-    steps: [
-      { n: 'STEP 1 · DANGER SIGNS', tier: 'normal' as Tier, head: 'No general danger signs', why: 'Able to drink · no vomiting · no convulsions · not lethargic' },
-      { n: 'STEP 2 · CLASSIFICATION', tier: 'high' as Tier, head: 'Fast breathing — pneumonia', why: '44 breaths/min at age 2 (cut-off 40)' },
-      { n: 'STEP 3 · DO THIS', tier: 'normal' as Tier, head: 'Amoxicillin 250 mg — 1 tablet twice daily, 5 days', why: 'Dose row: 2 years / 10–14 kg. Continue feeding and fluids.', numbered: true },
-      { n: 'STEP 4 · REFER IF', tier: 'critical' as Tier, head: 'Chest indrawing, unable to drink, or worse in 2 days', why: 'Refer to Hassanabad BHU — mark the case for follow-up.' },
-    ],
-    source: 'WHO IMCI chart booklet · LHW curriculum · tables stored on this phone',
-  },
-  pub: {
-    steps: [
-      { n: 'WHAT THIS MAY BE', tier: 'watch' as Tier, head: 'Possible chest infection', why: 'Fast breathing in a young child needs a health worker today.' },
-      { n: 'DO THIS NOW', tier: 'normal' as Tier, head: 'Go to Hassanabad BHU today', why: 'Keep the child warm. Keep giving fluids and feeding.', numbered: true },
-      { n: 'GO IMMEDIATELY IF', tier: 'critical' as Tier, head: 'Cannot drink, chest pulls in, or the child is limp', why: 'These are danger signs. Do not wait.' },
-    ],
-    source: 'Checked against WHO IMCI rules on this phone',
-  },
-};
-
 export const VALLEYS = ['Hunza · Hassanabad', 'Nagar · Hoper'];
 
 export const STAMP = { en: 'Updated 4 hours ago', ur: 'آخری اپ ڈیٹ: ۴ گھنٹے پہلے' };

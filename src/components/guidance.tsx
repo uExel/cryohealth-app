@@ -1,5 +1,6 @@
-/** Health assistant surfaces. Dosing text renders only from lookup-table data (mock.GUIDANCE
- *  for now, the deterministic IMCI engine later) — never from a language model. */
+/** Health assistant surfaces. Dosing text renders only from lookup-table data
+ *  (CryoHealth-api's `protocols.steps`, synced to the local `protocols` table) — never
+ *  from a language model. */
 import React from 'react';
 import { Text, View } from 'react-native';
 import { ShieldAlert, SquareCheck } from 'lucide-react-native';
