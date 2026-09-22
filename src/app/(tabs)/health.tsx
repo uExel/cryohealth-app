@@ -7,12 +7,18 @@ import { BtnPrimary, BtnSecondary, SectionLabel } from '../../components/ui';
 import { useStyles } from '../../design/styles';
 import { useTheme } from '../../design/theme';
 import { COMMON_COMPLAINTS } from '../../lib/mock';
+import { resolveComplaintSlug } from '../../lib/complaint-map';
 
 export default function Health() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
   const [text, setText] = useState('');
+
+  const goToGuidance = (slug?: string) =>
+    slug
+      ? router.push({ pathname: '/guidance', params: { slug } })
+      : router.push('/guidance');
 
   return (
     <Chromed title="Health assistant" sub="Works offline">
@@ -31,12 +37,12 @@ export default function Health() {
               placeholderTextColor={t.color.muted}
             />
           </View>
-          <BtnPrimary label="Get guidance" onPress={() => router.push('/guidance')} />
+          <BtnPrimary label="Get guidance" onPress={() => goToGuidance(resolveComplaintSlug(text))} />
         </View>
         <SectionLabel>Common</SectionLabel>
         <View style={{ paddingHorizontal: t.space.lg, gap: 8, paddingBottom: t.space.xxl }}>
           {COMMON_COMPLAINTS.map((c) => (
-            <BtnSecondary key={c} label={c} onPress={() => router.push('/guidance')} />
+            <BtnSecondary key={c} label={c} onPress={() => goToGuidance(resolveComplaintSlug(c))} />
           ))}
         </View>
       </ScrollView>

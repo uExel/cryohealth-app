@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { Chromed } from '../components/chrome';
 import { Disclaimer, GuidanceCard, Provenance } from '../components/guidance';
 import { useStyles } from '../design/styles';
@@ -8,11 +9,15 @@ import { useApp } from '../state/app';
 import { GUIDANCE } from '../lib/mock';
 
 /** Two content levels, one shell: CHW gets classification + dose; public gets neither.
- *  Enforced here in the data layer (mock now, IMCI engine later) — never by styling. */
+ *  Enforced here in the data layer (mock now, IMCI engine later) — never by styling.
+ *  `slug` is read but not yet used to load real data -- that lands in the next commit
+ *  (cryohealth-app#5 Step 7); this commit only proves the param reaches the screen. */
 export default function Guidance() {
   const t = useTheme();
   const s = useStyles();
   const { mode } = useApp();
+  const { slug } = useLocalSearchParams<{ slug?: string }>();
+  if (__DEV__ && slug) console.log('[guidance] slug param', slug);
   const g = mode === 'chw' ? GUIDANCE.chw : GUIDANCE.pub;
   let n = 0;
 
