@@ -1,114 +1,87 @@
 # HANDOFF — CryoHealth-app — 2026-09-22 PKT
-
-Session: task5-verify-fixloop Model: claude-sonnet-5 Branch: main Goal: #1 Task: #5
+Session: task5-escalated  Model: claude-sonnet-5  Branch: main  Goal: #1  Task: #5 — **agent:needs-human**
 
 ## State
+Task #5 is **escalated, not pushed, fix-loop budget (3) exhausted.** Full detail:
+[issue comment](https://github.com/uExel/cryohealth-app/issues/5#issuecomment-5780978243).
 
-Task #5 is **built, fix-looped twice, second verify passed both rubrics — third and
-final verify (loop budget 3 max) running now** on the newest commit, `f5b7350`, which
-fixes a real crash scenario the second verify surfaced (malformed step elements) plus a
-stale doc line. First verify found 3 findings (safety leak, crash bug, missing test),
-all fixed in iteration 1. Second verify passed but its report opened by catching
-something more important than a code defect in _this repo's companion_
-(`CryoHealth-api`'s deploy pipeline never runs the seed script carrying the data fix —
-see that repo's HANDOFF for detail; fixed there via a migration, `263e516`). Do not push
-or consider this done until the third verify lands.
+The short version: all 7 code steps were built and fix-looped twice against real
+`/uexel:verify` findings (a real safety leak, a real crash bug, a missing test — all
+fixed and confirmed by a second verify pass). The third and final verify pass then
+checked what's actually in production and found the premise underneath the whole
+feature was wrong: **production's `protocols` table has 11 real clinical protocols
+(cholera, severe malaria, diarrhoea treatment) — not the two dev-seeded protocols
+(`fast-breathing-pneumonia-2y`, `glof-evacuation-checklist`) this task built and tested
+against.** Confirmed independently this session via `curl https://api.cryohealth.io/protocols`
+(public, no credentials needed) — all 11 real protocols have `steps: null`.
+
+**The app-side code is sound** — `guidance.tsx`'s mode-aware fallback, the no-match
+state, `ProtocolModel`'s element validation all passed the third verify cleanly. The gap
+is entirely that there's no real content for it to show yet, and authoring that content
+(clinical dosing/diagnosis text) is something only a human/clinician can do — never an
+LLM, per PRD §9 R5. Local `main` is 5 commits ahead of `origin/main`, **not pushed**.
 
 ## Done this session
-
-- Ran `/uexel:verify` (uexel-verifier agent) against the Step 1-7 diff. Verdict:
-  **findings, not a pass.** Posted in full on
-  [#5](https://github.com/uExel/cryohealth-app/issues/5#issuecomment-5780408277).
-  - Finding 1 (safety): `guidance.tsx`'s body-fallback path ignored `mode`, so public
-    mode rendered the same content as CHW mode when a protocol had no `steps` yet — for
-    the pneumonia protocol this meant a drug/dose line was CHW-only content that public
-    mode could still see via the fallback.
-  - Finding 2 (correctness): `chw`/`pub` in `steps` were each individually optional
-    (class-validator skips `undefined` without `@IsDefined()`), and a bare array passed
-    where an object was required. A malformed payload synced to a device would crash
-    the Guidance screen on `undefined.map(...)`.
-  - Finding 3 (tests): no test covered the new validation boundary.
-- Fix loop, iteration 1 (all 3 findings, one commit each side):
-  - CryoHealth-api `2d62417`: `@IsDefined`/`@IsArray`/`@ArrayMinSize(1)` on
-    `steps.chw`/`.pub`, `@IsObject()` on `steps`; new `protocol-steps.dto.spec.ts` (11
-    cases, closes finding 3).
-  - CryoHealth-api `e79866c`: populated `steps` for `glof-evacuation-checklist` (closes
-    finding 1 at the data layer — it was the one seeded row still relying on the unsafe
-    fallback). Curated both protocols' `source` text (a lower-severity note from the
-    same verify pass — dropped an internal file-path leak).
-  - This repo `a12af4a`: `guidance.tsx` body-fallback now only renders in CHW mode;
-    public mode with no `steps` shows a new `NotYetAvailablePublic` state instead
-    (defense-in-depth for finding 1, holds even for a future protocol authored with only
-    `body`). `ProtocolModel.sanitizeSteps` now validates both `chw`/`pub` are non-empty
-    arrays before accepting (defense-in-depth for finding 2). Also normalizes a
-    repeated `?slug=` deep-link param.
-- **Second `/uexel:verify` passed both rubrics.** Its report's "READ FIRST" section
-  caught the CryoHealth-api deploy-coupling gap (see that repo's HANDOFF) and one
-  narrower, still-real client-side crash scenario: `ProtocolModel.ts`'s `isStepArray`
-  checked array length but not element shape, so `{chw:[null], pub:[valid]}` would pass
-  `sanitizeSteps` unchanged and crash `guidance.tsx` on `st.label`/`st.head`. Fixed in
-  `f5b7350`: `isStepArray` now validates every element (`head`/`why` non-empty, `tier`
-  one of the 4 valid values) before accepting. Same commit fixed a stale `CLAUDE.md`
-  line (said the body fallback applied to both audiences; it's CHW-only since `a12af4a`).
-- Third, final `/uexel:verify` (loop budget 3 max) launched on `a12af4a..f5b7350` plus
-  the CryoHealth-api migration commit — **result not in yet**.
+See `docs/ai/sessions/2026-09-22-task5-build-handoff.md` and
+`docs/ai/sessions/2026-09-22-task5-verify-fixloop-handoff.md` for the full build and
+two-round fix-loop history. Summary: Steps 1-7 built, GATE-approved; first verify found
+3 real findings (all fixed); second verify passed with a critical cross-repo observation
+(CryoHealth-api's deploy pipeline doesn't run the dev seed script, fixed via a migration
+there); third verify found that migration targets nonexistent production data, revealing
+the whole feature was scoped against dev fixtures rather than real content.
 
 ## Not done / deferred
-
-- Third verify's result — the actual next thing to happen
-- Step 8 (airplane-mode proof) remains a disclosed gap — no device/emulator attached in
-  this environment; unchanged from the build session
-- `src/app/alert/[id].tsx:28` unescaped-apostrophe lint error — pre-existing, unrelated,
-  still not fixed (scope discipline)
+- Real `steps` content for the 11 actual production protocols — needs a human author
+- Step 8 (airplane-mode proof) — still a disclosed gap, now secondary to the content
+  question above
+- `src/app/alert/[id].tsx:28` unescaped-apostrophe lint error — pre-existing, unrelated
+- `CLAUDE.md:73` still says "WatermelonDB schema is at version 2", eleven lines below
+  the bullet fixed to say v3 in `f5b7350` — small doc-consistency miss, not fixed
 - EAS TestFlight build/submit confirmation — unrelated, carried over since 2026-08-09
 
 ## Next action
+Human decides (the actual question, posted on the issue):
+1. Real `steps` content for the 11 production protocols is coming from a
+   clinician/PM on a timeline — ship as-is, Guidance correctly shows "not available
+   yet" until that content lands (by design, not a bug).
+2. Or scope down the complaint-map/rollout until real content exists.
 
-Read the third verify's verdict (posted as a comment on #5 and CryoHealth-api#19 when it
-lands). If pass or acknowledged: both repos are ready to push, but **CryoHealth-api
-pushing triggers a live production deploy** — get explicit human confirmation before
-that push specifically, separate from this repo's push. If findings remain: the fix-loop
-budget (3) is exhausted — per loop-contract.md, that's an escalation, not another silent
-iteration.
+If this resumes: `complaint-map.ts`'s `COMPLAINT_TO_SLUG` only points at the dev slug
+today — it will need real entries for whichever of the 11 production protocols get
+content first.
 
 ## Open questions for a human
-
-- Third verify pending — blocking: yes, for push/deploy
-- Push confirmation for CryoHealth-api specifically (production deploy) — blocking: yes,
-  even after a clean verify — this was set explicitly as a separate gate this session
+- The product/content decision above — blocking: yes
+- `CLAUDE.md:73`'s stale schema-version line — worth a one-line fix whenever this
+  resumes, not blocking
 
 ## Failed approaches (do not retry)
-
 - Bumping `@nozbe/with-observables` to fix the React 19 peer conflict — no version
   declares React 19 as a peer; `.npmrc` legacy-peer-deps is correct
 - Fixing the "Definitely assigned fields" Babel error via `babel.config.js` plugin
   options — the actual fix is removing the `!` from the source fields themselves
-- `migration:generate` in CryoHealth-api against the current dev DB — picks up unrelated
-  pre-existing schema drift; always hand-write a minimal migration instead
+- Building and fix-looping an entire feature against dev-seeded data without checking
+  what's actually in production first — the root cause of this escalation; check the
+  live public endpoint early next time a task touches shared/seeded content
 
 ## Loops run
-
-- Fix loop for `/uexel:verify` findings on #5/CryoHealth-api#19: iteration 1 (3 findings
-  fixed, second verify passed with a critical non-blocking observation), iteration 2
-  (element-validation crash + stale doc fixed, third/final verify in progress). Budget 3
-  max, this is the last one. Verifier: uexel-verifier agent. Rubrics: code-review.md,
-  api-design.md.
+- Fix loop for `/uexel:verify` findings on #5/CryoHealth-api#19: **iteration 1** (3
+  real findings fixed, second verify passed). **Iteration 2** (a narrower crash
+  scenario + doc fix, but the same pass revealed the CryoHealth-api deploy-coupling
+  gap). **Budget exhausted at 3 — escalated.** Correct outcome per loop-contract.md:
+  the code was genuinely fixed at every iteration; iteration 3 found the target data
+  itself was wrong, which isn't a loop-shaped problem.
 
 ## Files touched
-
-This session: `src/app/guidance.tsx`, `src/lib/db/models/ProtocolModel.ts`, `CLAUDE.md`
-(this repo); `src/protocols/dto/*.ts` (new: `protocol-steps.dto.spec.ts`),
-`scripts/seed-dev-data.ts`, `src/database/migrations/1790097238238-*.ts` (new)
-(CryoHealth-api). Docs: `docs/ai/HANDOFF.md`,
-`docs/ai/sessions/2026-09-22-task5-build-handoff.md` (new, archived from the build
-session).
+This session (escalation): docs/ai/HANDOFF.md,
+docs/ai/sessions/2026-09-22-task5-verify-fixloop-handoff.md (new, archived). No source
+changed this pass — see the archived files for the full build/fix-loop file list.
 
 ## Verification status
-
-typecheck: clean · lint: clean except the one pre-existing, unrelated error · tests
-(CryoHealth-api): 39/39 · third/final independent verify: **pending**, this is the actual
-verification status until that lands.
+Code: sound (typecheck/lint clean, third verify passed the app-side diff cleanly).
+**Data: wrong target** — confirmed via live production `curl`, not a code defect.
+Not pushed.
 
 ## Resume with
-
-/uexel:orient (then: check the third/final /uexel:verify verdict on #5)
+/uexel:orient   (then: read the human decision on this issue, don't resume the fix
+loop — it's exhausted and the remaining gap is a content question, not a code one)
