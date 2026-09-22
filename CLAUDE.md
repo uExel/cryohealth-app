@@ -70,7 +70,7 @@ No test script defined in this repo.
 - Alert acknowledgement (`alert/[id].tsx`'s "Acknowledge & log action" button) is still
   local React state only — no `AlertAck` WatermelonDB table or backend endpoint exists
   yet, unlike case sync. Don't assume it persists or syncs.
-- WatermelonDB schema is at **version 2** (`src/lib/db/schema.ts` + `migrations.ts`) —
+- WatermelonDB schema is at **version 3** (`src/lib/db/schema.ts` + `migrations.ts`) —
   bump both together and add an `addColumns`/`addTables` step, never just edit `schema.ts`
   alone once a schema version has shipped to a real device.
 
