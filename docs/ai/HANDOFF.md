@@ -1,84 +1,74 @@
-# HANDOFF — CryoHealth-app — 2026-09-23 PKT
-Session: task5-testflight  Model: claude-sonnet-5  Branch: main  Goal: #1  Task: #5
+# HANDOFF — CryoHealth-app — 2026-09-23 21:02 PKT
+Session: task5-device-slugfix  Model: claude-sonnet-5  Branch: main  Goal: #1  Task: #5
 
 ## State
-**Task #5 shipped, and the long-standing "EAS build/submit unconfirmed since 2026-08-09"
-question is finally resolved: it works.** While investigating, found that a prior
-session's production build (#6, commit `b0fb16d1`, the WatermelonDB decorator fix) had
-actually **already finished and been submitted successfully back on 2026-08-09** — every
-session since then just never checked back on it and kept carrying it as "unconfirmed."
-This session triggered a fresh build (#7) at current `main` (includes all of today's
-protocols work), which finished cleanly, and submitted it to TestFlight successfully:
-"Submitted your app to Apple App Store Connect!" Apple's own processing (usually 5-10
-min) happens server-side from here — no further local action needed for the upload
-itself.
+First-ever real-device report on this feature ("protocol sync not working / failing to
+download") turned out **not to be a sync bug** — sync downloads all 11 real production
+protocols correctly. The actual cause: `complaint-map.ts`'s only entry (`'Child breathing
+fast' -> 'fast-breathing-pneumonia-2y'`) pointed at a slug that only ever existed in dev
+seed data and was never in production, so it hit `guidance.tsx`'s slug-miss path ("No
+stored protocol for this yet") rather than the content-gap path ("isn't available for
+public view yet") that issue #5's prior "ship as-is" decision assumed. Fixed by emptying
+the dangling map (no user-visible change — all 4 complaint chips already rendered the
+same no-match copy either way). Committed, not yet pushed to `origin/main`.
 
 ## Done this session
-- `eas build --platform ios --profile production --non-interactive --auto-submit` —
-  build succeeded (build #7, buildNumber auto-incremented 6→7); `--auto-submit` itself
-  failed (see Failed approaches) but the build completed regardless.
-- `eas submit --platform ios --latest --non-interactive` (standalone, after the build
-  finished) — required a local fix (see below), then succeeded. Submission ID
-  `9428bc5c-3798-41ff-86fd-75ab2524ecfb`, build #7, commit `0419c6d`.
-- Local-only, uncommitted fix to unblock non-interactive submit: `eas.json`'s
-  `submit.production.ios` had `ascApiKeyId`/`ascApiKeyIssuerId` but no `ascApiKeyPath` —
-  EAS CLI requires all three together for non-interactive mode, and doesn't fall back to
-  the `EXPO_ASC_API_KEY_PATH` env var (confirmed present, `.appstoreconnect/private_keys/
-  AuthKey_MSSQV8JS2P.p8` exists locally at `~/.appstoreconnect/private_keys/`) in that
-  code path. Added `ascApiKeyPath` pointing at the local file, ran the submit, then
-  `git checkout -- eas.json` to revert — **never committed**, since that path is
-  machine-specific and would break for any other developer/CI.
+- Diagnosed the report via production `GET /protocols` (live curl, 200, 11 real rows) +
+  reading `sync.ts`/`guidance.tsx`/`complaint-map.ts` — confirmed sync/WatermelonDB
+  write/migration path is not implicated; narrowed to the dangling slug via user
+  confirming the exact on-screen text ("No stored protocol for this yet...").
+- `src/lib/complaint-map.ts` (commit `f722b77`): `COMPLAINT_TO_SLUG` emptied, comment
+  rewritten to explain why (clinical routing decision, not mine to author) and point at
+  the #5 thread. `npm run typecheck` and `npx eslint` on the file both clean.
+- Posted a comment on uExel/cryohealth-app#5 recording this finding and that real
+  complaint->slug mapping (incl. the diarrhoea plan A/B/C severity call) is still open,
+  human-authored work.
 
 ## Not done / deferred
-- Confirming the build actually appears/installs in TestFlight for a real tester —
-  Apple's post-upload processing (usually 5-10 min, can vary) wasn't watched to
-  completion this session; check
-  https://appstoreconnect.apple.com/apps/6797512420/testflight/ios
-- Adding TestFlight testers — still not attempted, unrelated
-- Real `steps` content for the 11 production protocols — explicitly deferred to a human
-  clinician/PM authoring pass (see task #5's own history)
-- Step 8 (airplane-mode device proof) — still a disclosed gap, no device/emulator in
-  this environment
+- **Push `f722b77` to `origin/main`** — committed locally only, user hadn't confirmed a
+  push by session end.
+- Real complaint -> production-protocol-slug mapping (4 `COMMON_COMPLAINTS`, 11 real
+  slugs) and `steps.chw`/`steps.pub` authoring for those 11 protocols — clinician/PM
+  work, explicitly out of scope for an LLM per every CLAUDE.md in this workspace. Still
+  the actual open item on #5.
+- No fresh EAS build needed for this fix (advisor flagged: diagnose without cutting a
+  new TestFlight build) — the fix isn't verified on-device yet, only via
+  typecheck/lint + code reading. Whoever authors the real mapping should confirm on
+  device at the same time.
 
 ## Next action
-Check https://appstoreconnect.apple.com/apps/6797512420/testflight/ios (or wait for
-Apple's processing email) to confirm build #7 actually shows up as installable in
-TestFlight, then add/notify testers if it's not automatic.
+`git push` this commit if the user wants it live, then park #5 until a
+clinician/PM is available to author the real complaint->slug mapping + protocol steps.
 
 ## Open questions for a human
-- none blocking
+- Who/when authors the real complaint->protocol mapping and `steps` content for the 11
+  production protocols? — blocking for the Health/Guidance flow to ever show real
+  content, not blocking for anything else.
 
 ## Failed approaches (do not retry)
-- `eas build --auto-submit` in one command, non-interactively — the auto-submit step
-  fails with "ascApiKeyPath, ascApiKeyIssuerId and ascApiKeyId must all be defined in
-  eas.json" even with the env var set; the build itself still completes fine, but run
-  `eas submit` as a separate step afterward rather than relying on `--auto-submit`
-  working end-to-end non-interactively
-- Bumping `@nozbe/with-observables` to fix the React 19 peer conflict — no version
-  declares React 19 as a peer; `.npmrc` legacy-peer-deps is correct
-- Fixing the "Definitely assigned fields" Babel error via `babel.config.js` plugin
-  options — the actual fix is removing the `!` from the source fields themselves
-- Assuming a triggered `eas build`/`eas submit` is "unconfirmed" forever without ever
-  checking back — this is literally what happened for six weeks. `eas build:list` /
-  `eas submit:list` take seconds and would have caught the August success immediately.
-- Building and fix-looping an entire protocols feature against dev-seeded data without
-  checking what's actually in production first — root cause of #5's escalation earlier
-  this session (unrelated to TestFlight, noted here for continuity)
+- Assuming "protocol sync not working" implies a network/WatermelonDB/migration bug —
+  spent real investigation time on EXPO_PUBLIC_API_URL config, Android cleartext
+  blocking, and the untested v2->v3 migration before the user's answers (TestFlight
+  build, exact on-screen text) ruled all three out. Ask for the exact on-screen text and
+  which build/platform *before* chasing infra causes for a "sync failing" report in this
+  app — the no-match/not-yet-available copy is easy to mistake for a download failure.
+- Writing `* / severe-malaria- * /` style prose inside a `/** */` JSDoc comment — the
+  literal `*/` substring closes the block comment early and cascades into unrelated
+  syntax errors several lines down. Reworded to avoid any `*/` sequence inside comment
+  bodies.
 
 ## Loops run
-- none this session (TestFlight work was operational, not a build/verify loop)
+- none this session (single targeted fix, not a build/verify loop)
 
 ## Files touched
-This session: none committed (the `eas.json` credential path was local-only and
-reverted). Docs: `docs/ai/HANDOFF.md`,
-`docs/ai/sessions/2026-09-22-task5-shipped-handoff.md` (new, archived).
+This session: `src/lib/complaint-map.ts` (commit `f722b77`). Docs:
+`docs/ai/HANDOFF.md`, `docs/ai/sessions/2026-09-23-task5-shipped-handoff.md` (archived
+prior HANDOFF).
 
 ## Verification status
-Build #7: finished successfully on EAS infrastructure. Submission: "Submitted your app
-to Apple App Store Connect!" (EAS CLI's own success confirmation). Apple-side processing
-completion: **not directly observed** — confirm via App Store Connect or the processing
-email before telling anyone testers can install it.
+tests: n/a (no test runner in this repo)  review: clean (typecheck + eslint on the
+touched file)  qa: n/a — fix has no user-visible behavior change, not separately
+device-tested
 
 ## Resume with
-/uexel:orient   (then: check App Store Connect for build #7's TestFlight processing
-status, add testers if needed)
+/uexel:orient   (then: confirm push, or move to authoring the real complaint mapping)
