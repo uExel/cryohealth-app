@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { bannerFor, useTheme } from '../design/theme';
 import { useStyles } from '../design/styles';
 import { useApp } from '../state/app';
+import { runSync } from '../lib/sync';
 
 /** Glacier peak crossed by a pulse trace — exact paths from the design reference
  *  (CryoHealth Screen.dc.html). One colour, both strokes equal; stroke steps up as
@@ -89,7 +90,7 @@ export const SyncBanner = () => {
     <View style={[s.banner, { backgroundColor: b.bg }]}>
       <Text style={[s.bannerText, { color: b.fg }]}>{b.text}</Text>
       {b.retry ? (
-        <Pressable style={[s.bannerRetry, { borderColor: b.fg }]} onPress={() => setNet('syncing')}>
+        <Pressable style={[s.bannerRetry, { borderColor: b.fg }]} onPress={() => void runSync(setNet)}>
           <Text style={[s.bannerRetryLabel, { color: b.fg }]}>SYNC NOW</Text>
         </Pressable>
       ) : null}

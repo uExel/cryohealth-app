@@ -1,12 +1,46 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import withObservables from '@nozbe/with-observables';
 import { Chromed } from '../components/chrome';
 import { BtnSecondary, BtnText, SectionLabel, Seg, Toggle } from '../components/ui';
 import { useStyles } from '../design/styles';
 import { useTheme } from '../design/theme';
 import { useApp } from '../state/app';
 import { VALLEYS } from '../lib/mock';
+import { database } from '../lib/db';
+import { LakeModel } from '../lib/db/models/LakeModel';
+import { AlertModel } from '../lib/db/models/AlertModel';
+import { ProtocolModel } from '../lib/db/models/ProtocolModel';
+
+/** Row counts for the three read-through sync caches. Lets a field report ("alerts
+ *  aren't showing") be checked against the actual local table instead of guessed at from
+ *  a screenshot of the rendered fallback state, which looks identical whether the table
+ *  is genuinely empty or has rows the screen isn't rendering. */
+function SyncCounts({ lakes, alerts, protocols }: { lakes: LakeModel[]; alerts: AlertModel[]; protocols: ProtocolModel[] }) {
+  const s = useStyles();
+  const rows: [string, number][] = [
+    ['Lakes', lakes.length],
+    ['Alerts', alerts.length],
+    ['Protocols', protocols.length],
+  ];
+  return (
+    <>
+      {rows.map(([k, v]) => (
+        <View key={k} style={s.settingsRow}>
+          <Text style={[s.bodyStrong, { flex: 1 }]}>{k}</Text>
+          <Text style={s.footnote}>{v} synced</Text>
+        </View>
+      ))}
+    </>
+  );
+}
+
+const ObservedSyncCounts = withObservables([], () => ({
+  lakes: database.get<LakeModel>('lakes').query().observe(),
+  alerts: database.get<AlertModel>('alerts').query().observe(),
+  protocols: database.get<ProtocolModel>('protocols').query().observe(),
+}))(SyncCounts);
 
 export default function Settings() {
   const t = useTheme();
@@ -53,6 +87,9 @@ export default function Settings() {
           </View>
           <Toggle on={notif} onPress={() => setNotif(!notif)} />
         </View>
+
+        <SectionLabel>Local data</SectionLabel>
+        <ObservedSyncCounts />
 
         {/* Demo controls — let a reviewer walk every state without a backend. */}
         <SectionLabel>Demo</SectionLabel>

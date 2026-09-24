@@ -143,9 +143,17 @@ export async function runSync(setNet: (n: NetState) => void) {
   setNet("syncing");
   try {
     await pushQueuedCases();
-    await pullLakesAndAlerts();
+    // Isolated like pullProtocols below: a lakes/alerts failure must not skip the
+    // protocols pull, and vice versa -- each cache degrades independently.
+    let lakesAndAlertsOk = true;
+    try {
+      await pullLakesAndAlerts();
+    } catch (err) {
+      console.warn("Lakes/alerts sync failed", err);
+      lakesAndAlertsOk = false;
+    }
     await pullProtocols();
-    setNet("online");
+    setNet(lakesAndAlertsOk ? "online" : "failed");
   } catch (err) {
     console.warn("Sync failed", err);
     setNet("failed");
