@@ -17,8 +17,9 @@ Lakes, alerts and protocols tables were always empty.
 Guidance still looked empty on #10 because `COMPLAINT_TO_SLUG` is intentionally `{}`
 (clinical routing, #5). A CHW-only protocol library on the Health tab (`73b0820`) is
 shipped in **build #11** (EAS 8c991ec6-3358-417d-b62f-4f8ad9f50e91, commit 10a6b57,
-submitted to App Store Connect as submission f216351d-08fa-4db5-b1e2-fa157853d370). Not yet
-confirmed on device.
+submitted to App Store Connect as submission f216351d-08fa-4db5-b1e2-fa157853d370).
+**Confirmed on device 2026-09-27:** the user sees the protocols on build #11, so sync and
+DB writes work end to end.
 
 ## Done this session
 - Captured iPhone syslog with `pymobiledevice3 syslog live` (scratch venv). Developer Mode is
@@ -36,14 +37,13 @@ confirmed on device.
   grouped by category, opens `/guidance?slug=…` (commit 73b0820)
 
 ## Not done / deferred
-- On-device check of build #11 (Health tab lists 11 protocols; tapping opens Guidance)
 - On-device confirmation of #10 (Local data 6/10/11, Alerts lists 10) — user hasn't reported
 - Complaint → slug mapping — clinical decision, needs a human (#5)
 - Structured `steps` for the 11 protocols (public mode shows "not available") — content work, API side
 - #6 schema migration — separate issue
 
 ## Next action
-With build #11 installed and the iPhone connected: `pymobiledevice3 syslog live --udid 00008150-000E705A02A1401C` (scratch venv), then have the user open Health → Protocols
+`gh issue view 6` (lakes.updated_at schema migration), or get the clinician's complaint → slug mapping for #5
 
 ## Open questions for a human
 - Build #11 Settings "Local data" counts and Health-tab protocol list on device — blocking: yes (for closing the field report)
@@ -71,7 +71,7 @@ src/components/protocol-library.tsx, src/app/(tabs)/health.tsx, docs/ai/HANDOFF.
 docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md
 
 ## Verification status
-tests: n/a (no runner); off-device WatermelonDB/LokiJS harness reproduced the exact device error without the fix and passed with it  review: typecheck clean, lint = pre-existing `alert/[id].tsx:28` only, madge no cycles; `expo export` bundle has 0 warning-helper call sites and uses the production API URL  qa: build #10 syslog clean (no sync errors); protocol library not yet on device
+tests: n/a (no runner); off-device WatermelonDB/LokiJS harness reproduced the exact device error without the fix and passed with it  review: typecheck clean, lint = pre-existing `alert/[id].tsx:28` only, madge no cycles; `expo export` bundle has 0 warning-helper call sites and uses the production API URL  qa: build #10 syslog clean; build #11 on device: user confirmed protocols visible
 
 ## Resume with
-/uexel:orient   (then: capture syslog on build #11 → confirm Health tab lists 11 protocols and Guidance opens them)
+/uexel:orient   (then: pick up #6 or #5)
