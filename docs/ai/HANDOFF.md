@@ -51,8 +51,9 @@ DB writes work end to end.
 - On-device confirmation of #10 (Local data 6/10/11, Alerts lists 10) — user hasn't reported
 - Complaint → slug mapping — clinical decision, needs a human (#5)
 - Structured `steps` for the 11 protocols (public mode shows "not available") — content work, API side
-- Build #12 (#6 schema v4 migration + nav/UX pass 92209d7) — not requested yet. First device
-  run of the v3->v4 migration: capture syslog on first launch.
+- On-device check of **build #12** (EAS e4addf3d-2a06-4dfb-b9c9-31c91b159e22, commit 477168c,
+  submission 6c143354-63d4-48a6-a5f1-ccae3d55ece5): #6 v3->v4 migration first device run
+  (capture syslog on first launch) + nav/UX tap-path checklist.
 - Protocols list is now CHW-login-only; user needs CHW credentials to see it again.
 
 ## Next action
