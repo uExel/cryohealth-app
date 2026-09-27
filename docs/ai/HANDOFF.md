@@ -40,11 +40,20 @@ DB writes work end to end.
   step's unused `updated_at` declared `number` so dev-mode reserved-name check passes
   (commit ad6f2d6, closes #6). Not yet in a TestFlight build.
 
+- Navigation/UX pass (commit 92209d7): sub-screens moved into (tabs) as hidden routes
+  (tab bar always visible, `backBehavior="history"`, back button in AppBar); CHW mode now
+  derived from login (removed mock Register/Verify + Demo switches; Sign out calls
+  logout()); SOS 1122 dials; alerts badge = active critical count; Learn tab and all
+  placeholder UI removed; tier colours off body text. Verified: typecheck, lint (only
+  pre-existing styles.ts warning), `expo export` bundle, dead-control grep. Not on device.
+
 ## Not done / deferred
 - On-device confirmation of #10 (Local data 6/10/11, Alerts lists 10) — user hasn't reported
 - Complaint → slug mapping — clinical decision, needs a human (#5)
 - Structured `steps` for the 11 protocols (public mode shows "not available") — content work, API side
-- Build #12 carrying the #6 schema v4 migration — not requested yet
+- Build #12 (#6 schema v4 migration + nav/UX pass 92209d7) — not requested yet. First device
+  run of the v3->v4 migration: capture syslog on first launch.
+- Protocols list is now CHW-login-only; user needs CHW credentials to see it again.
 
 ## Next action
 If the user wants #6 on device: `npx eas-cli build --platform ios --profile production --non-interactive --no-wait` (build #12). Otherwise get the clinician's complaint → slug mapping for #5
