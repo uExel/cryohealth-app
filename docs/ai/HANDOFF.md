@@ -1,95 +1,76 @@
-# HANDOFF — CryoHealth-app — 2026-09-27
-Session: offline-sync-hardening  Model: claude-opus-5-5  Branch: main  Goal: #1  Task: none (ad-hoc, not issue-tracked)
-Prior session archived: docs/ai/sessions/2026-09-24-alerts-protocols-field-report-handoff.md
-
-## ROOT CAUSE FOUND 2026-09-27 (evening) — supersedes "State"/"Next action" below
-Device syslog from build #9 (captured via `pymobiledevice3 syslog live`; Developer Mode is
-off so devicectl can't attach) shows EVERY sync failing at the DB write, not the network:
-`'Lakes/alerts sync failed', [Error: Decorating class property failed. Please ensure that
-transform-class-properties is enabled and runs after the decorators transform.]` (same for
-protocols). babel-preset-expo leaves class fields native on Hermes, so legacy `@field`
-decorators compile to `_initializerWarningHelper` calls that throw on any model
-construction -> every `prepareCreate` throws -> lakes, alerts AND protocols tables stay empty.
-Fix (commit `39da4f2`, pushed; **build #10** EAS 6a7b1cdb-c32a-43d9-b5a8-96ce34f2c59d,
-submitted to App Store Connect as submission d7dc3b07-faff-44b9-a7de-2b8b8a2c5d3b): `babel.config.js` adds
-`@babel/plugin-transform-class-properties` (loose) scoped via `overrides` to
-`src/lib/db/models/` (global enable breaks react-native's PerformanceObserver private methods;
-the `test` must be a function because Metro loads the config without a filename). Verified:
-off-device WatermelonDB/LokiJS harness reproduces the exact error without the fix and passes
-with it; `npx expo export --platform ios --no-bytecode` bundles with 0 warning-helper call
-sites. Build #10 pass criteria: no "Decorating class property" in syslog, Settings Local data
-6/10/11, Alerts tab lists 10; smoke-test login, triage, map.
-- Disproven: "lakes populated, alerts empty" (home/map read the same empty lakes table) and
-  "withObservables isn't emitting" -- the tables were simply empty.
-- Guidance: protocols will now reach the DB, but triage Guidance still shows NoMatch until
-  `COMPLAINT_TO_SLUG` is filled (#5). Learn tab reads `lib/mock`, not the DB.
-- Latent: `lakes.updated_at` is a `string` column, but WatermelonDB reserves `updated_at`
-  (number). Harmless in release (create path never touches it, lakes are never updated),
-  but the schema invariant throws at module load in any dev build (NODE_ENV!=production).
-  Needs a schema migration; tracked as cryohealth-app#6.
-- `src/lib/api-client.ts`: fallback API URL changed from `http://localhost:3000` to
-  `https://api.cryohealth.io` (`||`, so an empty env value also falls back); local dev sets
-  `EXPO_PUBLIC_API_URL` via `.env`. Verified with an env-less `expo export`.
+# HANDOFF — CryoHealth-app — 2026-09-27 22:16 PKT
+Session: alerts-root-cause-protocol-library  Model: claude-opus-5-5  Branch: main  Goal: #1  Task: none (ad-hoc field report; related #5, #6)
+Prior session archived: docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md
 
 ## State
-Four offline-sync defects fixed, committed (`881fd96`), and pushed. **Build #9**
-(commit 881fd96, EAS build 65da298d-83c0-40bb-8eb3-43ccea238fb4) finished and was
-submitted to App Store Connect (submission 60e7cc04-82ea-449b-8d44-0a125bcbb9c1). Apple
-processing hadn't been confirmed at session end. These fixes don't close the open
-"recent alerts not showing" report — the Settings → "Local data" counts from a device
-are still the deciding check.
+The "alerts / guidance not showing" field report has a confirmed root cause, fixed in
+build #10 (on the user's iPhone via TestFlight). Build #10's syslog shows the app launching
+with no sync errors. The user has not yet reported Settings "Local data" counts or the
+Alerts tab contents on #10. Unconfirmed on device, but no errors.
 
-Production API (`https://api.cryohealth.io`, from eas.json's production/preview env)
-verified live 2026-09-27: /health 200, /lakes 200 (6), /alerts 200 (10), /protocols 200
-(11), POST /cases 401 without a token, POST /auth/login 401 with bad creds.
+Root cause: device syslog from build #9 showed every sync failing at the DB write with
+`Decorating class property failed. Please ensure that transform-class-properties is
+enabled...`. On Hermes, babel-preset-expo leaves class fields native, so legacy WatermelonDB
+decorators compiled to `_initializerWarningHelper` calls that throw on model construction.
+Lakes, alerts and protocols tables were always empty.
+
+Guidance still looked empty on #10 because `COMPLAINT_TO_SLUG` is intentionally `{}`
+(clinical routing, #5). A CHW-only protocol library on the Health tab (`73b0820`) is
+committed and pushed but **not built**. It needs build #11, and the user has not yet
+approved a build.
 
 ## Done this session
-- `src/lib/api-client.ts`: 30s AbortController timeout covering the whole request and
-  body read (RN Android OkHttp has connect/read/write timeouts of 0, so one stalled
-  request held `syncInFlight` forever and every later sync silently no-oped). A 401
-  now logs out only if the request carried a token. Before this, a wrong PIN called
-  logout() and showed "Session expired". Error messages are pulled from NestJS's
-  `{message}` body.
-- `src/lib/sync.ts`: `pushQueuedCases` skips when there's no session and stops the loop
-  on 401/403. Added an AppState "active" listener that triggers sync on foreground (iOS
-  suspends JS timers, and NetInfo doesn't re-fire on resume).
-- `src/app/_layout.tsx`: the sync engine starts only after `hydrate()` settles
-  (`.finally`). Before this, NetInfo's immediate first event raced hydrate: queued
-  cases were pushed with no token, got a 401, and the stored session was wiped.
-- `src/app/login.tsx`: a successful login runs sync right away, so cases queued while
-  logged out push immediately instead of waiting for the next trigger.
-- Ruled out: the React Compiler / stale-array-reference theory for the alerts symptom.
-  WatermelonDB's subscribeToSimpleQuery emits `matchingRecords.slice(0)`, a fresh
-  array every time.
-- typecheck clean. lint: only the pre-existing `src/app/alert/[id].tsx:28` error.
-  madge: no cycles.
+- Captured iPhone syslog with `pymobiledevice3 syslog live` (scratch venv). Developer Mode is
+  off, so devicectl can't attach, but syslog works over pairing.
+- babel.config.js: `@babel/plugin-transform-class-properties` (loose), scoped via
+  `overrides` to `src/lib/db/models/`. Global enable breaks RN's PerformanceObserver private
+  methods. `test` must be a function because Metro loads the config without a filename.
+  Also api-client.ts falls back to `https://api.cryohealth.io` instead of localhost
+  (commit 39da4f2)
+- Build #10 (EAS 6a7b1cdb-c32a-43d9-b5a8-96ce34f2c59d) submitted to TestFlight (submission
+  d7dc3b07-faff-44b9-a7de-2b8b8a2c5d3b); handoff update (commit 0212859)
+- Opened cryohealth-app#6: `lakes.updated_at` string column clashes with WatermelonDB's
+  reserved numeric timestamp. The dev-build schema invariant throws at load; latent in release.
+- Protocol library: `src/components/protocol-library.tsx` + Health tab (CHW mode only),
+  grouped by category, opens `/guidance?slug=…` (commit 73b0820)
+
+## Not done / deferred
+- Build #11 with the protocol library — waiting on user approval to build/submit
+- On-device confirmation of #10 (Local data 6/10/11, Alerts lists 10) — user hasn't reported
+- Complaint → slug mapping — clinical decision, needs a human (#5)
+- Structured `steps` for the 11 protocols (public mode shows "not available") — content work, API side
+- #6 schema migration — separate issue
 
 ## Next action
-Check https://appstoreconnect.apple.com/apps/6797512420/testflight/ios to confirm build
-#9 finished processing. On device: check that a wrong PIN shows "Wrong ID or PIN", that
-a logged-in CHW stays logged in after a cold start with queued cases, and that
-reopening the app refreshes alerts right away. Also get the Settings "Local data"
-counts plus what the Alerts tab shows.
-
-Submit gotcha (same as build #7): non-interactive `eas submit` needs `ascApiKeyPath`
-in eas.json. Add it temporarily, pointing at
-~/.appstoreconnect/private_keys/AuthKey_MSSQV8JS2P.p8, submit, then
-`git checkout -- eas.json`. Never commit that path.
+Once the user approves: `npx eas-cli build --platform ios --profile production --non-interactive --no-wait`
 
 ## Open questions for a human
-- The build #8 Settings "Local data" counts (lakes/alerts/protocols) are still needed
-  to resolve the alerts-not-showing report (see the archived handoff).
+- Approve build #11 + TestFlight submit for the protocol library? — blocking: yes (for device check)
+- Which production protocol slug answers each COMMON_COMPLAINT (esp. diarrhoea plan A/B/C)? — blocking: no
 
 ## Failed approaches (do not retry)
-- See the archived handoff. Also: stale-array emission from WatermelonDB under React
-  Compiler, which was ruled out from the library source.
+- "withObservables isn't emitting" / "lakes populated, alerts empty". Disproven: all three
+  tables were empty, because every prepareCreate threw.
+- Enabling class-properties globally in babel.config.js breaks the bundle
+  (react-native PerformanceObserver: "Class private methods are not enabled").
+- RegExp `test` in babel `overrides`: Metro fails with "Configuration contains string/RegExp
+  pattern, but no filename was passed to Babel". Use a function.
+- Local simulator Release build: `expo run:ios --device <sim>` stops at "No code signing
+  certificates". A direct `xcodebuild -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO` builds,
+  but the app won't launch ("UIScene life cycle is required for apps built with this SDK");
+  the local ios/ project predates it. Verify on device via TestFlight instead.
+- `devicectl device info apps`: fails because Developer Mode is off on the iPhone.
+
+## Loops run
+- none
 
 ## Files touched
-src/lib/api-client.ts, src/lib/sync.ts, src/app/_layout.tsx, src/app/login.tsx, CLAUDE.md, docs/ai/HANDOFF.md
+babel.config.js, package.json, package-lock.json, src/lib/api-client.ts,
+src/components/protocol-library.tsx, src/app/(tabs)/health.tsx, docs/ai/HANDOFF.md,
+docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md
 
 ## Verification status
-tests: n/a (no runner)  review: typecheck + lint clean (pre-existing error only)
-qa: not on device yet (build #9 submitted to TestFlight)
+tests: n/a (no runner); off-device WatermelonDB/LokiJS harness reproduced the exact device error without the fix and passed with it  review: typecheck clean, lint = pre-existing `alert/[id].tsx:28` only, madge no cycles; `expo export` bundle has 0 warning-helper call sites and uses the production API URL  qa: build #10 syslog clean (no sync errors); protocol library not yet on device
 
 ## Resume with
-/uexel:orient
+/uexel:orient   (then: get approval → EAS build #11 → submit → capture syslog → confirm Health tab lists 11 protocols and Guidance opens them)
