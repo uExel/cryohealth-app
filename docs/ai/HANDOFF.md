@@ -3,12 +3,12 @@ Session: offline-sync-hardening  Model: claude-opus-5-5  Branch: main  Goal: #1 
 Prior session archived: docs/ai/sessions/2026-09-24-alerts-protocols-field-report-handoff.md
 
 ## State
-Four offline-sync defects fixed in the working tree. **Uncommitted, not pushed, no new
-EAS build.** Build #8 (commit 959276c, the prior session's fixes) finished 2026-09-24,
-and the prior handoff says it still needed a manual `eas submit`. This session didn't
-check whether it was submitted. Its Settings → "Local data" counts are still the
-deciding check for the open "recent alerts not showing" report — these fixes don't
-close that report.
+Four offline-sync defects fixed, committed (`881fd96`), and pushed. **Build #9**
+(commit 881fd96, EAS build 65da298d-83c0-40bb-8eb3-43ccea238fb4) finished and was
+submitted to App Store Connect (submission 60e7cc04-82ea-449b-8d44-0a125bcbb9c1). Apple
+processing hadn't been confirmed at session end. These fixes don't close the open
+"recent alerts not showing" report — the Settings → "Local data" counts from a device
+are still the deciding check.
 
 Production API (`https://api.cryohealth.io`, from eas.json's production/preview env)
 verified live 2026-09-27: /health 200, /lakes 200 (6), /alerts 200 (10), /protocols 200
@@ -36,11 +36,16 @@ verified live 2026-09-27: /health 200, /lakes 200 (6), /alerts 200 (10), /protoc
   madge: no cycles.
 
 ## Next action
-Get the user's go-ahead to commit + push. Then `eas build --platform ios --profile
-production --non-interactive` and, as a separate step, `eas submit --platform ios
---latest --non-interactive`. On device: check that a wrong PIN shows "Wrong ID or PIN",
-that a logged-in CHW stays logged in after a cold start with queued cases, and that
-reopening the app refreshes alerts right away.
+Check https://appstoreconnect.apple.com/apps/6797512420/testflight/ios to confirm build
+#9 finished processing. On device: check that a wrong PIN shows "Wrong ID or PIN", that
+a logged-in CHW stays logged in after a cold start with queued cases, and that
+reopening the app refreshes alerts right away. Also get the Settings "Local data"
+counts plus what the Alerts tab shows.
+
+Submit gotcha (same as build #7): non-interactive `eas submit` needs `ascApiKeyPath`
+in eas.json. Add it temporarily, pointing at
+~/.appstoreconnect/private_keys/AuthKey_MSSQV8JS2P.p8, submit, then
+`git checkout -- eas.json`. Never commit that path.
 
 ## Open questions for a human
 - The build #8 Settings "Local data" counts (lakes/alerts/protocols) are still needed
@@ -55,7 +60,7 @@ src/lib/api-client.ts, src/lib/sync.ts, src/app/_layout.tsx, src/app/login.tsx, 
 
 ## Verification status
 tests: n/a (no runner)  review: typecheck + lint clean (pre-existing error only)
-qa: not on device yet
+qa: not on device yet (build #9 submitted to TestFlight)
 
 ## Resume with
 /uexel:orient
