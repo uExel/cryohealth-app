@@ -3,16 +3,19 @@ import { ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Chromed } from '../../components/chrome';
 import { Disclaimer } from '../../components/guidance';
+import { ObservedProtocolLibrary } from '../../components/protocol-library';
 import { BtnPrimary, BtnSecondary, SectionLabel } from '../../components/ui';
 import { useStyles } from '../../design/styles';
 import { useTheme } from '../../design/theme';
 import { COMMON_COMPLAINTS } from '../../lib/mock';
 import { resolveComplaintSlug } from '../../lib/complaint-map';
+import { useApp } from '../../state/app';
 
 export default function Health() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
+  const { mode } = useApp();
   const [text, setText] = useState('');
 
   const goToGuidance = (slug?: string) =>
@@ -45,6 +48,9 @@ export default function Health() {
             <BtnSecondary key={c} label={c} onPress={() => goToGuidance(resolveComplaintSlug(c))} />
           ))}
         </View>
+        {/* CHW-only: protocol text is authored for health workers (it can contain dosing),
+            and public mode can't open a protocol without structured steps anyway. */}
+        {mode === 'chw' && <ObservedProtocolLibrary />}
       </ScrollView>
     </Chromed>
   );
