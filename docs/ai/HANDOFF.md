@@ -10,7 +10,8 @@ transform-class-properties is enabled and runs after the decorators transform.]`
 protocols). babel-preset-expo leaves class fields native on Hermes, so legacy `@field`
 decorators compile to `_initializerWarningHelper` calls that throw on any model
 construction -> every `prepareCreate` throws -> lakes, alerts AND protocols tables stay empty.
-Fix (uncommitted at time of writing): `babel.config.js` adds
+Fix (commit `39da4f2`, pushed; **build #10** EAS 6a7b1cdb-c32a-43d9-b5a8-96ce34f2c59d,
+submitted to App Store Connect as submission d7dc3b07-faff-44b9-a7de-2b8b8a2c5d3b): `babel.config.js` adds
 `@babel/plugin-transform-class-properties` (loose) scoped via `overrides` to
 `src/lib/db/models/` (global enable breaks react-native's PerformanceObserver private methods;
 the `test` must be a function because Metro loads the config without a filename). Verified:
@@ -25,7 +26,7 @@ sites. Build #10 pass criteria: no "Decorating class property" in syslog, Settin
 - Latent: `lakes.updated_at` is a `string` column, but WatermelonDB reserves `updated_at`
   (number). Harmless in release (create path never touches it, lakes are never updated),
   but the schema invariant throws at module load in any dev build (NODE_ENV!=production).
-  Needs a schema migration; not fixed.
+  Needs a schema migration; tracked as cryohealth-app#6.
 - `src/lib/api-client.ts`: fallback API URL changed from `http://localhost:3000` to
   `https://api.cryohealth.io` (`||`, so an empty env value also falls back); local dev sets
   `EXPO_PUBLIC_API_URL` via `.env`. Verified with an env-less `expo export`.
