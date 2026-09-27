@@ -4,7 +4,7 @@ import { appSchema, tableSchema } from "@nozbe/watermelondb";
  *  replaced on each pull sync; `chw_cases` is the only locally-authored table (queued
  *  until pushed). */
 export const schema = appSchema({
-  version: 3,
+  version: 4,
   tables: [
     tableSchema({
       name: "lakes",
@@ -19,7 +19,9 @@ export const schema = appSchema({
         { name: "elevation_m", type: "number", isOptional: true },
         { name: "lat", type: "number" },
         { name: "lng", type: "number" },
-        { name: "updated_at", type: "string" },
+        // The API's ISO `updatedAt`. Not `updated_at`: WatermelonDB reserves that name for
+        // its own numeric timestamp (cryohealth-app#6).
+        { name: "server_updated_at", type: "string" },
         { name: "synced_at", type: "number" },
       ],
     }),

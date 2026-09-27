@@ -8,9 +8,21 @@ import {
  *  on alerts. No data migration needed — both tables are wholesale-replaced by the next
  *  pull sync (see sync.ts), so new columns just start empty until then.
  *  v2 -> v3: new `protocols` table (cryohealth-app#5), a third read-through cache. No
- *  data migration needed — populated fresh by the first sync after upgrade. */
+ *  data migration needed — populated fresh by the first sync after upgrade.
+ *  v3 -> v4: lakes `server_updated_at` replaces `updated_at`, a name WatermelonDB reserves
+ *  for its own numeric timestamp (cryohealth-app#6). Migrations can't drop columns, so the
+ *  old one stays in SQLite unread; the next pull sync fills the new one. */
 export const migrations = schemaMigrations({
   migrations: [
+    {
+      toVersion: 4,
+      steps: [
+        addColumns({
+          table: "lakes",
+          columns: [{ name: "server_updated_at", type: "string" }],
+        }),
+      ],
+    },
     {
       toVersion: 3,
       steps: [
@@ -38,7 +50,9 @@ export const migrations = schemaMigrations({
           columns: [
             { name: "name_ur", type: "string", isOptional: true },
             { name: "elevation_m", type: "number", isOptional: true },
-            { name: "updated_at", type: "string" },
+            // Declared `number` (was `string`) only so dev builds pass WatermelonDB's
+            // reserved-name check; the column is unused since v4 (cryohealth-app#6).
+            { name: "updated_at", type: "number" },
           ],
         }),
         addColumns({

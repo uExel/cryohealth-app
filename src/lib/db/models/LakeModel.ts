@@ -15,6 +15,7 @@ export class LakeModel extends Model {
   @field("elevation_m") elevationM?: number;
   @field("lat") lat: number;
   @field("lng") lng: number;
-  @field("updated_at") updatedAt: string;
+  /** The server's ISO timestamp for the lake row -- see schema.ts for why not `updated_at`. */
+  @field("server_updated_at") serverUpdatedAt: string;
   @field("synced_at") syncedAt: number;
 }

@@ -73,9 +73,12 @@ No test script defined in this repo.
 - Alert acknowledgement (`alert/[id].tsx`'s "Acknowledge & log action" button) is still
   local React state only — no `AlertAck` WatermelonDB table or backend endpoint exists
   yet, unlike case sync. Don't assume it persists or syncs.
-- WatermelonDB schema is at **version 3** (`src/lib/db/schema.ts` + `migrations.ts`) —
+- WatermelonDB schema is at **version 4** (`src/lib/db/schema.ts` + `migrations.ts`) —
   bump both together and add an `addColumns`/`addTables` step, never just edit `schema.ts`
   alone once a schema version has shipped to a real device.
+  Never name a column `created_at`/`updated_at` unless it is WatermelonDB's own numeric
+  timestamp — the dev-build schema invariant throws at load otherwise, and `update()` would
+  overwrite it with `Date.now()` (cryohealth-app#6; lakes use `server_updated_at`).
 
 ## gstack (REQUIRED — global install)
 

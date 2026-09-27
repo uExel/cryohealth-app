@@ -1,7 +1,7 @@
 {
   "0": "useStyles",
   "1": "theme.ts",
-  "2": "index.ts",
+  "2": "home.tsx",
   "3": "expo",
   "4": "sync.ts",
   "5": "scripts",
@@ -18,7 +18,7 @@
   "16": "@expo-google-fonts/noto-nastaliq-urdu",
   "17": "expo-image",
   "18": "HANDOFF — cryohealth-app — 2026-08-02 00:05 PKT",
-  "19": "HANDOFF — CryoHealth-app — 2026-09-24 13:50 PKT",
+  "19": "HANDOFF — CryoHealth-app — 2026-09-27 22:16 PKT",
   "20": "expo-splash-screen",
   "21": "expo-status-bar",
   "22": "expo-symbols",
@@ -49,7 +49,7 @@
   "47": "TODO.md",
   "48": "README.md",
   "49": "HANDOFF — cryohealth-app — 2026-08-09 14:34 PKT",
-  "50": "expo-crypto",
+  "50": "HANDOFF — CryoHealth-app — 2026-09-24 13:50 PKT",
   "51": "expo-secure-store",
   "52": "@nozbe/watermelondb",
   "53": "@nozbe/with-observables",
@@ -71,5 +71,8 @@
   "69": "HANDOFF — CryoHealth-app — 2026-09-23 21:02 PKT",
   "70": "HANDOFF — CryoHealth-app — 2026-09-23 PKT",
   "71": "eslint.config.js",
-  "72": "expo-constants"
+  "72": "expo-constants",
+  "73": "mock.ts",
+  "74": "HANDOFF — CryoHealth-app — 2026-09-27",
+  "75": "@expo-google-fonts/archivo"
 }

@@ -60,14 +60,14 @@ function Home({
           place={`${worst.valley} · ${ur && worst.nameUr ? worst.nameUr : worst.name}`}
           line={line}
         />
-        <FreshRow stamp={`${ur ? 'تازہ کاری' : 'Updated'} ${relativeTime(worst.updatedAt)}`} />
+        <FreshRow stamp={`${ur ? 'تازہ کاری' : 'Updated'} ${relativeTime(worst.serverUpdatedAt)}`} />
 
         <SectionLabel>{ur ? 'قریبی زیرِ نگرانی جھیلیں' : 'Monitored lakes near you'}</SectionLabel>
         {sorted.slice(0, 3).map((l) => (
           <HazardRow
             key={l.id}
             name={ur && l.nameUr ? l.nameUr : l.name}
-            detail={`${l.valley} · ${relativeTime(l.updatedAt)}${l.stale ? (ur ? ' · باسی' : ' · stale') : ''}`}
+            detail={`${l.valley} · ${relativeTime(l.serverUpdatedAt)}${l.stale ? (ur ? ' · باسی' : ' · stale') : ''}`}
             tier={l.tier}
             onPress={() => router.push('/map')}
           />

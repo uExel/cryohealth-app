@@ -19,7 +19,7 @@ function Lakes({ lakes }: { lakes: LakeModel[] }) {
 
   return (
     <Chromed title="Lakes" sub="List view · tiles not downloaded">
-      <FreshRow stamp={`Tiers current as of last sync · ${sorted[0] ? relativeTime(sorted[0].updatedAt) : '—'}`} />
+      <FreshRow stamp={`Tiers current as of last sync · ${sorted[0] ? relativeTime(sorted[0].serverUpdatedAt) : '—'}`} />
       <ScrollView style={s.scroll}>
         {/* The list IS the map when tiles are absent — complete, not a fallback failure. */}
         <View style={{ margin: t.space.lg, backgroundColor: t.color.surface2, borderWidth: 1, borderColor: t.color.lineSoft, padding: t.space.lg, gap: 6 }}>

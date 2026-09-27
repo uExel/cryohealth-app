@@ -50,7 +50,7 @@ async function pullLakesAndAlerts() {
           rec.elevationM = l.elevationM;
           rec.lng = l.geom.coordinates[0];
           rec.lat = l.geom.coordinates[1];
-          rec.updatedAt = l.updatedAt;
+          rec.serverUpdatedAt = l.updatedAt;
           rec.syncedAt = now;
         }),
       ),
