@@ -40,13 +40,13 @@
     "semantic_hash": "ca9d75cf60f51e7a2d67fd08ddfb8275"
   },
   "src/app/(tabs)/_layout.tsx": {
-    "mtime": 1786170054.695252,
-    "ast_hash": "c9bcf0223ffd5fac2eac9597ae11e89c",
+    "mtime": 1790532094.479464,
+    "ast_hash": "11b493a987ef6156dfcc83ad08af0c35",
     "semantic_hash": ""
   },
   "src/app/(tabs)/alerts.tsx": {
-    "mtime": 1786204708.099158,
-    "ast_hash": "1852afd3fc19420b9db448410bac8d91",
+    "mtime": 1790532209.8905075,
+    "ast_hash": "bd2e1871a23b49522b19226aa2e3081e",
     "semantic_hash": ""
   },
   "src/app/(tabs)/health.tsx": {
@@ -54,14 +54,9 @@
     "ast_hash": "0915b77e40189a42089ceaefc7eb39b4",
     "semantic_hash": ""
   },
-  "src/app/(tabs)/learn.tsx": {
-    "mtime": 1786170054.695509,
-    "ast_hash": "e7a824734a167474ae58d6c14c3fd995",
-    "semantic_hash": "e7a824734a167474ae58d6c14c3fd995"
-  },
   "src/app/(tabs)/map.tsx": {
-    "mtime": 1790530785.0138876,
-    "ast_hash": "863e1f6c72755b4121d4ad927ab02fd8",
+    "mtime": 1790532219.8109264,
+    "ast_hash": "9230d3c1da3557a5cdbd88e4a9b82382",
     "semantic_hash": ""
   },
   "src/app/_layout.tsx": {
@@ -69,29 +64,14 @@
     "ast_hash": "e02a2ad493478a22d70d0f4edf3fa17a",
     "semantic_hash": ""
   },
-  "src/app/alert/[id].tsx": {
-    "mtime": 1786204748.0638773,
-    "ast_hash": "4180dc0f262c901c652c99a3f1522ea8",
-    "semantic_hash": ""
-  },
-  "src/app/case.tsx": {
-    "mtime": 1786203502.0227726,
-    "ast_hash": "fb4d1d9ffd748acaa10fb2f7d919d781",
-    "semantic_hash": ""
-  },
   "src/app/critical.tsx": {
-    "mtime": 1786204843.9622571,
-    "ast_hash": "aaf4bf4c1f43ac32ec1b5648234a52ea",
-    "semantic_hash": ""
-  },
-  "src/app/guidance.tsx": {
-    "mtime": 1790096494.0764945,
-    "ast_hash": "7519308fe836e39cfc1955fe41da3bc3",
+    "mtime": 1790532209.8909957,
+    "ast_hash": "e5eb30f179114e6c7b92bccfc4af9a3a",
     "semantic_hash": ""
   },
   "src/app/login.tsx": {
-    "mtime": 1790491653.5373237,
-    "ast_hash": "e3436e0bce6988207285be22ea837be4",
+    "mtime": 1790532107.1031206,
+    "ast_hash": "892e4f4271dee318a11de7261b2e90d7",
     "semantic_hash": ""
   },
   "src/app/permission.tsx": {
@@ -99,29 +79,14 @@
     "ast_hash": "2aac6860cfe58a76787ee6453e9c6279",
     "semantic_hash": ""
   },
-  "src/app/settings.tsx": {
-    "mtime": 1790241635.4137578,
-    "ast_hash": "9e766f6d5cd13ec762552336024eca3c",
-    "semantic_hash": ""
-  },
-  "src/app/signup.tsx": {
-    "mtime": 1786170054.6981127,
-    "ast_hash": "e16999cc5ba769450589c35a44fe59af",
-    "semantic_hash": "e16999cc5ba769450589c35a44fe59af"
-  },
-  "src/app/verify.tsx": {
-    "mtime": 1786170054.6981797,
-    "ast_hash": "e64b44a608b983b740f9c8dc140beb6e",
-    "semantic_hash": ""
-  },
   "src/app/welcome.tsx": {
-    "mtime": 1786170054.6982455,
-    "ast_hash": "7320879d16003d6d4daa5709c24e6672",
+    "mtime": 1790532111.75519,
+    "ast_hash": "2d2d44d6d978ac7baa3cf1473302ce3f",
     "semantic_hash": ""
   },
   "src/components/chrome.tsx": {
-    "mtime": 1790241540.7799459,
-    "ast_hash": "c9205769c17adf88d1b3aa41f28f2395",
+    "mtime": 1790532125.980521,
+    "ast_hash": "4fbf24cba76a8448e762c2cdf2e08552",
     "semantic_hash": ""
   },
   "src/components/guidance.tsx": {
@@ -130,8 +95,8 @@
     "semantic_hash": ""
   },
   "src/components/hazard.tsx": {
-    "mtime": 1786204686.2743351,
-    "ast_hash": "4a8e060fcf33985cea0ef89ccdd5e7f6",
+    "mtime": 1790532209.8911393,
+    "ast_hash": "29f51bd8bc93e1f6ba7ac109234c48e9",
     "semantic_hash": ""
   },
   "src/components/ui.tsx": {
@@ -155,9 +120,9 @@
     "semantic_hash": ""
   },
   "src/state/app.tsx": {
-    "mtime": 1786170054.699635,
-    "ast_hash": "e1e23f4d37aa9c51e0b0e3b0779e8dc3",
-    "semantic_hash": "e1e23f4d37aa9c51e0b0e3b0779e8dc3"
+    "mtime": 1790532107.1024277,
+    "ast_hash": "04cd90dcaff9d0ceb8d637ef2ee55776",
+    "semantic_hash": ""
   },
   "tsconfig.json": {
     "mtime": 1786268906.910439,
@@ -180,13 +145,13 @@
     "semantic_hash": ""
   },
   "src/app/(tabs)/home.tsx": {
-    "mtime": 1790530785.013559,
-    "ast_hash": "3da9e4abd4b8ce26e6d605a2e7b75bcd",
+    "mtime": 1790532209.8901668,
+    "ast_hash": "7596cfc4753d9687f4451d2e70182dd8",
     "semantic_hash": ""
   },
   "src/app/index.tsx": {
-    "mtime": 1786201817.1012304,
-    "ast_hash": "55677710675ec750cf67ddb4ad91e967",
+    "mtime": 1790532107.1028485,
+    "ast_hash": "a499b48db3f723c2999d9a6172e1738a",
     "semantic_hash": ""
   },
   "src/lib/api-client.ts": {
@@ -330,13 +295,13 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1790530841.6225615,
-    "ast_hash": "7985b9a218555327694b7344ed9734ae",
+    "mtime": 1790532256.990173,
+    "ast_hash": "389a46453daaefdacf3e3afbe0e36c02",
     "semantic_hash": ""
   },
   "docs/ai/HANDOFF.md": {
-    "mtime": 1790530681.8014865,
-    "ast_hash": "096e3b7faed647b3cc36816a9848d2ae",
+    "mtime": 1790530871.8518922,
+    "ast_hash": "98e19753a1ead05e31744680967c6b73",
     "semantic_hash": ""
   },
   "docs/ai/LEARNINGS.md": {
@@ -577,6 +542,26 @@
   "docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md": {
     "mtime": 1790529360.4405656,
     "ast_hash": "5b54865f3e04af25562e30904aaa54c5",
+    "semantic_hash": ""
+  },
+  "src/app/(tabs)/alert/[id].tsx": {
+    "mtime": 1790532138.3209798,
+    "ast_hash": "daa9c729f89ae513d4f4826c8375a7b7",
+    "semantic_hash": ""
+  },
+  "src/app/(tabs)/case.tsx": {
+    "mtime": 1790532138.3213496,
+    "ast_hash": "83d14cc684971edf3a92861723f63a37",
+    "semantic_hash": ""
+  },
+  "src/app/(tabs)/guidance.tsx": {
+    "mtime": 1790532138.3211694,
+    "ast_hash": "6adef3aeab718f04d11f0133765be52b",
+    "semantic_hash": ""
+  },
+  "src/app/(tabs)/settings.tsx": {
+    "mtime": 1790532155.2831056,
+    "ast_hash": "4d52bf3d95b1841ccb192317171c0db2",
     "semantic_hash": ""
   }
 }

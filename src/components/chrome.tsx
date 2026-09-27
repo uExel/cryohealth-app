@@ -1,8 +1,8 @@
 /** App chrome: logo, app bar, sync banner, tab bar, SOS sheet. Geometry from design/styles.ts. */
 import React from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Linking, Modal, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { Phone, X, ChevronRight, Settings2 } from 'lucide-react-native';
+import { Phone, X, ChevronLeft, ChevronRight, Settings2 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { bannerFor, useTheme } from '../design/theme';
@@ -37,7 +37,9 @@ export const Wordmark = ({ size = 40, color }: { size?: number; color?: string }
   );
 };
 
-export const AppBar = ({ title, sub }: { title: string; sub?: string }) => {
+/** `back` replaces the logo with a back button on sub-screens (alert detail, case,
+ *  guidance, settings). With no history (e.g. a cold deep link) it goes Home instead. */
+export const AppBar = ({ title, sub, back }: { title: string; sub?: string; back?: boolean }) => {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
@@ -51,7 +53,18 @@ export const AppBar = ({ title, sub }: { title: string; sub?: string }) => {
     // one this was last measured against.
     <View style={{ paddingTop: insets.top, backgroundColor: t.color.bg }}>
       <View style={s.appBar}>
-        <Logo />
+        {back ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back"
+            style={[s.btnIcon, { borderWidth: 0 }]}
+            onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
+          >
+            <ChevronLeft size={22} color={t.color.text} strokeWidth={2.4} />
+          </Pressable>
+        ) : (
+          <Logo />
+        )}
         <View style={{ flex: 1 }}>
           <Text style={s.appBarTitle}>{title}</Text>
           {sub ? <Text style={s.appBarSub}>{sub}</Text> : null}
@@ -88,7 +101,8 @@ export const SyncBanner = () => {
   if (!b) return null;
   return (
     <View style={[s.banner, { backgroundColor: b.bg }]}>
-      <Text style={[s.bannerText, { color: b.fg }]}>{b.text}</Text>
+      {/* The generated 'syncing' copy has a fixed "2 of 5 items" count that isn't real. */}
+      <Text style={[s.bannerText, { color: b.fg }]}>{net === 'syncing' ? 'Syncing…' : b.text}</Text>
       {b.retry ? (
         <Pressable style={[s.bannerRetry, { borderColor: b.fg }]} onPress={() => void runSync(setNet)}>
           <Text style={[s.bannerRetryLabel, { color: b.fg }]}>SYNC NOW</Text>
@@ -103,10 +117,16 @@ export const SosSheet = () => {
   const t = useTheme();
   const s = useStyles();
   const { sosOpen, setSosOpen } = useApp();
-  const rows: [string, string][] = [
-    ['Call rescue 1122', 'Needs signal — dials as soon as you have any network'],
-    ['Nearest facility: Hassanabad BHU', 'Directions work offline'],
-    ['Nearest high ground', 'Saved route — works offline'],
+  // Only rows that actually do something. Facility and high-ground rows come back once
+  // there is real per-valley data -- a hardcoded place is wrong for everyone else.
+  const rows: { head: string; note: string; onPress: () => void }[] = [
+    {
+      head: 'Call rescue 1122',
+      note: 'Needs signal — dials as soon as you have any network',
+      // Not gated on canOpenURL: that needs an Info.plist query entry for tel: and must
+      // never be the reason an emergency call doesn't start.
+      onPress: () => void Linking.openURL('tel:1122'),
+    },
   ];
   return (
     <Modal visible={sosOpen} transparent animationType="none" onRequestClose={() => setSosOpen(false)}>
@@ -118,8 +138,8 @@ export const SosSheet = () => {
               <X size={20} color={t.color.text} strokeWidth={2.4} />
             </Pressable>
           </View>
-          {rows.map(([head, note]) => (
-            <Pressable key={head} style={s.sheetRow}>
+          {rows.map(({ head, note, onPress }) => (
+            <Pressable key={head} accessibilityRole="button" style={s.sheetRow} onPress={onPress}>
               <View style={{ flex: 1 }}>
                 <Text style={s.headline}>{head}</Text>
                 <Text style={s.footnote}>{note}</Text>
@@ -139,11 +159,11 @@ export const BareScreen = ({ children }: { children: React.ReactNode }) => {
 };
 
 /** Chromed screen shell: app bar + sync banner above content. Tab bar comes from the navigator. */
-export const Chromed = ({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) => {
+export const Chromed = ({ title, sub, back, children }: { title: string; sub?: string; back?: boolean; children: React.ReactNode }) => {
   const s = useStyles();
   return (
     <View style={s.screen}>
-      <AppBar title={title} sub={sub} />
+      <AppBar title={title} sub={sub} back={back} />
       <SyncBanner />
       {children}
       <SosSheet />

@@ -16,7 +16,7 @@ export default function Login() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
-  const { setMode, setNet } = useApp();
+  const { setNet } = useApp();
   const setSession = useAuthStore((st) => st.setSession);
   const [stay, setStay] = React.useState(true);
   const [identifier, setIdentifier] = React.useState('');
@@ -30,7 +30,6 @@ export default function Login() {
     try {
       const res = await login(identifier, pin);
       await setSession(res.accessToken, { role: res.role, name: res.name });
-      setMode('chw');
       // Cases queued while logged out (or after an expired session) push right away.
       void runSync(setNet);
       router.replace('/home');
@@ -59,10 +58,9 @@ export default function Login() {
           disabled={submitting || !identifier || !pin}
           onPress={onSubmit}
         />
-        <View style={{ flexDirection: 'row', gap: 18 }}>
-          <BtnText label="Forgot PIN" />
-          <BtnText label="Register" onPress={() => router.push('/signup')} />
-        </View>
+        <Text style={s.footnote}>
+          No account, or forgot your PIN? Your supervisor sets up and resets health worker accounts.
+        </Text>
         <BtnText label="Continue without an account" onPress={() => router.replace('/home')} />
       </ScrollView>
     </BareScreen>

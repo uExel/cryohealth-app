@@ -30,8 +30,8 @@
     "semantic_hash": "35cb915a0bebbebbe69cf7815e174462"
   },
   "package.json": {
-    "mtime": 1790238931.5502677,
-    "ast_hash": "6ca97b3c5abac8800c9aff685e158f65",
+    "mtime": 1790526975.9090865,
+    "ast_hash": "5df4c2a21492f4cb5a725c74fcd6b3e8",
     "semantic_hash": ""
   },
   "scripts/reset-project.js": {
@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "src/app/(tabs)/health.tsx": {
-    "mtime": 1790094167.385018,
-    "ast_hash": "7e21687303a2d02757a540a46394105b",
+    "mtime": 1790528937.764308,
+    "ast_hash": "0915b77e40189a42089ceaefc7eb39b4",
     "semantic_hash": ""
   },
   "src/app/(tabs)/learn.tsx": {
@@ -60,8 +60,8 @@
     "semantic_hash": "e7a824734a167474ae58d6c14c3fd995"
   },
   "src/app/(tabs)/map.tsx": {
-    "mtime": 1786204630.9847517,
-    "ast_hash": "19b0e334f0d0eaee75590935fa005c17",
+    "mtime": 1790530785.0138876,
+    "ast_hash": "863e1f6c72755b4121d4ad927ab02fd8",
     "semantic_hash": ""
   },
   "src/app/_layout.tsx": {
@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "src/app/login.tsx": {
-    "mtime": 1786201817.1012344,
-    "ast_hash": "99e6dbcbbf0ead650872e9294d439854",
+    "mtime": 1790491653.5373237,
+    "ast_hash": "e3436e0bce6988207285be22ea837be4",
     "semantic_hash": ""
   },
   "src/app/permission.tsx": {
@@ -170,18 +170,18 @@
     "semantic_hash": ""
   },
   "babel.config.js": {
-    "mtime": 1786203920.3989022,
-    "ast_hash": "885c9b766187207bca51ff69cf04b37b",
+    "mtime": 1790527354.960679,
+    "ast_hash": "8d13500dcf3b46aaf54480a7fe70aa71",
     "semantic_hash": ""
   },
   "eas.json": {
-    "mtime": 1790335700.2969942,
+    "mtime": 1790529954.4824383,
     "ast_hash": "97fb71776b3a59afe9fdae96c27f0bdb",
     "semantic_hash": ""
   },
   "src/app/(tabs)/home.tsx": {
-    "mtime": 1786204615.7168512,
-    "ast_hash": "93c0179280fae44922b699346b371e3a",
+    "mtime": 1790530785.013559,
+    "ast_hash": "3da9e4abd4b8ce26e6d605a2e7b75bcd",
     "semantic_hash": ""
   },
   "src/app/index.tsx": {
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "src/lib/api-client.ts": {
-    "mtime": 1790491541.5215104,
-    "ast_hash": "e47de644a987c6c6a420fa4f1d230b22",
+    "mtime": 1790527419.8824131,
+    "ast_hash": "2942da2f88e397c3ef601ff690d9e17c",
     "semantic_hash": ""
   },
   "src/lib/api-types.ts": {
@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "src/lib/db/migrations.ts": {
-    "mtime": 1790093968.6925735,
-    "ast_hash": "c341e202f5be0699240d4629538d15a5",
+    "mtime": 1790530785.0126247,
+    "ast_hash": "191f37e34b856a27b8c4d9e92f18fd31",
     "semantic_hash": ""
   },
   "src/lib/db/models/AlertModel.ts": {
@@ -225,13 +225,13 @@
     "semantic_hash": ""
   },
   "src/lib/db/models/LakeModel.ts": {
-    "mtime": 1786268901.3376703,
-    "ast_hash": "85787884805b24db3c5645e38b12366b",
+    "mtime": 1790530785.0129006,
+    "ast_hash": "ad080e527357a3eb14758042cb6f2527",
     "semantic_hash": ""
   },
   "src/lib/db/schema.ts": {
-    "mtime": 1790093958.8048863,
-    "ast_hash": "30c4055bfad489b1303379a9ae41be69",
+    "mtime": 1790530785.0124009,
+    "ast_hash": "906e910445840d73636f03c8466eadcb",
     "semantic_hash": ""
   },
   "src/lib/device-id.ts": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "src/lib/sync.ts": {
-    "mtime": 1790491560.7406576,
-    "ast_hash": "ea3f472b70a61711368aa794a725f664",
+    "mtime": 1790530785.0132945,
+    "ast_hash": "24560b5b165ea21d5cd8c53db7c7e66b",
     "semantic_hash": ""
   },
   "src/state/auth.ts": {
@@ -330,13 +330,13 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1790491572.532745,
-    "ast_hash": "c255dd1f145b049f52b01affde10ea82",
+    "mtime": 1790530841.6225615,
+    "ast_hash": "7985b9a218555327694b7344ed9734ae",
     "semantic_hash": ""
   },
   "docs/ai/HANDOFF.md": {
-    "mtime": 1790248639.7980433,
-    "ast_hash": "f91ac6db7d99ac346fceae13bca31647",
+    "mtime": 1790530681.8014865,
+    "ast_hash": "096e3b7faed647b3cc36816a9848d2ae",
     "semantic_hash": ""
   },
   "docs/ai/LEARNINGS.md": {
@@ -562,6 +562,21 @@
   "docs/ai/sessions/2026-09-23-task5-shipped-handoff.md": {
     "mtime": 1790179328.7387993,
     "ast_hash": "13dfe94e43891c3449d1ef6d1d3c3f1d",
+    "semantic_hash": ""
+  },
+  "src/components/protocol-library.tsx": {
+    "mtime": 1790528929.3949587,
+    "ast_hash": "932189e30ade31223d5c08fb8c37bcfa",
+    "semantic_hash": ""
+  },
+  "docs/ai/sessions/2026-09-24-alerts-protocols-field-report-handoff.md": {
+    "mtime": 1790491589.6599634,
+    "ast_hash": "f91ac6db7d99ac346fceae13bca31647",
+    "semantic_hash": ""
+  },
+  "docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md": {
+    "mtime": 1790529360.4405656,
+    "ast_hash": "5b54865f3e04af25562e30904aaa54c5",
     "semantic_hash": ""
   }
 }

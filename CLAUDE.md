@@ -41,6 +41,14 @@ No test script defined in this repo.
 
 ## Gotchas
 
+- **Navigation:** every chromed screen lives in `src/app/(tabs)/`, including the sub-screens
+  (`alert/[id]`, `case`, `guidance`, `settings`, hidden via `href: null`), so the tab bar
+  stays visible. `SUB_SCREENS` in `(tabs)/_layout.tsx` maps each one to the tab it lights up.
+  `backBehavior="history"`. Sub-screens pass `back` to `Chromed`. Screens stay mounted, so
+  key per-item screens by id and reset forms after submit.
+- **Mode is derived from auth, never set:** `useApp().mode` is `'chw'` only when
+  `useAuthStore` is authenticated. Sign out = `logout()`. There is no self-registration.
+
 <!-- Only repo-wide traps that bite in ANY directory. Local conventions and test/lint
      commands go in that directory's own CLAUDE.md. Date rules that exist to work around
      a current limitation: "added YYYY-MM for <x> — re-evaluate on next model release". -->
@@ -53,8 +61,8 @@ No test script defined in this repo.
   babel.config.js** — neither was configured when the models were first added (models
   existed, typecheck/bundle were both silently broken). Both are now set; don't remove
   them.
-- **`src/lib/mock.ts` is now only used by Learn** (`LESSONS`) **and `settings.tsx`'s
-  valley picker** (deferred, not safety data). Home, map, alerts, alert detail, critical,
+- **`src/lib/mock.ts` is now only used for Health's `COMMON_COMPLAINTS` chips.** The Learn
+  tab and Settings' valley picker were placeholder-only and have been removed. Home, map, alerts, alert detail, critical,
   and Guidance all read live WatermelonDB data via `withObservables`
   (`@nozbe/with-observables`, `src/lib/db/models/*`) — narrative/bilingual fields
   (`nameUr`, `bodyUr`, `chips`, `checklist`, `windowStart/End`) are real CryoHealth-api

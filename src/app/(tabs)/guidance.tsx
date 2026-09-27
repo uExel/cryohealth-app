@@ -3,14 +3,14 @@ import { ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import withObservables from "@nozbe/with-observables";
 import { Q } from "@nozbe/watermelondb";
-import { Chromed } from "../components/chrome";
-import { Disclaimer, GuidanceCard, Provenance } from "../components/guidance";
-import { useStyles } from "../design/styles";
-import { useTheme } from "../design/theme";
-import { useApp } from "../state/app";
-import { database } from "../lib/db";
-import { ProtocolModel } from "../lib/db/models/ProtocolModel";
-import type { ApiProtocolStep } from "../lib/api-types";
+import { Chromed } from "../../components/chrome";
+import { Disclaimer, GuidanceCard, Provenance } from "../../components/guidance";
+import { useStyles } from "../../design/styles";
+import { useTheme } from "../../design/theme";
+import { useApp } from "../../state/app";
+import { database } from "../../lib/db";
+import { ProtocolModel } from "../../lib/db/models/ProtocolModel";
+import type { ApiProtocolStep } from "../../lib/api-types";
 
 /** No protocol for the given slug (including "no slug at all"). Never falls back to any
  *  other protocol -- showing the wrong dosing content is the worst failure mode this
@@ -19,7 +19,7 @@ function NoMatch() {
   const t = useTheme();
   const s = useStyles();
   return (
-    <Chromed title="Guidance">
+    <Chromed title="Guidance" back>
       <Disclaimer />
       <View style={{ padding: t.space.lg }}>
         <Text style={s.callout}>
@@ -54,7 +54,7 @@ function NotYetAvailablePublic() {
   const t = useTheme();
   const s = useStyles();
   return (
-    <Chromed title="Guidance">
+    <Chromed title="Guidance" back>
       <Disclaimer />
       <View style={{ padding: t.space.lg }}>
         <Text style={s.callout}>
@@ -81,7 +81,7 @@ function GuidanceContent({ protocol }: { protocol: ProtocolModel }) {
   let n = 0;
 
   return (
-    <Chromed title="Guidance" sub={protocol.title}>
+    <Chromed title="Guidance" sub={protocol.title} back>
       <Disclaimer />
       <Provenance text={protocol.source} />
       <ScrollView style={s.scroll}>

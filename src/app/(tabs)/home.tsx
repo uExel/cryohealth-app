@@ -5,7 +5,7 @@ import withObservables from '@nozbe/with-observables';
 import { Q } from '@nozbe/watermelondb';
 import { Chromed } from '../../components/chrome';
 import { FreshRow, HazardRow, TierHeader } from '../../components/hazard';
-import { BtnPrimary, BtnSecondary, SectionLabel } from '../../components/ui';
+import { BtnPrimary, SectionLabel } from '../../components/ui';
 import { useStyles } from '../../design/styles';
 import { TIER_LABEL, Tier, useTheme } from '../../design/theme';
 import { useApp } from '../../state/app';
@@ -35,7 +35,7 @@ function Home({
 
   if (lakes.length === 0) {
     return (
-      <Chromed title="CryoHealth" sub="Hunza · Hassanabad">
+      <Chromed title="CryoHealth" sub="Gilgit-Baltistan">
         <View style={{ padding: t.space.lg }}>
           <Text style={s.callout}>No lake data on this phone yet. Connect once to sync.</Text>
         </View>
@@ -51,7 +51,7 @@ function Home({
     (ur ? 'اس جھیل کے لیے کوئی فعال وارننگ نہیں۔' : 'No active advisory for this lake.');
 
   return (
-    <Chromed title="CryoHealth" sub="Hunza · Hassanabad">
+    <Chromed title="CryoHealth" sub="Gilgit-Baltistan">
       <ScrollView style={s.scroll}>
         <TierHeader
           tier={worst.tier}
@@ -62,7 +62,7 @@ function Home({
         />
         <FreshRow stamp={`${ur ? 'تازہ کاری' : 'Updated'} ${relativeTime(worst.serverUpdatedAt)}`} />
 
-        <SectionLabel>{ur ? 'قریبی زیرِ نگرانی جھیلیں' : 'Monitored lakes near you'}</SectionLabel>
+        <SectionLabel>{ur ? 'قریبی زیرِ نگرانی جھیلیں' : 'Most at-risk lakes'}</SectionLabel>
         {sorted.slice(0, 3).map((l) => (
           <HazardRow
             key={l.id}
@@ -81,9 +81,8 @@ function Home({
                 {queuedCases.length} case{queuedCases.length === 1 ? '' : 's'} waiting to sync
               </Text>
               <Text style={[s.callout, { marginTop: 4 }]}>Saved on this phone. Nothing is lost.</Text>
-              <View style={{ flexDirection: 'row', gap: 10, marginVertical: t.space.lg }}>
-                <BtnPrimary label="New case" style={{ flex: 1 }} onPress={() => router.push('/case')} />
-                <BtnSecondary label="Queue" style={{ flex: 1 }} />
+              <View style={{ marginVertical: t.space.lg }}>
+                <BtnPrimary label="New case" onPress={() => router.push('/case')} />
               </View>
             </View>
           </View>

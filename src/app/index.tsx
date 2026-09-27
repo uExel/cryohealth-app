@@ -11,7 +11,7 @@ import { useAuthStore } from '../state/auth';
 
 export default function Splash() {
   const router = useRouter();
-  const { net, setMode } = useApp();
+  const { net } = useApp();
   const authStatus = useAuthStore((s) => s.status);
   const offline = net === 'offline' || net === 'failed' || net === 'stale';
 
@@ -19,14 +19,13 @@ export default function Splash() {
     const id = setTimeout(() => {
       // A restored session (SecureStore) skips straight past welcome/login.
       if (authStatus === 'authenticated') {
-        setMode('chw');
         router.replace('/home');
       } else {
         router.replace('/welcome');
       }
     }, 1800);
     return () => clearTimeout(id);
-  }, [router, authStatus, setMode]);
+  }, [router, authStatus]);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#0a4d76' }}>

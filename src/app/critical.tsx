@@ -63,7 +63,13 @@ function Critical({ alerts }: { alerts: AlertModel[] }) {
       </View>
       <Pressable
         style={{ minHeight: t.size.controlPrimary, backgroundColor: '#ffffff', justifyContent: 'center', paddingHorizontal: t.space.lg }}
-        onPress={() => (alert ? router.replace(`/alert/${alert.remoteId}`) : router.back())}
+        onPress={() => {
+          // Close this root-stack modal first, then open the detail inside the tabs, so
+          // the detail keeps its tab bar and back button instead of stacking a second
+          // tab navigator on top.
+          router.back();
+          if (alert) router.push(`/alert/${alert.remoteId}`);
+        }}
       >
         <Text style={{ ...t.type.headline, fontSize: 16, color: t.color.tier.critical }}>See what to do</Text>
       </Pressable>

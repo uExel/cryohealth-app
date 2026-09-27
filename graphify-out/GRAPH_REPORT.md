@@ -1,16 +1,16 @@
 # Graph Report - CryoHealth-app  (2026-09-27)
 
 ## Corpus Check
-- 90 files · ~96,461 words
+- 87 files · ~96,146 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 724 nodes · 1175 edges · 76 communities (37 shown, 39 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 10 edges (avg confidence: 0.5)
+- 720 nodes · 1133 edges · 76 communities (37 shown, 39 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f87dae3e`
+- Built from commit: `09111d95`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,7 +19,7 @@
 - theme.ts
 - home.tsx
 - expo
-- sync.ts
+- cryohealth-api.ts
 - scripts
 - compilerOptions
 - reset-project.js
@@ -75,7 +75,7 @@
 - zustand
 - HANDOFF — cryohealth-app — 2026-08-08 21:15 PKT
 - HANDOFF — cryohealth-app — 2026-08-09 13:16 PKT
-- expo
+- expo-crypto
 - HANDOFF — cryohealth-app — 2026-08-09 14:50 PKT
 - HANDOFF — CryoHealth-app — 2026-09-22 PKT
 - HANDOFF — CryoHealth-app — 2026-09-22 PKT
@@ -92,28 +92,28 @@
 - @expo-google-fonts/archivo
 
 ## God Nodes (most connected - your core abstractions)
-1. `useStyles()` - 66 edges
-2. `useTheme()` - 55 edges
-3. `useApp()` - 27 edges
-4. `expo-router` - 19 edges
+1. `useStyles()` - 60 edges
+2. `useTheme()` - 48 edges
+3. `useApp()` - 25 edges
+4. `expo-router` - 17 edges
 5. `4. Components` - 16 edges
 6. `expo` - 15 edges
 7. `HANDOFF — cryohealth-app — 2026-08-02 00:05 PKT` - 15 edges
-8. `CryoHealth Mobile — design system for implementation` - 13 edges
-9. `Tier` - 12 edges
-10. `What You Must Do When Invoked` - 12 edges
+8. `useAuthStore` - 13 edges
+9. `CryoHealth Mobile — design system for implementation` - 13 edges
+10. `Tier` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Login()` --references--> `react`  [EXTRACTED]
   src/app/login.tsx → package.json
-- `Signup()` --references--> `react`  [EXTRACTED]
-  src/app/signup.tsx → package.json
 - `ThemeProvider()` --references--> `react`  [EXTRACTED]
   src/design/theme.ts → package.json
+- `startSyncEngine()` --references--> `AppState`  [EXTRACTED]
+  src/lib/sync.ts → src/state/app.tsx
+- `CriticalBadge()` --calls--> `useStyles()`  [EXTRACTED]
+  src/app/(tabs)/_layout.tsx → src/design/styles.ts
 - `Alerts()` --calls--> `useStyles()`  [EXTRACTED]
   src/app/(tabs)/alerts.tsx → src/design/styles.ts
-- `Home()` --calls--> `useStyles()`  [EXTRACTED]
-  src/app/(tabs)/home.tsx → src/design/styles.ts
 
 ## Import Cycles
 - None detected.
@@ -121,24 +121,24 @@
 ## Communities (76 total, 39 thin omitted)
 
 ### Community 0 - "useStyles"
-Cohesion: 0.08
-Nodes (61): expo-router, AlertDetail(), ObservedAlertDetail, NewCase(), OUTCOMES, PROBLEMS, Critical(), bodyFallbackSteps() (+53 more)
+Cohesion: 0.07
+Nodes (60): expo-router, Critical(), Splash(), AppEffects(), Login(), Permission(), AlertDetail(), NewCase() (+52 more)
 
 ### Community 1 - "theme.ts"
-Cohesion: 0.08
-Nodes (26): react, react, AppEffects(), border, FAMILY, Lang, Mode, motion (+18 more)
+Cohesion: 0.10
+Nodes (21): react, react, border, FAMILY, Lang, Mode, motion, NetState (+13 more)
 
 ### Community 2 - "home.tsx"
-Cohesion: 0.09
-Nodes (33): Alerts(), toCardData(), byRank(), Home(), TIER_RANK, Lakes(), TIER_RANK, AlertCard() (+25 more)
+Cohesion: 0.08
+Nodes (39): ObservedAlertDetail, Alerts(), toCardData(), OUTCOMES, PROBLEMS, TIER_RANK, Lakes(), TIER_RANK (+31 more)
 
 ### Community 3 - "expo"
-Cohesion: 0.06
-Nodes (33): backgroundColor, backgroundImage, foregroundImage, monochromeImage, adaptiveIcon, predictiveBackGestureEnabled, projectId, reactCompiler (+25 more)
+Cohesion: 0.05
+Nodes (38): backgroundColor, backgroundImage, foregroundImage, monochromeImage, adaptiveIcon, predictiveBackGestureEnabled, projectId, reactCompiler (+30 more)
 
-### Community 4 - "sync.ts"
-Cohesion: 0.09
-Nodes (34): ApiError, apiFetch(), ApiFetchOptions, errorMessage(), ApiAlert, ApiCase, ApiLake, ApiProtocol (+26 more)
+### Community 4 - "cryohealth-api.ts"
+Cohesion: 0.10
+Nodes (28): ApiError, apiFetch(), ApiFetchOptions, errorMessage(), ApiAlert, ApiCase, ApiLake, ApiProtocol (+20 more)
 
 ### Community 5 - "scripts"
 Cohesion: 0.08
@@ -154,7 +154,7 @@ Nodes (7): exampleDirPath, fs, oldDirs, path, readline, rl, root
 
 ### Community 8 - "dependencies"
 Cohesion: 0.22
-Nodes (9): expo-crypto, expo-linking, expo-router, dependencies, expo-crypto, expo-linking, expo-router, @tanstack/react-query (+1 more)
+Nodes (9): expo, expo-linking, expo-router, dependencies, expo, expo-linking, expo-router, @tanstack/react-query (+1 more)
 
 ### Community 9 - "4. Components"
 Cohesion: 0.07
@@ -265,24 +265,24 @@ Cohesion: 0.18
 Nodes (10): Done this session, Failed approaches (do not retry), Files touched, HANDOFF — CryoHealth-app — 2026-09-27, Next action, Open questions for a human, Resume with, ROOT CAUSE FOUND 2026-09-27 (evening) — supersedes "State"/"Next action" below (+2 more)
 
 ## Knowledge Gaps
-- **409 isolated node(s):** `check-gstack.sh script`, `name`, `slug`, `version`, `orientation` (+404 more)
+- **415 isolated node(s):** `check-gstack.sh script`, `name`, `slug`, `version`, `orientation` (+410 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **39 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `dependencies` to `theme.ts`, `scripts`, `expo-device`, `expo-font`, `expo-glass-effect`, `@expo-google-fonts/noto-nastaliq-urdu`, `expo-image`, `expo-splash-screen`, `expo-status-bar`, `expo-symbols`, `expo-system-ui`, `@expo/ui`, `expo-web-browser`, `lucide-react-native`, `react-dom`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-safe-area-context`, `react-native-screens`, `react-native-svg`, `react-native-web`, `react-native-worklets`, `expo-secure-store`, `@nozbe/watermelondb`, `@nozbe/with-observables`, `react-native`, `@react-native-community/netinfo`, `zod`, `zustand`, `expo`, `expo-constants`, `@expo-google-fonts/archivo`?**
+- **Why does `dependencies` connect `dependencies` to `theme.ts`, `scripts`, `expo-device`, `expo-font`, `expo-glass-effect`, `@expo-google-fonts/noto-nastaliq-urdu`, `expo-image`, `expo-splash-screen`, `expo-status-bar`, `expo-symbols`, `expo-system-ui`, `@expo/ui`, `expo-web-browser`, `lucide-react-native`, `react-dom`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-safe-area-context`, `react-native-screens`, `react-native-svg`, `react-native-web`, `react-native-worklets`, `expo-secure-store`, `@nozbe/watermelondb`, `@nozbe/with-observables`, `react-native`, `@react-native-community/netinfo`, `zod`, `zustand`, `expo-crypto`, `expo-constants`, `@expo-google-fonts/archivo`?**
   _High betweenness centrality (0.107) - this node is a cross-community bridge._
 - **Why does `react` connect `theme.ts` to `dependencies`, `useStyles`?**
   _High betweenness centrality (0.093) - this node is a cross-community bridge._
-- **Why does `Login()` connect `useStyles` to `theme.ts`, `sync.ts`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Why does `Login()` connect `useStyles` to `theme.ts`?**
+  _High betweenness centrality (0.064) - this node is a cross-community bridge._
 - **What connects `check-gstack.sh script`, `name`, `slug` to the rest of the system?**
-  _409 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _415 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `useStyles` be split into smaller, more focused modules?**
-  _Cohesion score 0.08045977011494253 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06835443037974684 - nodes in this community are weakly interconnected._
 - **Should `theme.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08064516129032258 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10144927536231885 - nodes in this community are weakly interconnected._
 - **Should `home.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.09042553191489362 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08361581920903954 - nodes in this community are weakly interconnected._

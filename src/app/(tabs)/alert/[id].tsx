@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import { Check } from 'lucide-react-native';
 import { useLocalSearchParams } from 'expo-router';
 import withObservables from '@nozbe/with-observables';
 import { Q } from '@nozbe/watermelondb';
-import { Chromed } from '../../components/chrome';
-import { TierBadge } from '../../components/hazard';
-import { BtnPrimary, CheckRow, SectionLabel } from '../../components/ui';
-import { useStyles } from '../../design/styles';
-import { useTheme } from '../../design/theme';
-import { useApp } from '../../state/app';
-import { database } from '../../lib/db';
-import { AlertModel } from '../../lib/db/models/AlertModel';
+import { Chromed } from '../../../components/chrome';
+import { TierBadge } from '../../../components/hazard';
+import { BtnPrimary, CheckRow, SectionLabel } from '../../../components/ui';
+import { useStyles } from '../../../design/styles';
+import { useTheme } from '../../../design/theme';
+import { useApp } from '../../../state/app';
+import { database } from '../../../lib/db';
+import { AlertModel } from '../../../lib/db/models/AlertModel';
 
 function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
   const t = useTheme();
@@ -23,9 +24,9 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
 
   if (!alert) {
     return (
-      <Chromed title="Alert">
+      <Chromed title="Alert" back>
         <View style={{ padding: t.space.lg }}>
-          <Text style={s.callout}>This alert isn't on this phone yet. Connect to sync.</Text>
+          <Text style={s.callout}>This alert isn&apos;t on this phone yet. Connect to sync.</Text>
         </View>
       </Chromed>
     );
@@ -37,7 +38,7 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
   if (window) facts.push(['Window', window]);
 
   return (
-    <Chromed title="Alert" sub={alert.downstreamSummary ?? undefined}>
+    <Chromed title="Alert" sub={alert.downstreamSummary ?? undefined} back>
       <ScrollView style={s.scroll}>
         <View style={{ padding: t.space.lg, gap: 10 }}>
           <TierBadge tier={alert.tier} />
@@ -74,7 +75,11 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
         {mode === 'chw' && alert.status === 'active' ? (
           <View style={{ padding: t.space.lg, gap: 7 }}>
             {acked ? (
-              <Text style={[s.footnote, { color: t.color.tier.normal }]}>Acknowledged</Text>
+              // Tier colour on the icon only -- body copy in a tier colour isn't allowed (DESIGN_SYSTEM §2).
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Check size={14} color={t.color.tier.normal} strokeWidth={2.6} />
+                <Text style={s.footnote}>Acknowledged</Text>
+              </View>
             ) : (
               <BtnPrimary label="Acknowledge & log action" onPress={() => setAcked(true)} />
             )}
@@ -91,5 +96,7 @@ const ObservedAlertDetail = withObservables(['id'], ({ id }: { id: string }) => 
 
 export default function AlertDetailRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  return <ObservedAlertDetail id={id ?? ''} />;
+  // Keyed by id: this screen stays mounted inside the tab navigator, so without a remount
+  // one alert's checklist/acknowledged state would carry over to the next.
+  return <ObservedAlertDetail key={id} id={id ?? ''} />;
 }

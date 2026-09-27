@@ -99,7 +99,7 @@ export const AlertCard = ({ a, onPress }: { a: AlertCardData; onPress?: () => vo
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TierBadge tier={a.tier} />
           {a.cleared ? (
-            <Text style={[s.footnote, { color: t.color.tier.normal }]}>CLEARED</Text>
+            <Text style={s.label}>CLEARED</Text>
           ) : null}
           <Text style={s.alertMeta}>{a.when}</Text>
         </View>
@@ -115,7 +115,7 @@ export const AlertCard = ({ a, onPress }: { a: AlertCardData; onPress?: () => vo
           </View>
         ) : null}
         {a.acked ? (
-          <Text style={[s.footnote, { color: t.color.tier.normal, marginTop: 8 }]}>{a.acked}</Text>
+          <Text style={[s.footnote, { marginTop: 8 }]}>{a.acked}</Text>
         ) : null}
       </View>
     </Pressable>

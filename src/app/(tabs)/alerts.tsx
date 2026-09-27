@@ -28,7 +28,7 @@ function Alerts({ alerts }: { alerts: AlertModel[] }) {
   const newest = sorted[0];
 
   return (
-    <Chromed title="Alerts" sub="Hunza · Hassanabad">
+    <Chromed title="Alerts" sub="All monitored lakes">
       <FreshRow stamp={newest ? `Feed updated ${relativeTime(newest.issuedAt)}` : 'No alerts yet'} />
       <ScrollView style={s.scroll}>
         {sorted.map((a) => {
@@ -37,7 +37,9 @@ function Alerts({ alerts }: { alerts: AlertModel[] }) {
             <AlertCard
               key={a.id}
               a={card}
-              onPress={() => (a.tier === 'critical' && a.status === 'active' ? router.push('/critical') : router.push(`/alert/${card.id}`))}
+              // Always this alert's own detail. /critical shows only the newest critical
+              // alert, so routing critical cards there made older ones unreachable.
+              onPress={() => router.push(`/alert/${card.id}`)}
             />
           );
         })}
