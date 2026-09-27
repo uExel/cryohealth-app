@@ -36,14 +36,18 @@ DB writes work end to end.
 - Protocol library: `src/components/protocol-library.tsx` + Health tab (CHW mode only),
   grouped by category, opens `/guidance?slug=…` (commit 73b0820)
 
+- #6 fixed: lakes `updated_at` -> `server_updated_at`, schema v4 + v3->v4 addColumns; v1->v2
+  step's unused `updated_at` declared `number` so dev-mode reserved-name check passes
+  (commit ad6f2d6, closes #6). Not yet in a TestFlight build.
+
 ## Not done / deferred
 - On-device confirmation of #10 (Local data 6/10/11, Alerts lists 10) — user hasn't reported
 - Complaint → slug mapping — clinical decision, needs a human (#5)
 - Structured `steps` for the 11 protocols (public mode shows "not available") — content work, API side
-- #6 schema migration — separate issue
+- Build #12 carrying the #6 schema v4 migration — not requested yet
 
 ## Next action
-`gh issue view 6` (lakes.updated_at schema migration), or get the clinician's complaint → slug mapping for #5
+If the user wants #6 on device: `npx eas-cli build --platform ios --profile production --non-interactive --no-wait` (build #12). Otherwise get the clinician's complaint → slug mapping for #5
 
 ## Open questions for a human
 - Build #11 Settings "Local data" counts and Health-tab protocol list on device — blocking: yes (for closing the field report)
@@ -67,11 +71,13 @@ DB writes work end to end.
 
 ## Files touched
 babel.config.js, package.json, package-lock.json, src/lib/api-client.ts,
-src/components/protocol-library.tsx, src/app/(tabs)/health.tsx, docs/ai/HANDOFF.md,
+src/components/protocol-library.tsx, src/app/(tabs)/health.tsx, src/lib/db/schema.ts,
+src/lib/db/migrations.ts, src/lib/db/models/LakeModel.ts, src/lib/sync.ts, src/app/(tabs)/map.tsx,
+src/app/(tabs)/home.tsx, CLAUDE.md, docs/ai/HANDOFF.md,
 docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md
 
 ## Verification status
 tests: n/a (no runner); off-device WatermelonDB/LokiJS harness reproduced the exact device error without the fix and passed with it  review: typecheck clean, lint = pre-existing `alert/[id].tsx:28` only, madge no cycles; `expo export` bundle has 0 warning-helper call sites and uses the production API URL  qa: build #10 syslog clean; build #11 on device: user confirmed protocols visible
 
 ## Resume with
-/uexel:orient   (then: pick up #6 or #5)
+/uexel:orient   (then: build #12 for the v4 migration, or #5)
