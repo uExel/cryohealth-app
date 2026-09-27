@@ -1,6 +1,9 @@
 import { useAuthStore } from '../state/auth';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+/** Production is the default so a release build can never ship pointing at localhost.
+ *  Local dev overrides it via `.env` (see `.env.example`); `||` also catches an empty value. */
+const PRODUCTION_API_URL = 'https://api.cryohealth.io';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || PRODUCTION_API_URL;
 
 /** React Native's Android fetch (OkHttp) has connect/read/write timeouts of 0 — i.e. none —
  *  so on a stalled rural connection a request can hang forever, and with it the sync

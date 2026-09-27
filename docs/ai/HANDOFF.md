@@ -2,6 +2,34 @@
 Session: offline-sync-hardening  Model: claude-opus-5-5  Branch: main  Goal: #1  Task: none (ad-hoc, not issue-tracked)
 Prior session archived: docs/ai/sessions/2026-09-24-alerts-protocols-field-report-handoff.md
 
+## ROOT CAUSE FOUND 2026-09-27 (evening) — supersedes "State"/"Next action" below
+Device syslog from build #9 (captured via `pymobiledevice3 syslog live`; Developer Mode is
+off so devicectl can't attach) shows EVERY sync failing at the DB write, not the network:
+`'Lakes/alerts sync failed', [Error: Decorating class property failed. Please ensure that
+transform-class-properties is enabled and runs after the decorators transform.]` (same for
+protocols). babel-preset-expo leaves class fields native on Hermes, so legacy `@field`
+decorators compile to `_initializerWarningHelper` calls that throw on any model
+construction -> every `prepareCreate` throws -> lakes, alerts AND protocols tables stay empty.
+Fix (uncommitted at time of writing): `babel.config.js` adds
+`@babel/plugin-transform-class-properties` (loose) scoped via `overrides` to
+`src/lib/db/models/` (global enable breaks react-native's PerformanceObserver private methods;
+the `test` must be a function because Metro loads the config without a filename). Verified:
+off-device WatermelonDB/LokiJS harness reproduces the exact error without the fix and passes
+with it; `npx expo export --platform ios --no-bytecode` bundles with 0 warning-helper call
+sites. Build #10 pass criteria: no "Decorating class property" in syslog, Settings Local data
+6/10/11, Alerts tab lists 10; smoke-test login, triage, map.
+- Disproven: "lakes populated, alerts empty" (home/map read the same empty lakes table) and
+  "withObservables isn't emitting" -- the tables were simply empty.
+- Guidance: protocols will now reach the DB, but triage Guidance still shows NoMatch until
+  `COMPLAINT_TO_SLUG` is filled (#5). Learn tab reads `lib/mock`, not the DB.
+- Latent: `lakes.updated_at` is a `string` column, but WatermelonDB reserves `updated_at`
+  (number). Harmless in release (create path never touches it, lakes are never updated),
+  but the schema invariant throws at module load in any dev build (NODE_ENV!=production).
+  Needs a schema migration; not fixed.
+- `src/lib/api-client.ts`: fallback API URL changed from `http://localhost:3000` to
+  `https://api.cryohealth.io` (`||`, so an empty env value also falls back); local dev sets
+  `EXPO_PUBLIC_API_URL` via `.env`. Verified with an env-less `expo export`.
+
 ## State
 Four offline-sync defects fixed, committed (`881fd96`), and pushed. **Build #9**
 (commit 881fd96, EAS build 65da298d-83c0-40bb-8eb3-43ccea238fb4) finished and was
