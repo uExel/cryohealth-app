@@ -1,6 +1,9 @@
 import { Q } from "@nozbe/watermelondb";
 import NetInfo from "@react-native-community/netinfo";
+import { AppState } from "react-native";
 import type { NetState } from "../design/theme";
+import { useAuthStore } from "../state/auth";
+import { ApiError } from "./api-client";
 import { database } from "./db";
 import { AlertModel } from "./db/models/AlertModel";
 import { ChwCaseModel } from "./db/models/ChwCaseModel";
@@ -108,8 +111,11 @@ async function pullProtocols() {
 }
 
 /** Push locally-queued CHW cases. clientCaseId makes retries idempotent server-side,
- *  so a failed push is simply left queued for the next sync pass. */
+ *  so a failed push is simply left queued for the next sync pass. Skipped entirely with
+ *  no session: POST /cases is CHW-only, and pushing tokenless just earns a 401. */
 async function pushQueuedCases() {
+  if (!useAuthStore.getState().token) return;
+
   const queued = await database
     .get<ChwCaseModel>("chw_cases")
     .query(Q.where("sync_state", "queued"))
@@ -131,6 +137,9 @@ async function pushQueuedCases() {
       });
     } catch (err) {
       console.warn("Case sync failed, will retry later", err);
+      // Expired session (401) or a non-CHW account (403): every remaining case would
+      // fail the same way, so stop and leave them all queued for after the next login.
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) return;
     }
   }
 }
@@ -162,8 +171,13 @@ export async function runSync(setNet: (n: NetState) => void) {
   }
 }
 
-/** Wires connectivity changes + a background interval to the sync engine. Call once
- *  from the root layout; returns an unsubscribe function. */
+/** Wires connectivity changes, app foregrounding, and a background interval to the sync
+ *  engine. Call once from the root layout, after the saved session is hydrated; returns
+ *  an unsubscribe function.
+ *
+ *  The foreground listener matters on iOS: JS timers don't run while the app is
+ *  suspended and NetInfo doesn't re-fire on resume unless connectivity actually changed,
+ *  so without it an app reopened after days shows its old cache for up to 5 minutes. */
 export function startSyncEngine(setNet: (n: NetState) => void) {
   const unsubscribeNetInfo = NetInfo.addEventListener((state) => {
     if (state.isConnected) {
@@ -171,6 +185,13 @@ export function startSyncEngine(setNet: (n: NetState) => void) {
     } else {
       setNet("offline");
     }
+  });
+
+  const appStateSub = AppState.addEventListener("change", (next) => {
+    if (next !== "active") return;
+    void NetInfo.fetch().then((state) => {
+      if (state.isConnected) void runSync(setNet);
+    });
   });
 
   const interval = setInterval(() => {
@@ -181,6 +202,7 @@ export function startSyncEngine(setNet: (n: NetState) => void) {
 
   return () => {
     unsubscribeNetInfo();
+    appStateSub.remove();
     clearInterval(interval);
   };
 }

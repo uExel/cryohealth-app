@@ -1,0 +1,466 @@
+{
+  "communities": {
+    "0": [
+      "src_app_alert_id",
+      "src_app_alert_id_alertdetail",
+      "src_app_case_newcase",
+      "src_app_guidance",
+      "src_app_guidance_guidance",
+      "src_app_permission_permission",
+      "src_app_settings",
+      "src_app_settings_settings",
+      "src_app_tabs_health",
+      "src_app_tabs_health_health",
+      "src_app_tabs_map",
+      "src_app_tabs_map_lakes",
+      "src_app_verify_verify",
+      "src_app_welcome_welcome",
+      "src_components_chrome_appbar",
+      "src_components_chrome_chromed",
+      "src_components_chrome_sossheet",
+      "src_components_chrome_syncbanner",
+      "src_components_guidance",
+      "src_components_guidance_disclaimer",
+      "src_components_guidance_guidancecard",
+      "src_components_guidance_provenance",
+      "src_components_ui_btndanger",
+      "src_components_ui_btnsecondary",
+      "src_components_ui_sectionlabel",
+      "src_components_ui_toggle",
+      "src_design_styles_makestyles",
+      "src_design_styles_usestyles",
+      "src_design_theme_bannerfor",
+      "src_design_theme_usetheme",
+      "src_lib_mock_alert_detail",
+      "src_lib_mock_valleys",
+      "src_state_app_useapp"
+    ],
+    "1": [
+      "package_dependencies_react",
+      "react",
+      "src_app_layout",
+      "src_app_layout_rootlayout",
+      "src_app_login_login",
+      "src_app_signup_signup",
+      "src_design_theme",
+      "src_design_theme_border",
+      "src_design_theme_face",
+      "src_design_theme_family",
+      "src_design_theme_lang",
+      "src_design_theme_mode",
+      "src_design_theme_motion",
+      "src_design_theme_netstate",
+      "src_design_theme_palette",
+      "src_design_theme_radius",
+      "src_design_theme_size",
+      "src_design_theme_space",
+      "src_design_theme_theme",
+      "src_design_theme_themecontext",
+      "src_design_theme_themename",
+      "src_design_theme_themeprovider",
+      "src_design_theme_themes",
+      "src_design_theme_tier_icon",
+      "src_state_app",
+      "src_state_app_appprovider",
+      "src_state_app_appstate",
+      "src_state_app_ctx"
+    ],
+    "2": [
+      "src_app_critical",
+      "src_app_critical_critical",
+      "src_app_tabs_alerts",
+      "src_app_tabs_alerts_alerts",
+      "src_app_tabs_index",
+      "src_app_tabs_index_home",
+      "src_components_hazard",
+      "src_components_hazard_alertcard",
+      "src_components_hazard_freshrow",
+      "src_components_hazard_hazardrow",
+      "src_components_hazard_tierbadge",
+      "src_components_hazard_tierheader",
+      "src_components_hazard_tiericon",
+      "src_design_styles_tierbadgestyle",
+      "src_design_styles_tiercolor",
+      "src_design_theme_freshnessfor",
+      "src_design_theme_tier",
+      "src_design_theme_tier_label",
+      "src_lib_mock",
+      "src_lib_mock_alert",
+      "src_lib_mock_alerts",
+      "src_lib_mock_common_complaints",
+      "src_lib_mock_critical",
+      "src_lib_mock_guidance",
+      "src_lib_mock_lake",
+      "src_lib_mock_lakes",
+      "src_lib_mock_stamp"
+    ],
+    "3": [
+      "app",
+      "app_adaptiveicon_backgroundcolor",
+      "app_adaptiveicon_backgroundimage",
+      "app_adaptiveicon_foregroundimage",
+      "app_adaptiveicon_monochromeimage",
+      "app_android_adaptiveicon",
+      "app_android_predictivebackgestureenabled",
+      "app_experiments_reactcompiler",
+      "app_experiments_typedroutes",
+      "app_expo",
+      "app_expo_android",
+      "app_expo_experiments",
+      "app_expo_icon",
+      "app_expo_ios",
+      "app_expo_name",
+      "app_expo_orientation",
+      "app_expo_plugins",
+      "app_expo_scheme",
+      "app_expo_slug",
+      "app_expo_userinterfacestyle",
+      "app_expo_version",
+      "app_expo_web",
+      "app_ios_icon",
+      "app_web_favicon",
+      "app_web_output"
+    ],
+    "4": [
+      "ref_expo_router",
+      "src_app_case",
+      "src_app_case_outcomes",
+      "src_app_case_problems",
+      "src_app_login",
+      "src_app_permission",
+      "src_app_signup",
+      "src_app_verify",
+      "src_app_welcome",
+      "src_components_chrome",
+      "src_components_chrome_barescreen",
+      "src_components_chrome_logo",
+      "src_components_chrome_usenavtocritical",
+      "src_components_ui",
+      "src_components_ui_btnprimary",
+      "src_components_ui_btnprops",
+      "src_components_ui_btntext",
+      "src_components_ui_checkrow",
+      "src_components_ui_field",
+      "src_components_ui_seg",
+      "src_design_styles",
+      "src_design_styles_absolutefillobject",
+      "src_design_styles_tiersoft"
+    ],
+    "5": [
+      "package",
+      "package_devdependencies",
+      "package_devdependencies_types_react",
+      "package_devdependencies_typescript",
+      "package_main",
+      "package_name",
+      "package_private",
+      "package_scripts",
+      "package_scripts_android",
+      "package_scripts_ios",
+      "package_scripts_lint",
+      "package_scripts_reset_project",
+      "package_scripts_start",
+      "package_scripts_typecheck",
+      "package_scripts_web",
+      "package_version",
+      "types_react",
+      "typescript"
+    ],
+    "6": [
+      "ref_assets",
+      "ref_expo_env_d_ts",
+      "ref_expo_tsconfig_base",
+      "ref_expo_types_ts",
+      "ref_ts",
+      "ref_tsx",
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_paths",
+      "tsconfig_compileroptions_strict",
+      "tsconfig_extends",
+      "tsconfig_include",
+      "tsconfig_paths_assets"
+    ],
+    "7": [
+      "scripts_reset_project",
+      "scripts_reset_project_exampledirpath",
+      "scripts_reset_project_fs",
+      "scripts_reset_project_movedirectories",
+      "scripts_reset_project_olddirs",
+      "scripts_reset_project_path",
+      "scripts_reset_project_readline",
+      "scripts_reset_project_rl",
+      "scripts_reset_project_root"
+    ],
+    "8": [
+      "expo",
+      "expo_constants",
+      "package_dependencies",
+      "package_dependencies_expo",
+      "package_dependencies_expo_constants",
+      "package_dependencies_react_native",
+      "react_native"
+    ],
+    "9": [
+      "src_app_tabs_learn",
+      "src_app_tabs_learn_download",
+      "src_app_tabs_learn_filters",
+      "src_app_tabs_learn_learn",
+      "src_lib_mock_lesson",
+      "src_lib_mock_lessons"
+    ],
+    "10": [
+      "src_app_tabs_layout",
+      "src_app_tabs_layout_tabbarprops",
+      "src_app_tabs_layout_tabs",
+      "src_app_tabs_layout_tabslayout",
+      "src_app_tabs_layout_uextabbar"
+    ],
+    "11": [
+      "claude_hooks_check_gstack",
+      "claude_hooks_check_gstack_sh__entry"
+    ],
+    "12": [
+      "expo_device",
+      "package_dependencies_expo_device"
+    ],
+    "13": [
+      "expo_font",
+      "package_dependencies_expo_font"
+    ],
+    "14": [
+      "expo_glass_effect",
+      "package_dependencies_expo_glass_effect"
+    ],
+    "15": [
+      "expo_google_fonts_archivo",
+      "package_dependencies_expo_google_fonts_archivo"
+    ],
+    "16": [
+      "expo_google_fonts_noto_nastaliq_urdu",
+      "package_dependencies_expo_google_fonts_noto_nastaliq_urdu"
+    ],
+    "17": [
+      "expo_image",
+      "package_dependencies_expo_image"
+    ],
+    "18": [
+      "expo_linking",
+      "package_dependencies_expo_linking"
+    ],
+    "19": [
+      "expo_router",
+      "package_dependencies_expo_router"
+    ],
+    "20": [
+      "expo_splash_screen",
+      "package_dependencies_expo_splash_screen"
+    ],
+    "21": [
+      "expo_status_bar",
+      "package_dependencies_expo_status_bar"
+    ],
+    "22": [
+      "expo_symbols",
+      "package_dependencies_expo_symbols"
+    ],
+    "23": [
+      "expo_system_ui",
+      "package_dependencies_expo_system_ui"
+    ],
+    "24": [
+      "expo_ui",
+      "package_dependencies_expo_ui"
+    ],
+    "25": [
+      "expo_web_browser",
+      "package_dependencies_expo_web_browser"
+    ],
+    "26": [
+      "lucide_react_native",
+      "package_dependencies_lucide_react_native"
+    ],
+    "27": [
+      "package_dependencies_react_dom",
+      "react_dom"
+    ],
+    "28": [
+      "package_dependencies_react_native_gesture_handler",
+      "react_native_gesture_handler"
+    ],
+    "29": [
+      "package_dependencies_react_native_reanimated",
+      "react_native_reanimated"
+    ],
+    "30": [
+      "package_dependencies_react_native_safe_area_context",
+      "react_native_safe_area_context"
+    ],
+    "31": [
+      "package_dependencies_react_native_screens",
+      "react_native_screens"
+    ],
+    "32": [
+      "package_dependencies_react_native_svg",
+      "react_native_svg"
+    ],
+    "33": [
+      "package_dependencies_react_native_web",
+      "react_native_web"
+    ],
+    "34": [
+      "package_dependencies_react_native_worklets",
+      "react_native_worklets"
+    ]
+  },
+  "cohesion": {
+    "0": 0.17045454545454544,
+    "1": 0.0873015873015873,
+    "2": 0.1282051282051282,
+    "3": 0.08,
+    "4": 0.25691699604743085,
+    "5": 0.1111111111111111,
+    "6": 0.15384615384615385,
+    "7": 0.2222222222222222,
+    "8": 0.2857142857142857,
+    "9": 0.3333333333333333,
+    "10": 0.5,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_design_styles_usestyles",
+      "label": "useStyles()",
+      "degree": 61
+    },
+    {
+      "id": "src_design_theme_usetheme",
+      "label": "useTheme()",
+      "degree": 50
+    },
+    {
+      "id": "src_state_app_useapp",
+      "label": "useApp()",
+      "degree": 19
+    },
+    {
+      "id": "ref_expo_router",
+      "label": "expo-router",
+      "degree": 15
+    },
+    {
+      "id": "app_expo",
+      "label": "expo",
+      "degree": 13
+    },
+    {
+      "id": "src_components_chrome_chromed",
+      "label": "Chromed()",
+      "degree": 11
+    },
+    {
+      "id": "src_components_ui_btnprimary",
+      "label": "BtnPrimary()",
+      "degree": 11
+    },
+    {
+      "id": "src_components_ui_btntext",
+      "label": "BtnText()",
+      "degree": 9
+    },
+    {
+      "id": "src_components_ui_sectionlabel",
+      "label": "SectionLabel()",
+      "degree": 9
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 8
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Login()",
+      "target": "react",
+      "source_files": [
+        "src/app/login.tsx",
+        "package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "Signup()",
+      "target": "react",
+      "source_files": [
+        "src/app/signup.tsx",
+        "package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "ThemeProvider()",
+      "target": "react",
+      "source_files": [
+        "src/design/theme.ts",
+        "package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "Alerts()",
+      "target": "useStyles()",
+      "source_files": [
+        "src/app/(tabs)/alerts.tsx",
+        "src/design/styles.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `Alerts()` unexpectedly reaches hub `useStyles()`"
+    },
+    {
+      "source": "UExTabBar()",
+      "target": "useStyles()",
+      "source_files": [
+        "src/app/(tabs)/_layout.tsx",
+        "src/design/styles.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

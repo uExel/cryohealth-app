@@ -20,11 +20,23 @@ const AppEffects = () => {
   const { setNet } = useApp();
   const hydrate = useAuthStore((s) => s.hydrate);
 
+  // Sync starts only once the saved session is loaded: NetInfo fires immediately on
+  // subscribe, and a first sync racing hydrate() would push queued cases with no token.
+  // `.finally`, not `.then` — public lakes/alerts/protocols must still sync for guests
+  // and if hydrate fails.
   useEffect(() => {
-    void hydrate();
-  }, [hydrate]);
-
-  useEffect(() => startSyncEngine(setNet), [setNet]);
+    let cancelled = false;
+    let stopSync: (() => void) | undefined;
+    hydrate()
+      .catch((err) => console.warn('Session hydrate failed', err))
+      .finally(() => {
+        if (!cancelled) stopSync = startSyncEngine(setNet);
+      });
+    return () => {
+      cancelled = true;
+      stopSync?.();
+    };
+  }, [hydrate, setNet]);
 
   return null;
 };

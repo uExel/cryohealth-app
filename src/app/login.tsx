@@ -9,13 +9,14 @@ import { useTheme } from '../design/theme';
 import { useApp } from '../state/app';
 import { useAuthStore } from '../state/auth';
 import { login } from '../lib/cryohealth-api';
+import { runSync } from '../lib/sync';
 import { ApiError } from '../lib/api-client';
 
 export default function Login() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
-  const { setMode } = useApp();
+  const { setMode, setNet } = useApp();
   const setSession = useAuthStore((st) => st.setSession);
   const [stay, setStay] = React.useState(true);
   const [identifier, setIdentifier] = React.useState('');
@@ -30,6 +31,8 @@ export default function Login() {
       const res = await login(identifier, pin);
       await setSession(res.accessToken, { role: res.role, name: res.name });
       setMode('chw');
+      // Cases queued while logged out (or after an expired session) push right away.
+      void runSync(setNet);
       router.replace('/home');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not reach the server. Try again.');

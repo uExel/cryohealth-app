@@ -30,7 +30,7 @@
     "semantic_hash": "35cb915a0bebbebbe69cf7815e174462"
   },
   "package.json": {
-    "mtime": 1790238931.5502677,
+    "mtime": 1786203975.7655523,
     "ast_hash": "6ca97b3c5abac8800c9aff685e158f65",
     "semantic_hash": ""
   },
@@ -50,9 +50,9 @@
     "semantic_hash": ""
   },
   "src/app/(tabs)/health.tsx": {
-    "mtime": 1790094167.385018,
-    "ast_hash": "7e21687303a2d02757a540a46394105b",
-    "semantic_hash": ""
+    "mtime": 1786170054.6953878,
+    "ast_hash": "c02487887d80dae4762e71f96beb61a7",
+    "semantic_hash": "c02487887d80dae4762e71f96beb61a7"
   },
   "src/app/(tabs)/learn.tsx": {
     "mtime": 1786170054.695509,
@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "src/app/_layout.tsx": {
-    "mtime": 1790491560.7409315,
-    "ast_hash": "e02a2ad493478a22d70d0f4edf3fa17a",
+    "mtime": 1786201817.1012192,
+    "ast_hash": "cdc619c9cbd2c1628ccea0df1a54f899",
     "semantic_hash": ""
   },
   "src/app/alert/[id].tsx": {
@@ -85,9 +85,9 @@
     "semantic_hash": ""
   },
   "src/app/guidance.tsx": {
-    "mtime": 1790096494.0764945,
-    "ast_hash": "7519308fe836e39cfc1955fe41da3bc3",
-    "semantic_hash": ""
+    "mtime": 1786170054.696074,
+    "ast_hash": "cda1bfb9c9af4073f8b8efd8d8603623",
+    "semantic_hash": "cda1bfb9c9af4073f8b8efd8d8603623"
   },
   "src/app/login.tsx": {
     "mtime": 1786201817.1012344,
@@ -100,9 +100,9 @@
     "semantic_hash": ""
   },
   "src/app/settings.tsx": {
-    "mtime": 1790241635.4137578,
-    "ast_hash": "9e766f6d5cd13ec762552336024eca3c",
-    "semantic_hash": ""
+    "mtime": 1786170054.6978724,
+    "ast_hash": "4f46b54b7c300aae801fce156886573a",
+    "semantic_hash": "4f46b54b7c300aae801fce156886573a"
   },
   "src/app/signup.tsx": {
     "mtime": 1786170054.6981127,
@@ -120,14 +120,14 @@
     "semantic_hash": ""
   },
   "src/components/chrome.tsx": {
-    "mtime": 1790241540.7799459,
-    "ast_hash": "c9205769c17adf88d1b3aa41f28f2395",
+    "mtime": 1786170054.698448,
+    "ast_hash": "037e7cc3924c176666828f624792c1e1",
     "semantic_hash": ""
   },
   "src/components/guidance.tsx": {
-    "mtime": 1790094298.0522985,
-    "ast_hash": "f179058bf69343e42fd9917281785062",
-    "semantic_hash": ""
+    "mtime": 1786170054.698519,
+    "ast_hash": "8cd26e4917741ebca79ef378301cef0b",
+    "semantic_hash": "8cd26e4917741ebca79ef378301cef0b"
   },
   "src/components/hazard.tsx": {
     "mtime": 1786204686.2743351,
@@ -150,9 +150,9 @@
     "semantic_hash": ""
   },
   "src/lib/mock.ts": {
-    "mtime": 1790094275.1128538,
-    "ast_hash": "0d0413ee2634e96c905aeb2e61f46126",
-    "semantic_hash": ""
+    "mtime": 1786170054.6995609,
+    "ast_hash": "2b57117c4e9a19eda9b6127553673200",
+    "semantic_hash": "2b57117c4e9a19eda9b6127553673200"
   },
   "src/state/app.tsx": {
     "mtime": 1786170054.699635,
@@ -165,8 +165,8 @@
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
-    "mtime": 1786270122.3509448,
-    "ast_hash": "ccbf1b45ee8fb501b5519e38febae011",
+    "mtime": 1786268914.5189908,
+    "ast_hash": "e7ebfeedca1aa83546864eaa38c40924",
     "semantic_hash": ""
   },
   "babel.config.js": {
@@ -175,7 +175,7 @@
     "semantic_hash": ""
   },
   "eas.json": {
-    "mtime": 1790335700.2969942,
+    "mtime": 1786263179.6673977,
     "ast_hash": "97fb71776b3a59afe9fdae96c27f0bdb",
     "semantic_hash": ""
   },
@@ -190,28 +190,28 @@
     "semantic_hash": ""
   },
   "src/lib/api-client.ts": {
-    "mtime": 1790491541.5215104,
-    "ast_hash": "e47de644a987c6c6a420fa4f1d230b22",
+    "mtime": 1786201817.1010678,
+    "ast_hash": "0d0f95b5c38f54494c03fe3e87e55770",
     "semantic_hash": ""
   },
   "src/lib/api-types.ts": {
-    "mtime": 1790093846.234375,
-    "ast_hash": "cf02422913e52b733a0dfff82e1c475a",
+    "mtime": 1786204422.9367874,
+    "ast_hash": "d48821643dfe462363142a9950296831",
     "semantic_hash": ""
   },
   "src/lib/cryohealth-api.ts": {
-    "mtime": 1790093862.3450058,
-    "ast_hash": "e9be07efe04b99384cad30de5b9a2fd8",
+    "mtime": 1786201817.1011846,
+    "ast_hash": "511459a81cf3f1d824616ff989a87267",
     "semantic_hash": ""
   },
   "src/lib/db/index.ts": {
-    "mtime": 1790093996.8111567,
-    "ast_hash": "f4b4d7b0b58164fb759f6f1b3fe0474e",
+    "mtime": 1786204493.6624513,
+    "ast_hash": "2d332eca75b2ac31e60e2728cd0daabd",
     "semantic_hash": ""
   },
   "src/lib/db/migrations.ts": {
-    "mtime": 1790093968.6925735,
-    "ast_hash": "c341e202f5be0699240d4629538d15a5",
+    "mtime": 1786204772.2304523,
+    "ast_hash": "f13195126e609a96475e0cc60d934f84",
     "semantic_hash": ""
   },
   "src/lib/db/models/AlertModel.ts": {
@@ -230,8 +230,8 @@
     "semantic_hash": ""
   },
   "src/lib/db/schema.ts": {
-    "mtime": 1790093958.8048863,
-    "ast_hash": "30c4055bfad489b1303379a9ae41be69",
+    "mtime": 1786204765.4098008,
+    "ast_hash": "292ac2213ffa9058e36b5d3117c25da6",
     "semantic_hash": ""
   },
   "src/lib/device-id.ts": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "src/lib/sync.ts": {
-    "mtime": 1790491560.7406576,
-    "ast_hash": "ea3f472b70a61711368aa794a725f664",
+    "mtime": 1786204789.5892751,
+    "ast_hash": "f7407f195e89733a2f295bce3bec560a",
     "semantic_hash": ""
   },
   "src/state/auth.ts": {
@@ -330,13 +330,13 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1790491572.532745,
-    "ast_hash": "c255dd1f145b049f52b01affde10ea82",
+    "mtime": 1786204931.584763,
+    "ast_hash": "30dfd9a98623e532c99b7f4c9c44043c",
     "semantic_hash": ""
   },
   "docs/ai/HANDOFF.md": {
-    "mtime": 1790248639.7980433,
-    "ast_hash": "f91ac6db7d99ac346fceae13bca31647",
+    "mtime": 1786268084.4215722,
+    "ast_hash": "495eb4fff6900fa19f31597966bc349d",
     "semantic_hash": ""
   },
   "docs/ai/LEARNINGS.md": {
@@ -345,13 +345,13 @@
     "semantic_hash": ""
   },
   "docs/ai/PLAN.md": {
-    "mtime": 1790093156.7413704,
-    "ast_hash": "7df6a08c93e734323c185b02c1f62483",
+    "mtime": 1786170054.6917188,
+    "ast_hash": "0a460a80658c4f6ed8f8fde64c2f5d9c",
     "semantic_hash": ""
   },
   "docs/ai/TODO.md": {
-    "mtime": 1790094402.6486905,
-    "ast_hash": "b94b19898281e4d87760655a08ad4077",
+    "mtime": 1786170054.6917849,
+    "ast_hash": "0a0595cdd4b3be691de73386bd0694f2",
     "semantic_hash": ""
   },
   "docs/ai/sessions/2026-08-03-design-implementation-testflight-handoff.md": {
@@ -487,81 +487,6 @@
   "docs/ai/sessions/2026-08-09-testflight-submission-setup-handoff.md": {
     "mtime": 1786263634.8042939,
     "ast_hash": "8b421660b1952a262cec6e794459543b",
-    "semantic_hash": ""
-  },
-  "eslint.config.js": {
-    "mtime": 1790093873.6962898,
-    "ast_hash": "b713dd66aa3ad59ed5098d7b9f8dc202",
-    "semantic_hash": ""
-  },
-  "src/lib/complaint-map.ts": {
-    "mtime": 1790179275.817413,
-    "ast_hash": "c0210445ea0d5d7e125fe0fcff97a2d0",
-    "semantic_hash": ""
-  },
-  "src/lib/db/models/ProtocolModel.ts": {
-    "mtime": 1790097355.9377575,
-    "ast_hash": "bc5f70e560c1da618e4a87f514ac77da",
-    "semantic_hash": ""
-  },
-  "docs/ai/planning/task-5-findings.md": {
-    "mtime": 1790093031.5083585,
-    "ast_hash": "2ca9b22d0a23db2071efee3a70934d8f",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-08-09-git-housekeeping-push-handoff.md": {
-    "mtime": 1790077536.039757,
-    "ast_hash": "df32314a4bee78283662b9bc2ea570aa",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-08-09-testflight-submission-setup-2-handoff.md": {
-    "mtime": 1786268084.4215722,
-    "ast_hash": "495eb4fff6900fa19f31597966bc349d",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-08-09-testflight-submission-setup-3-handoff.md": {
-    "mtime": 1786270141.81863,
-    "ast_hash": "1a716442ed081a7b3f9d8982bf19893a",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-22-harness-handoff-hygiene-handoff.md": {
-    "mtime": 1790093204.2903206,
-    "ast_hash": "a232dde3d1e69f4a1d26b6d03694407a",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-22-task5-build-handoff.md": {
-    "mtime": 1790096690.3966413,
-    "ast_hash": "85e0f45ff33935c90930943e62b6e067",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-22-task5-escalated-handoff.md": {
-    "mtime": 1790098604.550473,
-    "ast_hash": "fa10255feec14eff493043068832d080",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-22-task5-plan-handoff.md": {
-    "mtime": 1790094425.7464147,
-    "ast_hash": "8d796be3d6d72f6ffbb8cd186a01f8b4",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-22-task5-shipped-handoff.md": {
-    "mtime": 1790107194.3529277,
-    "ast_hash": "0b7d21f71d0dd3283188216ef4e67e54",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-22-task5-verify-fixloop-handoff.md": {
-    "mtime": 1790098187.603808,
-    "ast_hash": "c8d2aa69d1b143090264c1deef72f913",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-23-task5-device-slugfix-handoff.md": {
-    "mtime": 1790248600.8481967,
-    "ast_hash": "b73f66f0816c4a21a97b769ba90e5910",
-    "semantic_hash": ""
-  },
-  "docs/ai/sessions/2026-09-23-task5-shipped-handoff.md": {
-    "mtime": 1790179328.7387993,
-    "ast_hash": "13dfe94e43891c3449d1ef6d1d3c3f1d",
     "semantic_hash": ""
   }
 }

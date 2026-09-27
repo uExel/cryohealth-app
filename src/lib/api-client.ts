@@ -2,6 +2,11 @@ import { useAuthStore } from '../state/auth';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 
+/** React Native's Android fetch (OkHttp) has connect/read/write timeouts of 0 — i.e. none —
+ *  so on a stalled rural connection a request can hang forever, and with it the sync
+ *  engine's single-flight lock. Every request is aborted after this long instead. */
+const REQUEST_TIMEOUT_MS = 30_000;
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -13,32 +18,61 @@ export class ApiError extends Error {
 
 type ApiFetchOptions = Omit<RequestInit, 'body'> & { body?: unknown; auth?: boolean };
 
-/** Thin fetch wrapper: JSON in/out, bearer auth, and a single place that reacts to an
- *  expired/invalid token (401) by clearing the session so the UI can redirect to login. */
+/** NestJS error bodies are `{ message, error, statusCode }`; fall back to the raw text. */
+async function errorMessage(res: Response): Promise<string> {
+  const text = await res.text().catch(() => '');
+  try {
+    const parsed = JSON.parse(text) as { message?: unknown };
+    if (typeof parsed.message === 'string') return parsed.message;
+    if (Array.isArray(parsed.message)) return parsed.message.join(', ');
+  } catch {
+    // not JSON
+  }
+  return text || res.statusText;
+}
+
+/** Thin fetch wrapper: JSON in/out, bearer auth, a request timeout, and a single place
+ *  that reacts to an expired/invalid token (401) by clearing the session so the UI can
+ *  redirect to login. */
 export async function apiFetch<T>(path: string, opts: ApiFetchOptions = {}): Promise<T> {
   const { body, auth = true, headers, ...rest } = opts;
   const token = auth ? useAuthStore.getState().token : null;
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  if (res.status === 401) {
-    await useAuthStore.getState().logout();
-    throw new ApiError(401, 'Session expired');
+  // The timer spans the body read too — a response can stall mid-body as easily as
+  // before the headers arrive.
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      ...rest,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+
+    // Only a 401 on a request that actually carried a token means "session expired". A
+    // 401 without one (a wrong PIN on /auth/login, or a request sent before the saved
+    // session was hydrated) must never wipe the stored session.
+    if (res.status === 401 && token) {
+      await useAuthStore.getState().logout();
+      throw new ApiError(401, 'Session expired');
+    }
+
+    if (!res.ok) {
+      throw new ApiError(res.status, await errorMessage(res));
+    }
+
+    if (res.status === 204) return undefined as T;
+    return (await res.json()) as T;
+  } catch (err) {
+    if (controller.signal.aborted) throw new ApiError(0, 'Request timed out');
+    throw err;
+  } finally {
+    clearTimeout(timer);
   }
-
-  if (!res.ok) {
-    const message = await res.text().catch(() => res.statusText);
-    throw new ApiError(res.status, message || res.statusText);
-  }
-
-  if (res.status === 204) return undefined as T;
-  return (await res.json()) as T;
 }

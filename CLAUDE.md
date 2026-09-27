@@ -28,11 +28,14 @@ No test script defined in this repo.
 - src/design — generated from the Claude Design project; never hand-edit values (docs/design/README.md)
 - docs/design — the design contract (DESIGN_SYSTEM.md is binding, §1 especially)
 - src/lib/api-client.ts + cryohealth-api.ts — talks to CryoHealth-api (`EXPO_PUBLIC_API_URL`);
-  a 401 clears the session via the auth store, no separate interceptor.
+  a 401 on a request that carried a token clears the session via the auth store (a
+  tokenless 401, e.g. a wrong PIN, never does); every request aborts after 30s because
+  RN's Android fetch has no timeout at all.
 - src/lib/db/ — WatermelonDB local store: `lakes`/`alerts` are read-through caches wiped
   and replaced on every pull; `chw_cases` is the only locally-authored table, queued until
-  pushed. src/lib/sync.ts is the pull+push engine, wired from `_layout.tsx` on connectivity
-  change and a 5-minute interval.
+  pushed. src/lib/sync.ts is the pull+push engine, started from `_layout.tsx` only after
+  the session is hydrated, and triggered on connectivity change, app foreground, and a
+  5-minute interval.
 - src/state/auth.ts — zustand store, session persisted via expo-secure-store; hydrated once
   in `_layout.tsx`.
 
