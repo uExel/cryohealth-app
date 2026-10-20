@@ -2,7 +2,7 @@
   "expo": {
     "name": "CryoHealth",
     "slug": "cryohealth",
-    "version": "1.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "cryohealth",
@@ -16,6 +16,7 @@
     },
     "android": {
       "package": "com.uexel.cryohealth",
+      "versionCode": 5,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
