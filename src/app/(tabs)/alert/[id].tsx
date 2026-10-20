@@ -16,7 +16,7 @@ import { AlertModel } from '../../../lib/db/models/AlertModel';
 function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
   const t = useTheme();
   const s = useStyles();
-  const { mode } = useApp();
+  const { mode, lang } = useApp();
   const alert = alerts[0];
   const checklist = alert?.checklist ?? [];
   const [done, setDone] = useState<boolean[]>(checklist.map(() => false));
@@ -43,7 +43,11 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
         <View style={{ padding: t.space.lg, gap: 10 }}>
           <TierBadge tier={alert.tier} />
           <Text style={s.title1}>{alert.title}</Text>
-          <Text style={s.callout}>{alert.body}</Text>
+          {lang === 'ur' && alert.bodyUr ? (
+            <Text style={[s.callout, { writingDirection: 'rtl', textAlign: 'right' }]}>{alert.bodyUr}</Text>
+          ) : (
+            <Text style={s.callout}>{alert.body}</Text>
+          )}
         </View>
 
         {facts.length ? (
@@ -78,10 +82,10 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
               // Tier colour on the icon only -- body copy in a tier colour isn't allowed (DESIGN_SYSTEM §2).
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <Check size={14} color={t.color.tier.normal} strokeWidth={2.6} />
-                <Text style={s.footnote}>Acknowledged</Text>
+                <Text style={s.footnote}>Marked as read on this phone</Text>
               </View>
             ) : (
-              <BtnPrimary label="Acknowledge & log action" onPress={() => setAcked(true)} />
+              <BtnPrimary label="Mark as read" onPress={() => setAcked(true)} />
             )}
           </View>
         ) : null}

@@ -1,6 +1,6 @@
 /** App chrome: logo, app bar, sync banner, tab bar, SOS sheet. Geometry from design/styles.ts. */
 import React from 'react';
-import { Linking, Modal, Pressable, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, Modal, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Phone, X, ChevronLeft, ChevronRight, Settings2 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -65,9 +65,11 @@ export const AppBar = ({ title, sub, back }: { title: string; sub?: string; back
         ) : (
           <Logo />
         )}
-        <View style={{ flex: 1 }}>
-          <Text style={s.appBarTitle}>{title}</Text>
-          {sub ? <Text style={s.appBarSub}>{sub}</Text> : null}
+        {/* minWidth: 0 lets the column shrink below its text so the fixed-height bar never
+            wraps (three action buttons leave little room on a 360dp phone). */}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={s.appBarTitle} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+          {sub ? <Text style={s.appBarSub} numberOfLines={1} ellipsizeMode="tail">{sub}</Text> : null}
         </View>
         <Pressable accessibilityLabel="Settings" style={s.btnIcon} onPress={() => router.push('/settings')}>
           <Settings2 size={18} color={t.color.text} strokeWidth={2.2} />
@@ -175,3 +177,11 @@ export const useNavToCritical = () => {
   const router = useRouter();
   return () => router.push('/critical');
 };
+
+/** Lifts form content above the on-screen keyboard (the app is edge-to-edge on Android,
+ *  where the OS no longer resizes the window for us). */
+export const KeyboardAvoid = ({ children }: { children: React.ReactNode }) => (
+  <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+    {children}
+  </KeyboardAvoidingView>
+);

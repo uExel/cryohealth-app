@@ -9,6 +9,7 @@ import { BtnPrimary, SectionLabel } from '../../components/ui';
 import { useStyles } from '../../design/styles';
 import { TIER_LABEL, Tier, useTheme } from '../../design/theme';
 import { useApp } from '../../state/app';
+import { useSyncRefresh } from '../../lib/use-refresh';
 import { database } from '../../lib/db';
 import { LakeModel } from '../../lib/db/models/LakeModel';
 import { AlertModel } from '../../lib/db/models/AlertModel';
@@ -32,13 +33,16 @@ function Home({
   const router = useRouter();
   const { mode, lang } = useApp();
   const ur = lang === 'ur';
+  const refreshControl = useSyncRefresh();
 
   if (lakes.length === 0) {
     return (
       <Chromed title="CryoHealth" sub="Gilgit-Baltistan">
-        <View style={{ padding: t.space.lg }}>
-          <Text style={s.callout}>No lake data on this phone yet. Connect once to sync.</Text>
-        </View>
+        <ScrollView style={s.scroll} refreshControl={refreshControl}>
+          <View style={{ padding: t.space.lg }}>
+            <Text style={s.callout}>No lake data on this phone yet. Pull down to sync when you have signal.</Text>
+          </View>
+        </ScrollView>
       </Chromed>
     );
   }
@@ -52,7 +56,7 @@ function Home({
 
   return (
     <Chromed title="CryoHealth" sub="Gilgit-Baltistan">
-      <ScrollView style={s.scroll}>
+      <ScrollView style={s.scroll} refreshControl={refreshControl}>
         <TierHeader
           tier={worst.tier}
           kicker={ur ? 'خطرے کا درجہ' : 'HAZARD TIER'}

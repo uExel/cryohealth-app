@@ -9,6 +9,7 @@ import { AlertModel } from "./db/models/AlertModel";
 import { ChwCaseModel } from "./db/models/ChwCaseModel";
 import { LakeModel } from "./db/models/LakeModel";
 import { ProtocolModel } from "./db/models/ProtocolModel";
+import { syncPushRegistration } from "./push-notifications";
 import {
   createCase,
   fetchAlerts,
@@ -139,7 +140,8 @@ async function pushQueuedCases() {
       console.warn("Case sync failed, will retry later", err);
       // Expired session (401) or a non-CHW account (403): every remaining case would
       // fail the same way, so stop and leave them all queued for after the next login.
-      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) return;
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403))
+        return;
     }
   }
 }
@@ -151,6 +153,11 @@ export async function runSync(setNet: (n: NetState) => void) {
   syncInFlight = true;
   setNet("syncing");
   try {
+    try {
+      await syncPushRegistration();
+    } catch (err) {
+      console.warn("Push registration sync failed", err);
+    }
     await pushQueuedCases();
     // Isolated like pullProtocols below: a lakes/alerts failure must not skip the
     // protocols pull, and vice versa -- each cache degrades independently.

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Chromed } from '../../components/chrome';
+import { Chromed, KeyboardAvoid } from '../../components/chrome';
 import { Disclaimer } from '../../components/guidance';
 import { ObservedProtocolLibrary } from '../../components/protocol-library';
 import { BtnPrimary, BtnSecondary, SectionLabel } from '../../components/ui';
@@ -26,6 +26,7 @@ export default function Health() {
   return (
     <Chromed title="Health assistant" sub="Works offline">
       <Disclaimer />
+      <KeyboardAvoid>
       <ScrollView style={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={{ padding: t.space.lg, gap: 10 }}>
           <Text style={s.title2}>What is wrong?</Text>
@@ -38,6 +39,7 @@ export default function Health() {
               onChangeText={setText}
               placeholder="e.g. Child breathing fast"
               placeholderTextColor={t.color.muted}
+              accessibilityLabel="Describe the problem"
             />
           </View>
           <BtnPrimary label="Get guidance" onPress={() => goToGuidance(resolveComplaintSlug(text))} />
@@ -52,6 +54,7 @@ export default function Health() {
             and public mode can't open a protocol without structured steps anyway. */}
         {mode === 'chw' && <ObservedProtocolLibrary />}
       </ScrollView>
+      </KeyboardAvoid>
     </Chromed>
   );
 }

@@ -1,24 +1,32 @@
-import React, { useEffect } from 'react';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useFonts } from 'expo-font';
-import { QueryClientProvider } from '@tanstack/react-query';
+import React, { useEffect } from "react";
+import { Stack, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
   Archivo_400Regular,
   Archivo_600SemiBold,
   Archivo_800ExtraBold,
-} from '@expo-google-fonts/archivo';
-import { NotoNastaliqUrdu_400Regular } from '@expo-google-fonts/noto-nastaliq-urdu';
-import { AppProvider, useApp } from '../state/app';
-import { useAuthStore } from '../state/auth';
-import { queryClient } from '../lib/query-client';
-import { startSyncEngine } from '../lib/sync';
+} from "@expo-google-fonts/archivo";
+import { NotoNastaliqUrdu_400Regular } from "@expo-google-fonts/noto-nastaliq-urdu";
+import { AppProvider, useApp } from "../state/app";
+import { useAuthStore } from "../state/auth";
+import { queryClient } from "../lib/query-client";
+import { startSyncEngine } from "../lib/sync";
+import * as Notifications from "expo-notifications";
+import {
+  alertIdFromResponse,
+  alertTierFromResponse,
+  cacheAlertFromPush,
+  refreshPushToken,
+} from "../lib/push-notifications";
 
 /** Runs once auth/theme context exist: hydrates the saved session and wires the
  *  sync engine's connectivity state into the existing sync banner (`net`). */
 const AppEffects = () => {
   const { setNet } = useApp();
   const hydrate = useAuthStore((s) => s.hydrate);
+  const router = useRouter();
 
   // Sync starts only once the saved session is loaded: NetInfo fires immediately on
   // subscribe, and a first sync racing hydrate() would push queued cases with no token.
@@ -28,15 +36,73 @@ const AppEffects = () => {
     let cancelled = false;
     let stopSync: (() => void) | undefined;
     hydrate()
-      .catch((err) => console.warn('Session hydrate failed', err))
+      .catch((err) => console.warn("Session hydrate failed", err))
       .finally(() => {
-        if (!cancelled) stopSync = startSyncEngine(setNet);
+        if (!cancelled) {
+          stopSync = startSyncEngine(setNet);
+        }
       });
     return () => {
       cancelled = true;
       stopSync?.();
     };
   }, [hydrate, setNet]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const handled = new Set<string>();
+
+    const openAlert = async (response: Notifications.NotificationResponse) => {
+      const alertId = alertIdFromResponse(response);
+      if (!alertId) return;
+      // One handling per tap (the cold-start response is also replayed by the listener),
+      // but a later push for the same alert still opens it.
+      const tapId = response.notification.request.identifier;
+      if (handled.has(tapId)) return;
+      handled.add(tapId);
+      let cached = true;
+      try {
+        await cacheAlertFromPush(alertId);
+      } catch (err) {
+        // Offline or API down: the detail screen has its own "not on this phone yet" state.
+        cached = false;
+        console.warn("Could not cache the alert from this notification", err);
+      }
+      if (cancelled) return;
+      // /critical shows the newest critical alert in the local DB, so only use it when
+      // this alert was just cached.
+      if (cached && alertTierFromResponse(response) === "critical") {
+        router.push("/critical");
+      } else {
+        router.push(`/alert/${alertId}`);
+      }
+    };
+
+    const subscription =
+      Notifications.addNotificationResponseReceivedListener(openAlert);
+    const tokenSubscription = Notifications.addPushTokenListener((token) => {
+      void refreshPushToken(token.data).catch((err: unknown) =>
+        console.warn("Push token refresh registration failed", err),
+      );
+    });
+    void Notifications.getLastNotificationResponseAsync()
+      .then((response) => {
+        if (response) void openAlert(response);
+        return Notifications.clearLastNotificationResponseAsync();
+      })
+      .catch((err: unknown) => {
+        console.warn(
+          "Could not read the notification that opened the app",
+          err,
+        );
+      });
+
+    return () => {
+      cancelled = true;
+      subscription.remove();
+      tokenSubscription.remove();
+    };
+  }, [router]);
 
   return null;
 };
@@ -45,9 +111,9 @@ export default function RootLayout() {
   // Registered under the exact family names design/theme.ts emits on Android.
   // iOS resolves the plain "Archivo" family + fontWeight; register the regular cut for it too.
   const [loaded] = useFonts({
-    'Archivo-Regular': Archivo_400Regular,
-    'Archivo-SemiBold': Archivo_600SemiBold,
-    'Archivo-ExtraBold': Archivo_800ExtraBold,
+    "Archivo-Regular": Archivo_400Regular,
+    "Archivo-SemiBold": Archivo_600SemiBold,
+    "Archivo-ExtraBold": Archivo_800ExtraBold,
     Archivo: Archivo_400Regular,
     NotoNastaliqUrdu: NotoNastaliqUrdu_400Regular,
   });
@@ -58,13 +124,21 @@ export default function RootLayout() {
       <AppProvider>
         <AppEffects />
         <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false, animation: 'fade', animationDuration: 180 }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: "fade",
+            animationDuration: 180,
+          }}
+        >
           <Stack.Screen name="(tabs)" />
           {/* A warning never animates in (theme.motion.critical). */}
-          <Stack.Screen name="critical" options={{ presentation: 'fullScreenModal', animation: 'none' }} />
+          <Stack.Screen
+            name="critical"
+            options={{ presentation: "fullScreenModal", animation: "none" }}
+          />
         </Stack>
       </AppProvider>
     </QueryClientProvider>
   );
 }
-
