@@ -9,6 +9,8 @@ import { useTheme } from '../../design/theme';
 import { useStyles } from '../../design/styles';
 import { database } from '../../lib/db';
 import { AlertModel } from '../../lib/db/models/AlertModel';
+import { AlertReadModel } from '../../lib/db/models/AlertReadModel';
+import { readIds } from '../../lib/alert-state';
 
 // Learn is hidden until real lesson content exists (it was all placeholder).
 const TABS = [
@@ -28,17 +30,20 @@ const SUB_SCREENS: Record<string, string | null> = {
   settings: null,
 };
 
-/** Red square badge = count of active CRITICAL alerts, and nothing else (DESIGN_SYSTEM
- *  §1: red means critical). Hidden at zero. */
-function CriticalBadge({ alerts }: { alerts: AlertModel[] }) {
+/** Red square badge = count of active CRITICAL alerts the user has not opened yet, and
+ *  nothing else (DESIGN_SYSTEM §1: red means critical). Opening an alert (list tap or push
+ *  tap) marks it read and lowers the count. Hidden at zero. */
+function CriticalBadge({ alerts, reads }: { alerts: AlertModel[]; reads: AlertReadModel[] }) {
   const s = useStyles();
-  if (alerts.length === 0) return null;
+  const read = readIds(reads);
+  const count = alerts.filter((a) => !read.has(a.remoteId)).length;
+  if (count === 0) return null;
   return (
     <View
       style={[s.tabBadge, { right: '50%', marginRight: -22 }]}
-      accessibilityLabel={`${alerts.length} active critical alert${alerts.length === 1 ? '' : 's'}`}
+      accessibilityLabel={`${count} unread critical alert${count === 1 ? '' : 's'}`}
     >
-      <Text style={s.tabBadgeLabel}>{alerts.length}</Text>
+      <Text style={s.tabBadgeLabel}>{count}</Text>
     </View>
   );
 }
@@ -48,6 +53,7 @@ const ObservedCriticalBadge = withObservables([], () => ({
     .get<AlertModel>('alerts')
     .query(Q.where('tier', 'critical'), Q.where('status', 'active'))
     .observe(),
+  reads: database.get<AlertReadModel>('alert_reads').query().observe(),
 }))(CriticalBadge);
 
 // Structural props: expo-router and @react-navigation ship conflicting copies of

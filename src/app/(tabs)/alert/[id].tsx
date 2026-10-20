@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { Check } from 'lucide-react-native';
 import { useLocalSearchParams } from 'expo-router';
 import withObservables from '@nozbe/with-observables';
 import { Q } from '@nozbe/watermelondb';
 import { Chromed } from '../../../components/chrome';
 import { TierBadge } from '../../../components/hazard';
-import { BtnPrimary, CheckRow, SectionLabel } from '../../../components/ui';
+import { CheckRow, SectionLabel } from '../../../components/ui';
 import { useStyles } from '../../../design/styles';
 import { useTheme } from '../../../design/theme';
 import { useApp } from '../../../state/app';
 import { database } from '../../../lib/db';
 import { AlertModel } from '../../../lib/db/models/AlertModel';
+import { markAlertRead } from '../../../lib/alert-state';
 
 function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
   const t = useTheme();
   const s = useStyles();
-  const { mode, lang } = useApp();
+  const { lang } = useApp();
   const alert = alerts[0];
   const checklist = alert?.checklist ?? [];
   const [done, setDone] = useState<boolean[]>(checklist.map(() => false));
-  const [acked, setAcked] = useState(false);
+
+  // Opening an alert (from the list, a push tap or a link) is what marks it read. Keyed on the
+  // remote id, so it runs once per alert and survives every sync.
+  const remoteId = alert?.remoteId;
+  useEffect(() => {
+    if (remoteId) void markAlertRead(remoteId).catch((err: unknown) => console.warn('Could not mark alert read', err));
+  }, [remoteId]);
 
   if (!alert) {
     return (
@@ -76,19 +82,6 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
           </>
         ) : null}
 
-        {mode === 'chw' && alert.status === 'active' ? (
-          <View style={{ padding: t.space.lg, gap: 7 }}>
-            {acked ? (
-              // Tier colour on the icon only -- body copy in a tier colour isn't allowed (DESIGN_SYSTEM §2).
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Check size={14} color={t.color.tier.normal} strokeWidth={2.6} />
-                <Text style={s.footnote}>Marked as read on this phone</Text>
-              </View>
-            ) : (
-              <BtnPrimary label="Mark as read" onPress={() => setAcked(true)} />
-            )}
-          </View>
-        ) : null}
       </ScrollView>
     </Chromed>
   );

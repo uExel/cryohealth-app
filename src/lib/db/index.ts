@@ -6,6 +6,7 @@ import { LakeModel } from "./models/LakeModel";
 import { AlertModel } from "./models/AlertModel";
 import { ChwCaseModel } from "./models/ChwCaseModel";
 import { ProtocolModel } from "./models/ProtocolModel";
+import { AlertReadModel } from "./models/AlertReadModel";
 
 const adapter = new SQLiteAdapter({
   schema,
@@ -19,5 +20,11 @@ const adapter = new SQLiteAdapter({
 
 export const database = new Database({
   adapter,
-  modelClasses: [LakeModel, AlertModel, ChwCaseModel, ProtocolModel],
+  modelClasses: [
+    LakeModel,
+    AlertModel,
+    ChwCaseModel,
+    ProtocolModel,
+    AlertReadModel,
+  ],
 });

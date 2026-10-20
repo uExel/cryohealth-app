@@ -38,3 +38,4 @@ web-build/
 yarn-debug.*
 yarn-error.*
 .gstack/
+graphify-out
