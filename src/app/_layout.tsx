@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Stack, useRouter } from "expo-router";
+import { Stack, usePathname, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ import { AppProvider, useApp } from "../state/app";
 import { useAuthStore } from "../state/auth";
 import { queryClient } from "../lib/query-client";
 import { startSyncEngine } from "../lib/sync";
+import { createStartupGate } from "../lib/startup-gate";
 import * as Notifications from "expo-notifications";
 import {
   alertIdFromResponse,
@@ -27,6 +28,15 @@ const AppEffects = () => {
   const { setNet } = useApp();
   const hydrate = useAuthStore((s) => s.hydrate);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // See startup-gate.ts: a cold-start notification tap must not navigate until the splash
+  // route has routed away from "/". The timeout below keeps a stuck session load from
+  // swallowing the tap.
+  const [gate] = React.useState(createStartupGate);
+  useEffect(() => {
+    if (pathname !== "/") gate.open();
+  }, [pathname, gate]);
 
   // Sync starts only once the saved session is loaded: NetInfo fires immediately on
   // subscribe, and a first sync racing hydrate() would push queued cases with no token.
@@ -60,6 +70,8 @@ const AppEffects = () => {
       const tapId = response.notification.request.identifier;
       if (handled.has(tapId)) return;
       handled.add(tapId);
+      // Still on the splash route => this tap launched the app (cold start).
+      const coldStart = !gate.done;
       let cached = true;
       try {
         await cacheAlertFromPush(alertId);
@@ -67,6 +79,14 @@ const AppEffects = () => {
         // Offline or API down: the detail screen has its own "not on this phone yet" state.
         cached = false;
         console.warn("Could not cache the alert from this notification", err);
+      }
+      if (coldStart) {
+        await Promise.race([
+          gate.wait,
+          new Promise<void>((resolve) => setTimeout(resolve, 5000)),
+        ]);
+        // Land on Home with the alert above it, so Back goes Home and not out of the app.
+        if (!cancelled) router.replace("/home");
       }
       if (cancelled) return;
       // /critical shows the newest critical alert in the local DB, so only use it when
@@ -102,7 +122,7 @@ const AppEffects = () => {
       subscription.remove();
       tokenSubscription.remove();
     };
-  }, [router]);
+  }, [router, gate]);
 
   return null;
 };
