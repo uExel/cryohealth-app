@@ -80,9 +80,16 @@ export default function Permission() {
             Focus and Silent mode settings may silence notifications.
           </Text>
         ) : (
-          <Text style={s.callout}>
-            Your notification and Do Not Disturb settings may silence alerts.
-          </Text>
+          <>
+            <Text style={s.callout}>
+              Your notification and Do Not Disturb settings may silence alerts.
+            </Text>
+            <Text style={s.callout}>
+              Some phones stop an app when you swipe it away. To keep alerts
+              coming, open Settings later and choose “Open app settings” under
+              Hazard notifications.
+            </Text>
+          </>
         )}
         <View style={{ marginTop: "auto", marginBottom: t.space.xxl, gap: 10 }}>
           {error ? <Text style={s.callout}>{error}</Text> : null}

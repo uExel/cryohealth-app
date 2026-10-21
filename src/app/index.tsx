@@ -8,6 +8,7 @@ import { WifiOff, RefreshCw } from 'lucide-react-native';
 import { Logo, Wordmark } from '../components/chrome';
 import { useApp } from '../state/app';
 import { useAuthStore } from '../state/auth';
+import { shouldShowBatteryPrompt } from '../lib/battery-settings';
 
 export default function Splash() {
   const router = useRouter();
@@ -19,9 +20,15 @@ export default function Splash() {
   // signed-in user through welcome), but keep the mark up briefly so it doesn't flash.
   useEffect(() => {
     if (authStatus === 'loading') return;
-    const id = setTimeout(() => {
+    const id = setTimeout(async () => {
       // A restored session (SecureStore) skips straight past welcome/login.
-      router.replace(authStatus === 'authenticated' ? '/home' : '/welcome');
+      if (authStatus === 'authenticated') {
+        router.replace('/home');
+        return;
+      }
+      // First launch on Android: ask for battery access before anything else, once.
+      const askBattery = await shouldShowBatteryPrompt().catch(() => false);
+      router.replace(askBattery ? '/battery' : '/welcome');
     }, 600);
     return () => clearTimeout(id);
   }, [router, authStatus]);

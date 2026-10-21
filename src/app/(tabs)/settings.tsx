@@ -12,6 +12,7 @@ import { database } from "../../lib/db";
 import { LakeModel } from "../../lib/db/models/LakeModel";
 import { AlertModel } from "../../lib/db/models/AlertModel";
 import { ProtocolModel } from "../../lib/db/models/ProtocolModel";
+import { openAppSettings } from "../../lib/battery-settings";
 import {
   disablePushNotifications,
   enablePushNotifications,
@@ -166,6 +167,20 @@ export default function Settings() {
               </View>
               {pushError ? (
                 <Text style={s.fieldErrorText}>{pushError}</Text>
+              ) : null}
+              {pushEnabled ? (
+                <View style={{ paddingTop: t.space.sm, gap: 8 }}>
+                  <Text style={s.bodyStrong}>Keep alerts working when the app is closed</Text>
+                  <Text style={s.footnote}>
+                    Some phones stop an app when you swipe it away, and a stopped app cannot
+                    receive alerts. In app settings, open Battery and choose “Don’t optimize”
+                    or “Unrestricted” for CryoHealth.
+                  </Text>
+                  <BtnSecondary
+                    label="Open app settings"
+                    onPress={() => void openAppSettings().catch(() => setPushError("Could not open app settings."))}
+                  />
+                </View>
               ) : null}
             </View>
           </>
