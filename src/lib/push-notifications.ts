@@ -90,8 +90,15 @@ export async function enablePushNotifications(): Promise<boolean> {
   }
   if (status !== "granted") return false;
 
-  await registerCurrentToken();
+  // Opt in before registering: registration needs the network, and an offline first launch
+  // must not trap the user on the permission screen. `syncPushRegistration` retries the
+  // registration on every sync until it succeeds.
   await SecureStore.setItemAsync(PUSH_ENABLED_KEY, "true");
+  try {
+    await registerCurrentToken();
+  } catch (err) {
+    console.warn("Push registration failed, will retry on next sync", err);
+  }
   return true;
 }
 

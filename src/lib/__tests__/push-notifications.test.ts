@@ -3,9 +3,10 @@ import {
   alertIdFromResponse,
   alertTierFromResponse,
   disablePushNotifications,
+  enablePushNotifications,
   syncPushRegistration,
 } from "../push-notifications";
-import { unregisterPushDevice } from "../cryohealth-api";
+import { registerPushDevice, unregisterPushDevice } from "../cryohealth-api";
 
 const mockStore: Record<string, string> = {};
 
@@ -20,6 +21,12 @@ jest.mock("expo-secure-store", () => ({
 }));
 jest.mock("expo-notifications", () => ({
   setNotificationHandler: jest.fn(),
+  AndroidImportance: { MAX: 5 },
+  deleteNotificationChannelAsync: jest.fn(async () => undefined),
+  setNotificationChannelAsync: jest.fn(async () => undefined),
+  getPermissionsAsync: jest.fn(async () => ({ status: "granted" })),
+  requestPermissionsAsync: jest.fn(async () => ({ status: "granted" })),
+  getDevicePushTokenAsync: jest.fn(async () => ({ data: "fcm-token-1" })),
 }));
 jest.mock("expo-device", () => ({ isDevice: true }));
 jest.mock("../db", () => ({ database: {} }));
@@ -30,12 +37,14 @@ jest.mock("../cryohealth-api", () => ({
 }));
 
 const unregister = unregisterPushDevice as jest.Mock;
+const register = registerPushDevice as jest.Mock;
 const respond = (data: Record<string, unknown>) =>
   ({ notification: { request: { content: { data } } } }) as unknown as NotificationResponse;
 
 beforeEach(() => {
   for (const k of Object.keys(mockStore)) delete mockStore[k];
   unregister.mockReset();
+  register.mockReset();
 });
 
 describe("alertIdFromResponse", () => {
@@ -72,5 +81,23 @@ describe("disablePushNotifications while offline", () => {
     await syncPushRegistration();
     expect(unregister).toHaveBeenCalledWith("tok");
     expect(mockStore.cryohealth_push_token).toBeUndefined();
+  });
+});
+
+describe("enablePushNotifications while offline", () => {
+  it("opts in and succeeds even though the token cannot be registered yet", async () => {
+    register.mockRejectedValue(new Error("network down"));
+    await expect(enablePushNotifications()).resolves.toBe(true);
+    expect(mockStore.cryohealth_push_enabled).toBe("true");
+    expect(mockStore.cryohealth_push_token).toBeUndefined();
+  });
+
+  it("the next sync registers the token and stores it", async () => {
+    register.mockRejectedValueOnce(new Error("network down"));
+    await enablePushNotifications();
+    register.mockResolvedValue(undefined);
+    await syncPushRegistration();
+    expect(register).toHaveBeenLastCalledWith("fcm-token-1", "android");
+    expect(mockStore.cryohealth_push_token).toBe("fcm-token-1");
   });
 });
