@@ -10,7 +10,7 @@ import { useStyles } from '../../design/styles';
 import { database } from '../../lib/db';
 import { AlertModel } from '../../lib/db/models/AlertModel';
 import { AlertReadModel } from '../../lib/db/models/AlertReadModel';
-import { readIds } from '../../lib/alert-state';
+import { countUnreadCritical } from '../../lib/alert-state';
 
 // Learn is hidden until real lesson content exists (it was all placeholder).
 const TABS = [
@@ -35,8 +35,7 @@ const SUB_SCREENS: Record<string, string | null> = {
  *  tap) marks it read and lowers the count. Hidden at zero. */
 function CriticalBadge({ alerts, reads }: { alerts: AlertModel[]; reads: AlertReadModel[] }) {
   const s = useStyles();
-  const read = readIds(reads);
-  const count = alerts.filter((a) => !read.has(a.remoteId)).length;
+  const count = countUnreadCritical(alerts, reads);
   if (count === 0) return null;
   return (
     <View
