@@ -17,6 +17,7 @@ export class AlertModel extends Model {
   @field("downstream_summary") downstreamSummary?: string;
   @field("window_start") windowStart?: string;
   @field("window_end") windowEnd?: string;
+  @field("estimated_window") estimatedWindow?: string;
   /** Optional, human-authored (see CryoHealth-api's IssueAlertDto) — absent on most
    *  alerts today; a missing value means "not provided", never render a placeholder. */
   @json("chips_json", sanitizeStrings) chips?: string[];

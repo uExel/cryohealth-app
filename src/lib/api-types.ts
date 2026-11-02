@@ -31,6 +31,7 @@ export type ApiAlert = {
   bodyUr?: string;
   windowStart?: string;
   windowEnd?: string;
+  estimatedWindow?: string;
   downstreamSummary?: string;
   /** Optional, human-authored at issue time (IssueAlertDto) — absent on most alerts
    *  today; never fill these client-side with invented copy. */

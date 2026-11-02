@@ -66,6 +66,7 @@ async function pullLakesAndAlerts() {
           rec.downstreamSummary = a.downstreamSummary;
           rec.windowStart = a.windowStart;
           rec.windowEnd = a.windowEnd;
+          rec.estimatedWindow = a.estimatedWindow;
           rec.chips = a.chips;
           rec.checklist = a.checklist;
           rec.status = a.status;

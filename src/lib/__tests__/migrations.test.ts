@@ -18,8 +18,24 @@ describe("WatermelonDB migrations", () => {
   it("creates alert_reads exactly as the schema defines it", () => {
     const v5 = migrations.sortedMigrations.find((m) => m.toVersion === 5);
     const step = v5?.steps.find((st) => st.type === "create_table");
-    if (!step || step.type !== "create_table") throw new Error("v5 has no create_table step");
+    if (!step || step.type !== "create_table")
+      throw new Error("v5 has no create_table step");
     expect(step.schema.name).toBe("alert_reads");
-    expect(step.schema.columnArray).toEqual(schema.tables.alert_reads.columnArray);
+    expect(step.schema.columnArray).toEqual(
+      schema.tables.alert_reads.columnArray,
+    );
+  });
+
+  it("adds the estimated impact window to cached alerts", () => {
+    const v6 = migrations.sortedMigrations.find((m) => m.toVersion === 6);
+    const step = v6?.steps.find((st) => st.type === "add_columns");
+    if (!step || step.type !== "add_columns")
+      throw new Error("v6 has no add_columns step");
+    expect(step.table).toBe("alerts");
+    expect(step.columns).toContainEqual({
+      name: "estimated_window",
+      type: "string",
+      isOptional: true,
+    });
   });
 });

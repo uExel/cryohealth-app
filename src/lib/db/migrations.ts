@@ -17,6 +17,17 @@ import {
 export const migrations = schemaMigrations({
   migrations: [
     {
+      toVersion: 6,
+      steps: [
+        addColumns({
+          table: "alerts",
+          columns: [
+            { name: "estimated_window", type: "string", isOptional: true },
+          ],
+        }),
+      ],
+    },
+    {
       toVersion: 5,
       steps: [
         createTable({

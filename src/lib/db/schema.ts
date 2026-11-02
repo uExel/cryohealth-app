@@ -4,7 +4,7 @@ import { appSchema, tableSchema } from "@nozbe/watermelondb";
  *  replaced on each pull sync; `chw_cases` is the only locally-authored table (queued
  *  until pushed). */
 export const schema = appSchema({
-  version: 5,
+  version: 6,
   tables: [
     tableSchema({
       name: "lakes",
@@ -37,6 +37,7 @@ export const schema = appSchema({
         { name: "downstream_summary", type: "string", isOptional: true },
         { name: "window_start", type: "string", isOptional: true },
         { name: "window_end", type: "string", isOptional: true },
+        { name: "estimated_window", type: "string", isOptional: true },
         { name: "chips_json", type: "string", isOptional: true },
         { name: "checklist_json", type: "string", isOptional: true },
         { name: "status", type: "string" },
