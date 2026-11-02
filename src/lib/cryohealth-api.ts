@@ -1,4 +1,5 @@
 import { apiFetch } from "./api-client";
+import { useAuthStore } from "../state/auth";
 import type {
   ApiAlert,
   ApiCase,
@@ -29,12 +30,22 @@ export const fetchAlerts = (page = 1, pageSize = 100) =>
 export const fetchAlert = (id: string) =>
   apiFetch<ApiAlert>(`/alerts/${encodeURIComponent(id)}`, { auth: false });
 
-export const registerPushDevice = (token: string, platform: "android") =>
-  apiFetch<{ registered: boolean }>("/push/devices", {
-    method: "POST",
-    auth: false,
-    body: { token, platform },
-  });
+export const registerPushDevice = async (
+  token: string,
+  platform: "android",
+) => {
+  const { token: sessionToken, role } = useAuthStore.getState();
+  const hasScopedRole =
+    Boolean(sessionToken) && (role === "chw" || role === "facility_admin");
+  return apiFetch<{ registered: boolean }>(
+    hasScopedRole ? "/push/devices/for-user" : "/push/devices",
+    {
+      method: "POST",
+      auth: hasScopedRole,
+      body: { token, platform },
+    },
+  );
+};
 
 export const unregisterPushDevice = (token: string) =>
   apiFetch<{ unregistered: boolean }>("/push/devices", {
