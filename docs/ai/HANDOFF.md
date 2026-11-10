@@ -16,7 +16,7 @@ Based on `main` (01527f1), not on `shabir_dev`. Not merged, no build made from t
 - Checked #5 (Guidance screen from `/protocols`): already fixed in code (commit 779e3cf). Confirmed with a throwaway render test (not committed): real stored protocol shown, public mode shows "not available" when `steps` is empty, unknown slug shows no-match. It is still open on GitHub.
 
 ## Not done / deferred
-- **This branch's code was never built onto a phone.** The installed app may be signed with a different key, and uninstalling it was not allowed, so the `hydrate()` fix is verified by tests only, not on the device.
+- **The `hydrate()` fix is verified by tests only.** It cannot be checked on a phone: a release app does not let anyone plant a damaged saved login, and `main` has no Android project (`android/`, the Android package name and `google-services.json` exist only on `shabir_dev`), so there is no Android build of this branch to install. Building it with `shabir_dev`'s Android setup would pull in that branch's 9 unmerged commits.
 - Only an admin account was tried on the phone. A CHW (`chw`) login and the Case screen offline were not exercised.
 - Startup time was not measured (the screen was off at the first launch).
 - The Alerts tab ignored the first two taps once, then worked on 4 of 4 retries. Not reproduced, cause unknown. Worth watching.
