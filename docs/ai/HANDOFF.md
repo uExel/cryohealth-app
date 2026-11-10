@@ -1,93 +1,49 @@
-# HANDOFF — CryoHealth-app — 2026-09-27 22:16 PKT
-Session: alerts-root-cause-protocol-library  Model: claude-opus-5-5  Branch: main  Goal: #1  Task: none (ad-hoc field report; related #5, #6)
-Prior session archived: docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md
+# HANDOFF — CryoHealth-app — 2026-11-10
+Session: issue-2-auth-tests-hydrate-fix  Model: claude-sonnet-5-5  Branch: fix/2-auth-hydrate-and-tests  Goal: #1  Task: #2
+Prior session archived: docs/ai/sessions/2026-09-27-alerts-root-cause-protocol-library-handoff.md
 
 ## State
-The "alerts / guidance not showing" field report has a confirmed root cause, fixed in
-build #10 (on the user's iPhone via TestFlight). Build #10's syslog shows the app launching
-with no sync errors. The user has not yet reported Settings "Local data" counts or the
-Alerts tab contents on #10. Unconfirmed on device, but no errors.
-
-Root cause: device syslog from build #9 showed every sync failing at the DB write with
-`Decorating class property failed. Please ensure that transform-class-properties is
-enabled...`. On Hermes, babel-preset-expo leaves class fields native, so legacy WatermelonDB
-decorators compiled to `_initializerWarningHelper` calls that throw on model construction.
-Lakes, alerts and protocols tables were always empty.
-
-Guidance still looked empty on #10 because `COMPLAINT_TO_SLUG` is intentionally `{}`
-(clinical routing, #5). A CHW-only protocol library on the Health tab (`73b0820`) is
-shipped in **build #11** (EAS 8c991ec6-3358-417d-b62f-4f8ad9f50e91, commit 10a6b57,
-submitted to App Store Connect as submission f216351d-08fa-4db5-b1e2-fa157853d370).
-**Confirmed on device 2026-09-27:** the user sees the protocols on build #11, so sync and
-DB writes work end to end.
+Based on `main` (01527f1), not on `shabir_dev`. Not merged, no build made from this branch. Issue #2 (scaffold + offline store + auth) was already built in the app; what it lacked was proof. This branch adds that proof (login and session tests, a way to run them) and fixes one real bug the tests found. PR #7 targets `shabir_dev`; this one targets `main` on purpose, so it carries none of `shabir_dev`'s 9 unmerged commits.
 
 ## Done this session
-- Captured iPhone syslog with `pymobiledevice3 syslog live` (scratch venv). Developer Mode is
-  off, so devicectl can't attach, but syslog works over pairing.
-- babel.config.js: `@babel/plugin-transform-class-properties` (loose), scoped via
-  `overrides` to `src/lib/db/models/`. Global enable breaks RN's PerformanceObserver private
-  methods. `test` must be a function because Metro loads the config without a filename.
-  Also api-client.ts falls back to `https://api.cryohealth.io` instead of localhost
-  (commit 39da4f2)
-- Build #10 (EAS 6a7b1cdb-c32a-43d9-b5a8-96ce34f2c59d) submitted to TestFlight (submission
-  d7dc3b07-faff-44b9-a7de-2b8b8a2c5d3b); handoff update (commit 0212859)
-- Opened cryohealth-app#6: `lakes.updated_at` string column clashes with WatermelonDB's
-  reserved numeric timestamp. The dev-build schema invariant throws at load; latent in release.
-- Protocol library: `src/components/protocol-library.tsx` + Health tab (CHW mode only),
-  grouped by category, opens `/guidance?slug=…` (commit 73b0820)
-
-- #6 fixed: lakes `updated_at` -> `server_updated_at`, schema v4 + v3->v4 addColumns; v1->v2
-  step's unused `updated_at` declared `number` so dev-mode reserved-name check passes
-  (commit ad6f2d6, closes #6). Not yet in a TestFlight build.
-
-- Navigation/UX pass (commit 92209d7): sub-screens moved into (tabs) as hidden routes
-  (tab bar always visible, `backBehavior="history"`, back button in AppBar); CHW mode now
-  derived from login (removed mock Register/Verify + Demo switches; Sign out calls
-  logout()); SOS 1122 dials; alerts badge = active critical count; Learn tab and all
-  placeholder UI removed; tier colours off body text. Verified: typecheck, lint (only
-  pre-existing styles.ts warning), `expo export` bundle, dead-control grep. Not on device.
+- **Bug fixed, `src/state/auth.ts` `hydrate()`**: a damaged saved identity (not JSON, `null`, unknown role, missing name) made `JSON.parse` throw, status stayed `loading`, and the splash screen never routed. A secure-store read error did the same. Now every one of those falls back to `guest` (with a `console.warn` for read errors).
+- **20 tests, all passing**: `src/state/__tests__/auth.test.ts` (13: hydrate, setSession, a login surviving an app restart, logout, no network call at start, the damaged cases above) and `src/lib/__tests__/login-api.test.ts` (7: request shape, success, wrong password keeps a saved session, no internet keeps it, 500, 30 s timeout, 401 with a token logs out).
+- **`npm test` now exists on `main`**: jest, jest-expo, @types/jest, @react-native/jest-preset (same versions as `shabir_dev`), the `test` script, the jest block, and `"types": ["jest","node"]` in `tsconfig.json`. `main` had no test runner before. `package-lock.json` gained 541 packages; no existing version changed and nothing was removed (checked by comparing both lockfiles).
+- **On a real phone** (OPPO CPH2083, Android 9, about 1.8 GB RAM, Wi-Fi off, airplane mode on), using the already-installed v2.1.0 build from 21 Oct (built from `shabir_dev`, not this branch): force-stopped and cold-launched the app several times.
+  - As a guest: Welcome, then Home, Health, Lakes and Alerts all open from saved data ("Offline — showing saved information"). No crash.
+  - Logged in as `admin-001` (Cryo Admin): cold launch with no network goes straight to Home, not Welcome. Settings shows Lakes 6, Alerts 11, Protocols 11 stored on the phone.
+  - Login with no network shows "Could not reach the server" and does not crash.
+- Checked #5 (Guidance screen from `/protocols`): already fixed in code (commit 779e3cf). Confirmed with a throwaway render test (not committed): real stored protocol shown, public mode shows "not available" when `steps` is empty, unknown slug shows no-match. It is still open on GitHub.
 
 ## Not done / deferred
-- On-device confirmation of #10 (Local data 6/10/11, Alerts lists 10) — user hasn't reported
-- Complaint → slug mapping — clinical decision, needs a human (#5)
-- Structured `steps` for the 11 protocols (public mode shows "not available") — content work, API side
-- On-device check of **build #12** (EAS e4addf3d-2a06-4dfb-b9c9-31c91b159e22, commit 477168c,
-  submission 6c143354-63d4-48a6-a5f1-ccae3d55ece5): #6 v3->v4 migration first device run
-  (capture syslog on first launch) + nav/UX tap-path checklist.
-- Protocols list is now CHW-login-only; user needs CHW credentials to see it again.
+- **This branch's code was never built onto a phone.** The installed app may be signed with a different key, and uninstalling it was not allowed, so the `hydrate()` fix is verified by tests only, not on the device.
+- Only an admin account was tried on the phone. A CHW (`chw`) login and the Case screen offline were not exercised.
+- Startup time was not measured (the screen was off at the first launch).
+- The Alerts tab ignored the first two taps once, then worked on 4 of 4 retries. Not reproduced, cause unknown. Worth watching.
+- #3 (Urdu LLM benchmark) needs a 4 GB phone and model files; not started.
+- Server data: all 11 protocols have `steps: null`, so public mode shows "not available" for each. API-side content work (already listed in the 2026-09-27 handoff).
 
 ## Next action
-If the user wants #6 on device: `npx eas-cli build --platform ios --profile production --non-interactive --no-wait` (build #12). Otherwise get the clinician's complaint → slug mapping for #5
+Review and merge this PR (a human merges; nothing here was merged or pushed to `main`). After it merges, `shabir_dev` will add the same jest lines to `package.json`/`tsconfig.json`; they are identical by design, so any conflict there is just "keep one copy", but `package-lock.json` may need `npm install --package-lock-only` to resolve.
 
 ## Open questions for a human
-- Build #11 Settings "Local data" counts and Health-tab protocol list on device — blocking: yes (for closing the field report)
-- Which production protocol slug answers each COMMON_COMPLAINT (esp. diarrhoea plan A/B/C)? — blocking: no
+- Should #2 close on merge (this PR says so), or wait for a CHW-role device check and a build of merged `main`? — blocking: no
+- Close #5 on GitHub? Its acceptance criteria are met in code. — blocking: no
 
 ## Failed approaches (do not retry)
-- "withObservables isn't emitting" / "lakes populated, alerts empty". Disproven: all three
-  tables were empty, because every prepareCreate threw.
-- Enabling class-properties globally in babel.config.js breaks the bundle
-  (react-native PerformanceObserver: "Class private methods are not enabled").
-- RegExp `test` in babel `overrides`: Metro fails with "Configuration contains string/RegExp
-  pattern, but no filename was passed to Babel". Use a function.
-- Local simulator Release build: `expo run:ios --device <sim>` stops at "No code signing
-  certificates". A direct `xcodebuild -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO` builds,
-  but the app won't launch ("UIScene life cycle is required for apps built with this SDK");
-  the local ios/ project predates it. Verify on device via TestFlight instead.
-- `devicectl device info apps`: fails because Developer Mode is off on the iPhone.
+- A `jest.mock()` factory may only reference variables whose names start with `mock`; any other name and Jest refuses to load the test file.
+- A throwaway test that rendered the Guidance screen on a LokiJS in-memory database hung Jest for over 5 minutes until it was run with `--forceExit`; the open database keeps the process alive.
+- `tsc` fails with "Cannot find name 'jest'" until `tsconfig.json` has `"types": ["jest","node"]`.
+- Phone screenshots come back all black when the display is asleep (`adb shell input keyevent KEYCODE_WAKEUP` first). The face-lock screen did not stop `monkey` from launching the app.
 
 ## Loops run
 - none
 
 ## Files touched
-babel.config.js, package.json, package-lock.json, src/lib/api-client.ts,
-src/components/protocol-library.tsx, src/app/(tabs)/health.tsx, src/lib/db/schema.ts,
-src/lib/db/migrations.ts, src/lib/db/models/LakeModel.ts, src/lib/sync.ts, src/app/(tabs)/map.tsx,
-src/app/(tabs)/home.tsx, CLAUDE.md, docs/ai/HANDOFF.md,
-docs/ai/sessions/2026-09-27-offline-sync-hardening-handoff.md
+src/state/auth.ts, src/state/__tests__/auth.test.ts, src/lib/__tests__/login-api.test.ts, package.json, package-lock.json, tsconfig.json, CLAUDE.md, docs/ai/HANDOFF.md, docs/ai/sessions/2026-09-27-alerts-root-cause-protocol-library-handoff.md, docs/ai/sessions/2026-11-10-issue-2-auth-tests-hydrate-fix-handoff.md
 
 ## Verification status
-tests: n/a (no runner); off-device WatermelonDB/LokiJS harness reproduced the exact device error without the fix and passed with it  review: typecheck clean, lint = pre-existing `alert/[id].tsx:28` only, madge no cycles; `expo export` bundle has 0 warning-helper call sites and uses the production API URL  qa: build #10 syslog clean; build #11 on device: user confirmed protocols visible
+tests: 20/20 on this branch (the only suites on `main`)  tsc: clean  lint: clean on the changed files (`npx eslint src/state src/lib/__tests__`)  review: none  qa: real Android phone, offline cold launch as guest and as admin (see above); the fix itself is tests-only
 
 ## Resume with
-/uexel:orient   (then: build #12 for the v4 migration, or #5)
+/uexel:orient   (then: gh pr view --repo uExel/cryohealth-app, or issue #3)

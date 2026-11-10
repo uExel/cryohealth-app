@@ -16,9 +16,8 @@ npm install
 npm start            # Expo dev server; npm run android / ios / web for a target directly
 npm run lint
 npm run typecheck     # tsc --noEmit
+npm test             # jest (jest-expo/android); tests live in __tests__/ folders next to the code
 ```
-
-No test script defined in this repo.
 
 ## Map
 
