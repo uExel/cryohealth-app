@@ -20,7 +20,6 @@ Based on `main` (01527f1), not on `shabir_dev`. Not merged, no build made from t
 - **The `hydrate()` fix is verified by tests only.** It cannot be checked on a phone: a release app does not let anyone plant a damaged saved login, and `main` has no Android project (`android/`, the Android package name and `google-services.json` exist only on `shabir_dev`), so there is no Android build of this branch to install. Building it with `shabir_dev`'s Android setup would pull in that branch's 9 unmerged commits.
 - A case was not submitted offline and synced later: it would create a real case on the production server. Only opening the form was checked.
 - Startup time was not measured (the screen was off at the first launch).
-- The Alerts tab ignored the first two taps once, then worked on 4 of 4 retries. Not reproduced, cause unknown. Worth watching.
 - #3 (Urdu LLM benchmark) needs a 4 GB phone and model files; not started.
 - Server data: all 11 protocols have `steps: null`, so public mode shows "not available" for each. API-side content work (already listed in the 2026-09-27 handoff).
 
