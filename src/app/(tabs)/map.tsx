@@ -11,31 +11,32 @@ import { useSyncRefresh } from '../../lib/use-refresh';
 import { database } from '../../lib/db';
 import { LakeModel } from '../../lib/db/models/LakeModel';
 import { relativeTime } from '../../lib/format';
+import { formatNumber } from '../../lib/i18n';
 
 const TIER_RANK: Record<Tier, number> = { critical: 0, high: 1, watch: 2, normal: 3 };
 
 function Lakes({ lakes }: { lakes: LakeModel[] }) {
   const s = useStyles();
   const t = useTheme();
-  const { lang } = useApp();
+  const { lang, tr } = useApp();
   const refreshControl = useSyncRefresh();
   const sorted = [...lakes].sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier]);
 
   return (
-    <Chromed title="Lakes" sub="Gilgit-Baltistan">
-      <FreshRow stamp={`Tiers current as of last sync · ${sorted[0] ? relativeTime(sorted[0].serverUpdatedAt) : '—'}`} />
+    <Chromed title={tr('lakes.title')} sub={tr('place.gb')}>
+      <FreshRow stamp={tr('lakes.fresh', { time: sorted[0] ? relativeTime(sorted[0].serverUpdatedAt, lang) : '—' })} />
       <ScrollView style={s.scroll} refreshControl={refreshControl}>
         {sorted.length === 0 ? (
           <View style={{ padding: t.space.lg }}>
-            <Text style={s.callout}>No lake data on this phone yet. Pull down to sync when you have signal.</Text>
+            <Text style={s.callout}>{tr('home.noLakes')}</Text>
           </View>
         ) : null}
-        <SectionLabel>Monitored lakes · by hazard tier</SectionLabel>
+        <SectionLabel>{tr('lakes.section')}</SectionLabel>
         {sorted.map((l) => (
           <HazardRow
             key={l.id}
             name={lang === 'ur' && l.nameUr ? l.nameUr : l.name}
-            detail={`${l.district}${l.elevationM ? ` · ${l.elevationM.toLocaleString()} m` : ''}${l.stale ? ' · stale' : ''}`}
+            detail={`${l.district}${l.elevationM ? ` · ${formatNumber(l.elevationM, lang)} ${tr('unit.m')}` : ''}${l.stale ? ` · ${tr('common.stale')}` : ''}`}
             tier={l.tier}
           />
         ))}

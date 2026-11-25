@@ -6,6 +6,7 @@ import { BareScreen } from "../components/chrome";
 import { BtnPrimary, BtnText } from "../components/ui";
 import { useStyles } from "../design/styles";
 import { useTheme } from "../design/theme";
+import { useApp } from "../state/app";
 import {
   disablePushNotifications,
   enablePushNotifications,
@@ -15,6 +16,7 @@ export default function Permission() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
+  const { tr } = useApp();
   const ios = Platform.OS === "ios";
   const [working, setWorking] = React.useState(false);
   const [error, setError] = React.useState<string>();
@@ -31,9 +33,7 @@ export default function Permission() {
     try {
       const enabled = await enablePushNotifications();
       if (!enabled) {
-        setError(
-          "Permission was not granted. You can enable notifications later in Settings.",
-        );
+        setError(tr("permission.denied"));
         return;
       }
       router.replace("/home");
@@ -41,7 +41,7 @@ export default function Permission() {
       setError(
         err instanceof Error
           ? err.message
-          : "Could not register this device for alerts.",
+          : tr("permission.registerFail"),
       );
     } finally {
       setWorking(false);
@@ -59,7 +59,7 @@ export default function Permission() {
       setError(
         err instanceof Error
           ? err.message
-          : "Could not update notification settings.",
+          : tr("permission.updateFail"),
       );
     } finally {
       setWorking(false);
@@ -70,36 +70,25 @@ export default function Permission() {
     <BareScreen>
       <View style={[s.padXWide, { paddingTop: 84, gap: 14, flex: 1 }]}>
         <BellRing size={28} color={t.color.accent} strokeWidth={2.2} />
-        <Text style={s.title1}>A flood warning must reach you at night</Text>
-        <Text style={s.body}>
-          CryoHealth sends important hazard alerts for monitored lakes. You can
-          turn notifications off later in Settings.
-        </Text>
+        <Text style={s.title1}>{tr("permission.title")}</Text>
+        <Text style={s.body}>{tr("permission.body")}</Text>
         {ios ? (
-          <Text style={s.callout}>
-            Focus and Silent mode settings may silence notifications.
-          </Text>
+          <Text style={s.callout}>{tr("permission.silentIos")}</Text>
         ) : (
           <>
-            <Text style={s.callout}>
-              Your notification and Do Not Disturb settings may silence alerts.
-            </Text>
-            <Text style={s.callout}>
-              Some phones stop an app when you swipe it away. To keep alerts
-              coming, open Settings later and choose “Open app settings” under
-              Hazard notifications.
-            </Text>
+            <Text style={s.callout}>{tr("permission.silent")}</Text>
+            <Text style={s.callout}>{tr("permission.swipe")}</Text>
           </>
         )}
         <View style={{ marginTop: "auto", marginBottom: t.space.xxl, gap: 10 }}>
           {error ? <Text style={s.callout}>{error}</Text> : null}
           <BtnPrimary
-            label={working ? "Setting up alerts…" : "Allow alerts"}
+            label={working ? tr("permission.working") : tr("permission.allow")}
             disabled={working}
             onPress={() => void allowAlerts()}
           />
           <BtnText
-            label="Not now — I will check each morning"
+            label={tr("permission.later")}
             onPress={() => void skipAlerts()}
           />
         </View>

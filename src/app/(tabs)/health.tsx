@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { EnglishOnly } from '../../components/english-only';
 import { ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Chromed, KeyboardAvoid } from '../../components/chrome';
@@ -11,7 +12,7 @@ import { COMMON_COMPLAINTS } from '../../lib/mock';
 import { resolveComplaintSlug } from '../../lib/complaint-map';
 import { useApp } from '../../state/app';
 
-export default function Health() {
+function Health() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
@@ -56,5 +57,14 @@ export default function Health() {
       </ScrollView>
       </KeyboardAvoid>
     </Chromed>
+  );
+}
+
+// Not translated yet: stays English and left-to-right while the app is in Urdu (see english-only.tsx).
+export default function HealthRoute() {
+  return (
+    <EnglishOnly>
+      <Health />
+    </EnglishOnly>
   );
 }

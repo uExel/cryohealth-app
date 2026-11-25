@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { EnglishOnly } from '../../components/english-only';
 import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Crypto from 'expo-crypto';
@@ -16,7 +17,7 @@ const PROBLEMS = ['Cough / breathing', 'Diarrhoea', 'Fever', 'Injury', 'Cold exp
 const AGE_UNITS = ['Years', 'Months'] as const;
 const OUTCOMES = ['Referred to facility', 'Treated at home', 'Follow-up in 2 days'];
 
-export default function NewCase() {
+function NewCase() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
@@ -102,5 +103,14 @@ export default function NewCase() {
       </ScrollView>
       </KeyboardAvoid>
     </Chromed>
+  );
+}
+
+// Not translated yet: stays English and left-to-right while the app is in Urdu (see english-only.tsx).
+export default function NewCaseRoute() {
+  return (
+    <EnglishOnly>
+      <NewCase />
+    </EnglishOnly>
   );
 }

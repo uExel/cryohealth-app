@@ -6,6 +6,7 @@ import { BareScreen } from "../components/chrome";
 import { BtnPrimary, BtnSecondary } from "../components/ui";
 import { useStyles } from "../design/styles";
 import { useTheme } from "../design/theme";
+import { useApp } from "../state/app";
 import {
   markBatteryPromptSeen,
   oemBatteryHint,
@@ -18,6 +19,7 @@ export default function Battery() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
+  const { tr } = useApp();
   const hint = oemBatteryHint();
 
   // Open the settings page first and save the "seen" flag afterwards. Awaiting the storage
@@ -44,20 +46,14 @@ export default function Battery() {
     <BareScreen>
       <View style={[s.padXWide, { paddingTop: 84, gap: 14, flex: 1 }]}>
         <BatteryCharging size={28} color={t.color.accent} strokeWidth={2.2} />
-        <Text style={s.title1}>Keep flood warnings reaching you</Text>
-        <Text style={s.body}>
-          Some phones stop an app once it is closed or swiped away. CryoHealth
-          cannot warn you then. Allow it to run in the background now.
-        </Text>
-        <Text style={s.callout}>
-          1. Tap Open battery settings.{"\n"}2. Choose CryoHealth.{"\n"}3. Select
-          Don’t optimize (or Unrestricted).{"\n"}4. Come back and tap Continue.
-        </Text>
+        <Text style={s.title1}>{tr("battery.title")}</Text>
+        <Text style={s.body}>{tr("battery.body")}</Text>
+        <Text style={s.callout}>{tr("battery.steps")}</Text>
         {hint ? <Text style={s.callout}>{hint}</Text> : null}
 
         <View style={{ marginTop: "auto", marginBottom: t.space.xxl, gap: 10 }}>
-          <BtnPrimary label="Open battery settings" onPress={() => void openSettings()} />
-          <BtnSecondary label="Continue" onPress={() => void finish()} />
+          <BtnPrimary label={tr("battery.open")} onPress={() => void openSettings()} />
+          <BtnSecondary label={tr("battery.continue")} onPress={() => void finish()} />
         </View>
       </View>
     </BareScreen>

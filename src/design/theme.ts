@@ -101,6 +101,35 @@ export const typeUrdu = {
   footnote: { fontFamily: FAMILY.urdu, fontSize: 15, lineHeight: 30 },
 } satisfies Record<string, TextStyle>;
 
+/** note 2026-11-25 (cryohealth-app#1, Urdu/RTL): hand-added, not generated from tokens.json.
+ *  The full type scale for Urdu: the Nastaliq family, about double the leading (the four sizes in
+ *  `typeUrdu` above, the rest derived the same way), no negative tracking (it breaks the joins
+ *  between letters), no uppercase, and a right-to-left paragraph direction. Nastaliq has one
+ *  registered weight, so hierarchy comes from size alone. Fold into tokens.json upstream. */
+export type TypeScale = Record<keyof typeof type, TextStyle>;
+
+const urdu = (fontSize: number, lineHeight: number): TextStyle => ({
+  fontFamily: FAMILY.urdu,
+  fontSize,
+  lineHeight,
+  writingDirection: 'rtl',
+});
+
+export const typeUrduScale: TypeScale = {
+  hero: urdu(40, 76),
+  display: urdu(34, 66),
+  title1: urdu(26, 50),
+  title2: urdu(22, 44),
+  title3: urdu(20, 40),
+  headline: urdu(18, 36),
+  body: urdu(17, 34),
+  bodyStrong: urdu(17, 34),
+  callout: urdu(15, 30),
+  footnote: urdu(14, 28),
+  label: urdu(13, 26),
+  badge: urdu(12, 24),
+};
+
 /* ------------------------------------------------------------- geometry -- */
 
 export const space = {
@@ -138,7 +167,7 @@ export const motion = {
 export type Theme = {
   name: ThemeName;
   color: (typeof palette)['light'];
-  type: typeof type;
+  type: TypeScale;
   typeUrdu: typeof typeUrdu;
   space: typeof space;
   size: typeof size;
@@ -153,12 +182,24 @@ export const themes: Record<ThemeName, Theme> = {
   dark:  { name: 'dark',  color: palette.dark,  type, typeUrdu, space, size, border, radius, motion, isDark: true  },
 };
 
+/** note 2026-11-25 (cryohealth-app#1): the same two themes with the Urdu type scale swapped in. */
+const urduThemes: Record<ThemeName, Theme> = {
+  light: { ...themes.light, type: typeUrduScale },
+  dark: { ...themes.dark, type: typeUrduScale },
+};
+
+/** The theme for a colour scheme and a language. Both results are module constants, so the
+ *  object (and every style sheet memoised on it) is stable until the language really changes. */
+export const themeFor = (name: ThemeName, lang: Lang = 'en'): Theme =>
+  lang === 'ur' ? urduThemes[name] : themes[name];
+
 const ThemeContext = createContext<Theme>(themes.light);
 
 /** Resolve the theme once at the root and pass it down. Leaf components must not
- *  call useColorScheme() themselves — the app can be pinned to a theme in Settings. */
-export const ThemeProvider = ({ name, children }: { name: ThemeName; children: React.ReactNode }) =>
-  React.createElement(ThemeContext.Provider, { value: themes[name] }, children);
+ *  call useColorScheme() themselves — the app can be pinned to a theme in Settings.
+ *  note 2026-11-25: takes `lang` so Urdu gets its own type scale (see `typeUrduScale`). */
+export const ThemeProvider = ({ name, lang = 'en', children }: { name: ThemeName; lang?: Lang; children: React.ReactNode }) =>
+  React.createElement(ThemeContext.Provider, { value: themeFor(name, lang) }, children);
 
 export const useTheme = () => useContext(ThemeContext);
 

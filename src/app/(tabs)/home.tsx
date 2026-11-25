@@ -7,14 +7,14 @@ import { Chromed } from '../../components/chrome';
 import { FreshRow, HazardRow, TierHeader } from '../../components/hazard';
 import { BtnPrimary, SectionLabel } from '../../components/ui';
 import { useStyles } from '../../design/styles';
-import { TIER_LABEL, Tier, useTheme } from '../../design/theme';
+import { Tier, useTheme } from '../../design/theme';
 import { useApp } from '../../state/app';
 import { useSyncRefresh } from '../../lib/use-refresh';
 import { database } from '../../lib/db';
 import { LakeModel } from '../../lib/db/models/LakeModel';
 import { AlertModel } from '../../lib/db/models/AlertModel';
 import { ChwCaseModel } from '../../lib/db/models/ChwCaseModel';
-import { relativeTime, TIER_LABEL_UR } from '../../lib/format';
+import { relativeTime, tierLabel } from '../../lib/format';
 
 const TIER_RANK: Record<Tier, number> = { critical: 0, high: 1, watch: 2, normal: 3 };
 const byRank = (a: LakeModel, b: LakeModel) => TIER_RANK[a.tier] - TIER_RANK[b.tier];
@@ -31,16 +31,16 @@ function Home({
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
-  const { mode, lang } = useApp();
+  const { mode, lang, tr } = useApp();
   const ur = lang === 'ur';
   const refreshControl = useSyncRefresh();
 
   if (lakes.length === 0) {
     return (
-      <Chromed title="CryoHealth" sub="Gilgit-Baltistan">
+      <Chromed title="CryoHealth" sub={tr('place.gb')}>
         <ScrollView style={s.scroll} refreshControl={refreshControl}>
           <View style={{ padding: t.space.lg }}>
-            <Text style={s.callout}>No lake data on this phone yet. Pull down to sync when you have signal.</Text>
+            <Text style={s.callout}>{tr('home.noLakes')}</Text>
           </View>
         </ScrollView>
       </Chromed>
@@ -50,28 +50,26 @@ function Home({
   const sorted = [...lakes].sort(byRank);
   const worst = sorted[0];
   const worstAlert = alerts.find((a) => a.lakeId === worst.remoteId && a.status === 'active');
-  const line =
-    (ur ? worstAlert?.bodyUr : worstAlert?.body) ??
-    (ur ? 'اس جھیل کے لیے کوئی فعال وارننگ نہیں۔' : 'No active advisory for this lake.');
+  const line = (ur ? worstAlert?.bodyUr : worstAlert?.body) ?? tr('home.noAdvisory');
 
   return (
-    <Chromed title="CryoHealth" sub="Gilgit-Baltistan">
+    <Chromed title="CryoHealth" sub={tr('place.gb')}>
       <ScrollView style={s.scroll} refreshControl={refreshControl}>
         <TierHeader
           tier={worst.tier}
-          kicker={ur ? 'خطرے کا درجہ' : 'HAZARD TIER'}
-          name={ur ? TIER_LABEL_UR[worst.tier] : TIER_LABEL[worst.tier]}
+          kicker={tr('home.hazardTier')}
+          name={tierLabel(worst.tier, lang)}
           place={`${worst.valley} · ${ur && worst.nameUr ? worst.nameUr : worst.name}`}
           line={line}
         />
-        <FreshRow stamp={`${ur ? 'تازہ کاری' : 'Updated'} ${relativeTime(worst.serverUpdatedAt)}`} />
+        <FreshRow stamp={`${tr('common.updated')} ${relativeTime(worst.serverUpdatedAt, lang)}`} />
 
-        <SectionLabel>{ur ? 'قریبی زیرِ نگرانی جھیلیں' : 'Most at-risk lakes'}</SectionLabel>
+        <SectionLabel>{tr('home.atRisk')}</SectionLabel>
         {sorted.slice(0, 3).map((l) => (
           <HazardRow
             key={l.id}
             name={ur && l.nameUr ? l.nameUr : l.name}
-            detail={`${l.valley} · ${relativeTime(l.serverUpdatedAt)}${l.stale ? (ur ? ' · باسی' : ' · stale') : ''}`}
+            detail={`${l.valley} · ${relativeTime(l.serverUpdatedAt, lang)}${l.stale ? ` · ${tr('common.stale')}` : ''}`}
             tier={l.tier}
             onPress={() => router.push('/map')}
           />
@@ -79,14 +77,14 @@ function Home({
 
         {mode === 'chw' ? (
           <View style={[s.ruleTopStrong, { marginTop: t.space.xl }]}>
-            <SectionLabel>YOUR QUEUE</SectionLabel>
+            <SectionLabel>{tr('home.queue')}</SectionLabel>
             <View style={{ paddingHorizontal: t.space.lg }}>
               <Text style={s.title3}>
-                {queuedCases.length} case{queuedCases.length === 1 ? '' : 's'} waiting to sync
+                {tr(queuedCases.length === 1 ? 'home.queueOne' : 'home.queueMany', { n: queuedCases.length })}
               </Text>
-              <Text style={[s.callout, { marginTop: 4 }]}>Saved on this phone. Nothing is lost.</Text>
+              <Text style={[s.callout, { marginTop: 4 }]}>{tr('home.queueNote')}</Text>
               <View style={{ marginVertical: t.space.lg }}>
-                <BtnPrimary label="New case" onPress={() => router.push('/case')} />
+                <BtnPrimary label={tr('home.newCase')} onPress={() => router.push('/case')} />
               </View>
             </View>
           </View>

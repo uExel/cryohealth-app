@@ -38,7 +38,7 @@ export const GuidanceCard = ({
   const t = useTheme();
   const s = useStyles();
   return (
-    <View style={[s.guidanceCard, { borderLeftColor: tierColor(t, tier) }]}>
+    <View style={[s.guidanceCard, { borderStartColor: tierColor(t, tier) }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         {numbered ? (
           <View style={s.guidanceNum}>

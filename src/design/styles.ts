@@ -16,6 +16,10 @@ import { StyleSheet } from 'react-native';
 const absoluteFillObject = { position: 'absolute' as const, left: 0, right: 0, top: 0, bottom: 0 };
 import { Theme, Tier, useTheme } from './theme';
 
+// note 2026-11-25 (cryohealth-app#1, Urdu/RTL): ten lines below used physical left/right and now
+// use start/end (textAlign 'left' became 'auto') so the layout mirrors when the root direction is
+// rtl. In left-to-right they resolve to exactly the old values. Marked "rtl:" where changed.
+// Fold into the design project's tokens.json upstream.
 export const makeStyles = (t: Theme) =>
   StyleSheet.create({
     /* ---------------------------------------------------------- surfaces */
@@ -90,7 +94,7 @@ export const makeStyles = (t: Theme) =>
       borderBottomColor: t.color.line,
     },
     freshText: { ...t.type.footnote, color: t.color.muted },
-    freshState: { ...t.type.badge, color: t.color.muted, marginLeft: 'auto' },
+    freshState: { ...t.type.badge, color: t.color.muted, marginStart: 'auto' }, // rtl: was marginLeft
 
     /* ---------------------------------------------------------- list row */
     hazardRow: {
@@ -120,7 +124,7 @@ export const makeStyles = (t: Theme) =>
     alertBar: { width: t.size.alertBar },
     alertBody: { flex: 1, padding: t.space.md + 2 },
     alertTitle: { ...t.type.title3, fontSize: 18, lineHeight: 22 },
-    alertMeta: { ...t.type.footnote, color: t.color.muted, marginLeft: 'auto' },
+    alertMeta: { ...t.type.footnote, color: t.color.muted, marginStart: 'auto' }, // rtl: was marginLeft
     alertChip: { borderWidth: 1, borderColor: t.color.line, paddingVertical: 4, paddingHorizontal: 8 },
     alertChipLabel: { ...t.type.footnote, color: t.color.text },
     alertCleared: { opacity: 0.75 },
@@ -130,7 +134,7 @@ export const makeStyles = (t: Theme) =>
       backgroundColor: t.color.surface2,
       borderWidth: 1,
       borderColor: t.color.lineSoft,
-      borderLeftWidth: t.size.tierBar,
+      borderStartWidth: t.size.tierBar, // rtl: was borderLeftWidth
       padding: t.space.md + 2,
     },
     guidanceStep: { ...t.type.label },
@@ -161,7 +165,7 @@ export const makeStyles = (t: Theme) =>
       paddingHorizontal: t.space.lg,
     },
     btnPrimaryPressed: { backgroundColor: t.color.accentInk },
-    btnPrimaryLabel: { ...t.type.headline, fontSize: 16, color: t.color.onAccent, textAlign: 'left' },
+    btnPrimaryLabel: { ...t.type.headline, fontSize: 16, color: t.color.onAccent, textAlign: 'auto' }, // rtl: was 'left'
 
     btnSecondary: {
       minHeight: t.size.control,
@@ -171,7 +175,7 @@ export const makeStyles = (t: Theme) =>
       paddingHorizontal: t.space.lg,
     },
     btnSecondaryPressed: { backgroundColor: t.color.accentSoft },
-    btnSecondaryLabel: { ...t.type.headline, fontSize: 15, color: t.color.text, textAlign: 'left' },
+    btnSecondaryLabel: { ...t.type.headline, fontSize: 15, color: t.color.text, textAlign: 'auto' }, // rtl: was 'left'
 
     /** Only SOS and call-rescue. Never delete, never a form error. */
     btnDanger: {
@@ -185,7 +189,7 @@ export const makeStyles = (t: Theme) =>
     btnDangerLabel: { ...t.type.headline, fontSize: 15, color: '#ffffff' },
 
     btnText: { minHeight: 48, justifyContent: 'center' },
-    btnTextLabel: { ...t.type.headline, fontSize: 15, color: t.color.accent, textAlign: 'left' },
+    btnTextLabel: { ...t.type.headline, fontSize: 15, color: t.color.accent, textAlign: 'auto' }, // rtl: was 'left'
 
     btnIcon: {
       width: t.size.minTouch, height: t.size.minTouch,
@@ -212,8 +216,8 @@ export const makeStyles = (t: Theme) =>
       alignSelf: 'stretch',
       justifyContent: 'center',
       paddingHorizontal: t.space.md,
-      borderRightWidth: t.border.rule,
-      borderRightColor: t.color.line,
+      borderEndWidth: t.border.rule, // rtl: was borderRightWidth
+      borderEndColor: t.color.line, // rtl: was borderRightColor
       backgroundColor: t.color.surface,
     },
 
@@ -232,8 +236,8 @@ export const makeStyles = (t: Theme) =>
 
     toggleTrack: { width: t.size.toggleW, height: t.size.toggleH, backgroundColor: t.color.surface, borderWidth: 1, borderColor: t.color.line },
     toggleTrackOn: { backgroundColor: t.color.accent, borderWidth: 0 },
-    toggleKnob: { position: 'absolute', top: 2, left: 2, width: 22, height: 22, backgroundColor: t.color.muted },
-    toggleKnobOn: { top: 3, left: undefined, right: 3, backgroundColor: '#ffffff' },
+    toggleKnob: { position: 'absolute', top: 2, start: 2, width: 22, height: 22, backgroundColor: t.color.muted }, // rtl: was left
+    toggleKnobOn: { top: 3, start: undefined, end: 3, backgroundColor: '#ffffff' }, // rtl: was left/right
 
     seg: { flexDirection: 'row', borderWidth: t.border.rule, borderColor: t.color.line },
     segOpt: { flex: 1, minHeight: t.size.control, alignItems: 'center', justifyContent: 'center' },

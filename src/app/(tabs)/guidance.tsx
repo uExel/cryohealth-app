@@ -1,4 +1,5 @@
 import React from "react";
+import { EnglishOnly } from '../../components/english-only';
 import { ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import withObservables from "@nozbe/with-observables";
@@ -122,7 +123,7 @@ const ObservedProtocolLookup = withObservables(
 /** Branches on `slug` before the observable HOC -- a `Q.where('slug', '')` sentinel would
  *  conflate "no slug" with "unknown slug" and may leave the observable without a first
  *  emission (rendering nothing instead of the no-match copy). */
-export default function Guidance() {
+function Guidance() {
   const params = useLocalSearchParams<{ slug?: string | string[] }>();
   // A repeated query param (e.g. a malformed deep link) yields string[] at runtime even
   // though the type only says string -- take the first value rather than let it reach
@@ -130,4 +131,13 @@ export default function Guidance() {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   if (!slug) return <NoMatch />;
   return <ObservedProtocolLookup slug={slug} />;
+}
+
+// Not translated yet: stays English and left-to-right while the app is in Urdu (see english-only.tsx).
+export default function GuidanceRoute() {
+  return (
+    <EnglishOnly>
+      <Guidance />
+    </EnglishOnly>
+  );
 }

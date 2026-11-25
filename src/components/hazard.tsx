@@ -2,9 +2,11 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Check, CircleAlert, TriangleAlert, Clock3 } from 'lucide-react-native';
-import { freshnessFor, Tier, TIER_LABEL, useTheme } from '../design/theme';
+import { NetState, Tier, useTheme } from '../design/theme';
 import { tierBadgeStyle, tierColor, useStyles } from '../design/styles';
 import { useApp } from '../state/app';
+import { tierLabel } from '../lib/format';
+import type { StringKey } from '../lib/strings';
 
 /** Presentational contract for AlertCard — screens map their data source (live
  *  AlertModel today) onto this, rather than AlertCard depending on a data layer. */
@@ -32,14 +34,16 @@ export const TierIcon = ({ tier, size = 14, color }: { tier: Tier; size?: number
 /** Soft fill + solid text + icon + word. Never a dot alone. */
 export const TierBadge = ({ tier }: { tier: Tier }) => {
   const t = useTheme();
+  const { lang, tr } = useApp();
   const { bg, fg } = tierBadgeStyle(t, tier);
+  const word = tierLabel(tier, lang);
   return (
     <View
-      accessibilityLabel={`Hazard tier: ${TIER_LABEL[tier].toLowerCase()}`}
+      accessibilityLabel={tr('a11y.tier', { tier: word.toLowerCase() })}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: bg, paddingVertical: 5, paddingHorizontal: 8 }}
     >
       <TierIcon tier={tier} color={fg} size={12} />
-      <Text style={{ ...t.type.badge, color: fg }}>{TIER_LABEL[tier]}</Text>
+      <Text style={{ ...t.type.badge, color: fg }}>{word}</Text>
     </View>
   );
 };
@@ -62,16 +66,24 @@ export const TierHeader = ({ tier, place, line, kicker, name }: { tier: Tier; pl
   );
 };
 
+const FRESHNESS: Record<NetState, StringKey> = {
+  online: 'fresh.live',
+  syncing: 'fresh.updating',
+  stale: 'fresh.stale',
+  failed: 'fresh.failed',
+  offline: 'fresh.saved',
+};
+
 /** Required on every screen showing hazard data (DESIGN_SYSTEM non-negotiable 4). */
 export const FreshRow = ({ stamp }: { stamp: string }) => {
   const t = useTheme();
   const s = useStyles();
-  const { net } = useApp();
+  const { net, tr } = useApp();
   return (
     <View style={s.freshRow}>
       <Clock3 size={13} color={t.color.muted} strokeWidth={2.2} />
       <Text style={s.freshText}>{stamp}</Text>
-      <Text style={s.freshState}>{freshnessFor(net)}</Text>
+      <Text style={s.freshState}>{tr(FRESHNESS[net])}</Text>
     </View>
   );
 };
@@ -94,21 +106,22 @@ export const HazardRow = ({ name, detail, tier, onPress }: { name: string; detai
 export const AlertCard = ({ a, onPress }: { a: AlertCardData; onPress?: () => void }) => {
   const t = useTheme();
   const s = useStyles();
+  const { tr } = useApp();
   return (
     <Pressable
       style={[s.alertCard, a.cleared && s.alertCleared, a.unread && { backgroundColor: t.color.accentSoft }]}
       onPress={onPress}
-      accessibilityLabel={a.unread ? `Unread. ${a.title}` : a.title}
+      accessibilityLabel={a.unread ? tr('a11y.unread', { title: a.title }) : a.title}
     >
       <View style={[s.alertBar, { backgroundColor: tierColor(t, a.tier) }]} />
       <View style={s.alertBody}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TierBadge tier={a.tier} />
           {a.cleared ? (
-            <Text style={s.label}>CLEARED</Text>
+            <Text style={s.label}>{tr('alerts.cleared')}</Text>
           ) : null}
           {a.unread ? (
-            <Text style={[s.label, { color: t.color.accentInk }]}>NEW</Text>
+            <Text style={[s.label, { color: t.color.accentInk }]}>{tr('alerts.new')}</Text>
           ) : null}
           <Text style={s.alertMeta}>{a.when}</Text>
         </View>
