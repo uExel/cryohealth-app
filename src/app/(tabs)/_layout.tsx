@@ -7,17 +7,20 @@ import withObservables from '@nozbe/with-observables';
 import { Q } from '@nozbe/watermelondb';
 import { useTheme } from '../../design/theme';
 import { useStyles } from '../../design/styles';
+import { useApp } from '../../state/app';
+import { formatNumber } from '../../lib/i18n';
+import type { StringKey } from '../../lib/strings';
 import { database } from '../../lib/db';
 import { AlertModel } from '../../lib/db/models/AlertModel';
 import { AlertReadModel } from '../../lib/db/models/AlertReadModel';
 import { countUnreadCritical } from '../../lib/alert-state';
 
 // Learn is hidden until real lesson content exists (it was all placeholder).
-const TABS = [
-  { name: 'home', label: 'HOME', Icon: House },
-  { name: 'alerts', label: 'ALERTS', Icon: Bell },
-  { name: 'health', label: 'HEALTH', Icon: HeartPulse },
-  { name: 'map', label: 'LAKES', Icon: Mountain },
+const TABS: { name: string; label: StringKey; Icon: typeof House }[] = [
+  { name: 'home', label: 'tab.home', Icon: House },
+  { name: 'alerts', label: 'tab.alerts', Icon: Bell },
+  { name: 'health', label: 'tab.health', Icon: HeartPulse },
+  { name: 'map', label: 'tab.lakes', Icon: Mountain },
 ];
 
 /** Sub-screens live inside this navigator so the tab bar stays on screen
@@ -35,14 +38,17 @@ const SUB_SCREENS: Record<string, string | null> = {
  *  tap) marks it read and lowers the count. Hidden at zero. */
 function CriticalBadge({ alerts, reads }: { alerts: AlertModel[]; reads: AlertReadModel[] }) {
   const s = useStyles();
+  const { lang, tr } = useApp();
   const count = countUnreadCritical(alerts, reads);
   if (count === 0) return null;
   return (
     <View
-      style={[s.tabBadge, { right: '50%', marginRight: -22 }]}
-      accessibilityLabel={`${count} unread critical alert${count === 1 ? '' : 's'}`}
+      // end / marginEnd, not right / marginRight: the badge sits on the tab's trailing corner in
+      // both directions.
+      style={[s.tabBadge, { end: '50%', marginEnd: -22 }]}
+      accessibilityLabel={tr(count === 1 ? 'a11y.unreadCriticalOne' : 'a11y.unreadCriticalMany', { n: count })}
     >
-      <Text style={s.tabBadgeLabel}>{count}</Text>
+      <Text style={s.tabBadgeLabel}>{formatNumber(count, lang)}</Text>
     </View>
   );
 }
@@ -65,6 +71,7 @@ type TabBarProps = {
 function UExTabBar({ state, navigation }: TabBarProps) {
   const t = useTheme();
   const s = useStyles();
+  const { tr } = useApp();
   const insets = useSafeAreaInsets();
   const focused = state.routes[state.index]?.name;
   const activeTab = focused && focused in SUB_SCREENS ? SUB_SCREENS[focused] : focused;
@@ -78,12 +85,12 @@ function UExTabBar({ state, navigation }: TabBarProps) {
             key={spec.name}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
-            accessibilityLabel={spec.label}
+            accessibilityLabel={tr(spec.label)}
             style={[s.tab, active && s.tabActive]}
             onPress={() => navigation.navigate(spec.name)}
           >
             <spec.Icon size={23} color={color} strokeWidth={2.2} />
-            <Text style={[s.tabLabel, active && s.tabLabelActive]}>{spec.label}</Text>
+            <Text style={[s.tabLabel, active && s.tabLabelActive]}>{tr(spec.label)}</Text>
             {spec.name === 'alerts' ? <ObservedCriticalBadge /> : null}
           </Pressable>
         );

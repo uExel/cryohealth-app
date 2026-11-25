@@ -11,13 +11,15 @@ import { database } from '../../lib/db';
 import { AlertModel } from '../../lib/db/models/AlertModel';
 import { AlertReadModel } from '../../lib/db/models/AlertReadModel';
 import { readIds } from '../../lib/alert-state';
+import { useApp } from '../../state/app';
 import { relativeTime } from '../../lib/format';
+import type { Lang } from '../../design/theme';
 
-function toCardData(a: AlertModel, unread: boolean): AlertCardData {
+function toCardData(a: AlertModel, unread: boolean, lang: Lang): AlertCardData {
   return {
     id: a.remoteId,
     tier: a.tier,
-    when: relativeTime(a.issuedAt),
+    when: relativeTime(a.issuedAt, lang),
     title: a.title,
     place: a.downstreamSummary,
     chips: a.chips,
@@ -31,21 +33,22 @@ function Alerts({ alerts, reads }: { alerts: AlertModel[]; reads: AlertReadModel
   const t = useTheme();
   const refreshControl = useSyncRefresh();
   const router = useRouter();
+  const { lang, tr } = useApp();
   const read = readIds(reads);
   const sorted = [...alerts].sort((a, b) => b.issuedAt.localeCompare(a.issuedAt));
   const newest = sorted[0];
 
   return (
-    <Chromed title="Alerts" sub="All monitored lakes">
-      <FreshRow stamp={newest ? `Feed updated ${relativeTime(newest.issuedAt)}` : 'No alerts yet'} />
+    <Chromed title={tr('alerts.title')} sub={tr('alerts.sub')}>
+      <FreshRow stamp={newest ? tr('alerts.fresh', { time: relativeTime(newest.issuedAt, lang) }) : tr('alerts.none')} />
       <ScrollView style={s.scroll} refreshControl={refreshControl}>
         {sorted.length === 0 ? (
           <View style={{ padding: t.space.lg }}>
-            <Text style={s.callout}>No alerts on this phone yet. Pull down to sync when you have signal.</Text>
+            <Text style={s.callout}>{tr('alerts.empty')}</Text>
           </View>
         ) : null}
         {sorted.map((a) => {
-          const card = toCardData(a, !read.has(a.remoteId));
+          const card = toCardData(a, !read.has(a.remoteId), lang);
           return (
             <AlertCard
               key={a.id}

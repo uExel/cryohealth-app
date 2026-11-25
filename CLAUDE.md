@@ -48,6 +48,18 @@ npm run typecheck     # tsc --noEmit
   key per-item screens by id and reset forms after submit.
 - **Mode is derived from auth, never set:** `useApp().mode` is `'chw'` only when
   `useAuthStore` is authenticated. Sign out = `logout()`. There is no self-registration.
+- **Urdu / RTL (added 2026-11, #1):** `useApp().lang` is `'en' | 'ur'`; it is saved in SecureStore
+  and, on a first launch with nothing saved, follows the phone's language. Interface text comes
+  from `useApp().tr(key)` (`src/lib/strings.ts`, English and Urdu together; interface labels only,
+  never dosing or diagnosis text). Urdu swaps in the Nastaliq type scale (`typeUrduScale` in
+  `theme.ts`, through `ThemeProvider lang`) and `LayoutDirection` sets `direction: 'rtl'` on the
+  root, so switching is live with no restart. Use `marginStart/End`, `paddingStart/End`,
+  `start/end`, `borderStart*` and `textAlign: 'auto'`, never `left`/`right` (a test fails on them).
+  A `Modal` is its own native root and needs `directionStyle(rtl)` itself (see `SosSheet`).
+  Numbers go through `formatNumber` / `localizeDigits` for Urdu digits. A screen not yet translated
+  is wrapped in `EnglishOnly` (Health, Case, Guidance, Login); a test requires every route to use
+  `tr()` or `EnglishOnly`. `theme.ts` and `styles.ts` carry dated patches for this (marked `rtl:`),
+  to fold into the design project's tokens.
 
 <!-- Only repo-wide traps that bite in ANY directory. Local conventions and test/lint
      commands go in that directory's own CLAUDE.md. Date rules that exist to work around

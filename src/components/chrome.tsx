@@ -5,10 +5,13 @@ import Svg, { Path } from 'react-native-svg';
 import { Phone, X, ChevronLeft, ChevronRight, Settings2 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { bannerFor, useTheme } from '../design/theme';
+import { bannerFor, NetState, useTheme } from '../design/theme';
 import { useStyles } from '../design/styles';
-import { useApp } from '../state/app';
+import { directionStyle, useApp } from '../state/app';
 import { runSync } from '../lib/sync';
+import { localizeDigits } from '../lib/i18n';
+import { EnglishContent, useEnglishOnly } from './english-only';
+import type { StringKey } from '../lib/strings';
 
 /** Glacier peak crossed by a pulse trace — exact paths from the design reference
  *  (CryoHealth Screen.dc.html). One colour, both strokes equal; stroke steps up as
@@ -44,7 +47,9 @@ export const AppBar = ({ title, sub, back }: { title: string; sub?: string; back
   const s = useStyles();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { lang, setLang, setSosOpen } = useApp();
+  const { lang, setLang, setSosOpen, rtl, tr } = useApp();
+  // The back arrow points the way a page is left behind: right in right-to-left.
+  const BackIcon = rtl ? ChevronRight : ChevronLeft;
   return (
     // Safe-area top inset varies by device (notch/Dynamic Island height differs
     // across iPhone models) — padding it here, on a wrapper separate from the
@@ -56,11 +61,11 @@ export const AppBar = ({ title, sub, back }: { title: string; sub?: string; back
         {back ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Back"
+            accessibilityLabel={tr('a11y.back')}
             style={[s.btnIcon, { borderWidth: 0 }]}
             onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
           >
-            <ChevronLeft size={22} color={t.color.text} strokeWidth={2.4} />
+            <BackIcon size={22} color={t.color.text} strokeWidth={2.4} />
           </Pressable>
         ) : (
           <Logo />
@@ -71,18 +76,18 @@ export const AppBar = ({ title, sub, back }: { title: string; sub?: string; back
           <Text style={s.appBarTitle} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
           {sub ? <Text style={s.appBarSub} numberOfLines={1} ellipsizeMode="tail">{sub}</Text> : null}
         </View>
-        <Pressable accessibilityLabel="Settings" style={s.btnIcon} onPress={() => router.push('/settings')}>
+        <Pressable accessibilityLabel={tr('a11y.settings')} style={s.btnIcon} onPress={() => router.push('/settings')}>
           <Settings2 size={18} color={t.color.text} strokeWidth={2.2} />
         </Pressable>
         <Pressable
-          accessibilityLabel="Switch language"
+          accessibilityLabel={tr('a11y.switchLanguage')}
           style={s.btnIcon}
           onPress={() => setLang(lang === 'en' ? 'ur' : 'en')}
         >
           <Text style={[s.footnote, { color: t.color.text }]}>{lang === 'en' ? 'اردو' : 'EN'}</Text>
         </Pressable>
         <Pressable
-          accessibilityLabel="SOS — emergency options"
+          accessibilityLabel={tr('a11y.sos')}
           style={[s.btnDanger, { minHeight: t.size.minTouch, paddingHorizontal: 12 }]}
           onPress={() => setSosOpen(true)}
         >
@@ -94,20 +99,29 @@ export const AppBar = ({ title, sub, back }: { title: string; sub?: string; back
   );
 };
 
+const BANNER_TEXT: Partial<Record<NetState, StringKey>> = {
+  offline: 'banner.offline',
+  syncing: 'banner.syncing',
+  failed: 'banner.failed',
+  stale: 'banner.stale',
+};
+
 /** Hidden when online (bannerFor returns null). */
 export const SyncBanner = () => {
   const t = useTheme();
   const s = useStyles();
-  const { net, setNet } = useApp();
+  const { net, setNet, tr } = useApp();
   const b = bannerFor(t, net);
   if (!b) return null;
+  const textKey = BANNER_TEXT[net];
   return (
     <View style={[s.banner, { backgroundColor: b.bg }]}>
-      {/* The generated 'syncing' copy has a fixed "2 of 5 items" count that isn't real. */}
-      <Text style={[s.bannerText, { color: b.fg }]}>{net === 'syncing' ? 'Syncing…' : b.text}</Text>
+      {/* The generated 'syncing' copy has a fixed "2 of 5 items" count that isn't real, so the
+          words come from the strings table (which has no count) and only the colours from bannerFor. */}
+      <Text style={[s.bannerText, { color: b.fg }]}>{textKey ? tr(textKey) : b.text}</Text>
       {b.retry ? (
         <Pressable style={[s.bannerRetry, { borderColor: b.fg }]} onPress={() => void runSync(setNet)}>
-          <Text style={[s.bannerRetryLabel, { color: b.fg }]}>SYNC NOW</Text>
+          <Text style={[s.bannerRetryLabel, { color: b.fg }]}>{tr('banner.syncNow')}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -118,13 +132,14 @@ export const SyncBanner = () => {
 export const SosSheet = () => {
   const t = useTheme();
   const s = useStyles();
-  const { sosOpen, setSosOpen } = useApp();
+  const { sosOpen, setSosOpen, lang, rtl, tr } = useApp();
+  const Forward = rtl ? ChevronLeft : ChevronRight;
   // Only rows that actually do something. Facility and high-ground rows come back once
   // there is real per-valley data -- a hardcoded place is wrong for everyone else.
   const rows: { head: string; note: string; onPress: () => void }[] = [
     {
-      head: 'Call rescue 1122',
-      note: 'Needs signal — dials as soon as you have any network',
+      head: tr('sos.call', { n: localizeDigits('1122', lang) }),
+      note: tr('sos.callNote'),
       // Not gated on canOpenURL: that needs an Info.plist query entry for tel: and must
       // never be the reason an emergency call doesn't start.
       onPress: () => void Linking.openURL('tel:1122'),
@@ -132,11 +147,12 @@ export const SosSheet = () => {
   ];
   return (
     <Modal visible={sosOpen} transparent animationType="none" onRequestClose={() => setSosOpen(false)}>
-      <View style={s.scrim}>
+      {/* A Modal is its own native root: it does not inherit the screen's direction. */}
+      <View style={[s.scrim, directionStyle(rtl)]}>
         <View style={s.sheet}>
           <View style={[s.sheetRow, { borderTopWidth: 0 }]}>
-            <Text style={[s.title3, { flex: 1 }]}>Emergency</Text>
-            <Pressable accessibilityLabel="Close" style={s.btnIcon} onPress={() => setSosOpen(false)}>
+            <Text style={[s.title3, { flex: 1 }]}>{tr('sos.title')}</Text>
+            <Pressable accessibilityLabel={tr('a11y.close')} style={s.btnIcon} onPress={() => setSosOpen(false)}>
               <X size={20} color={t.color.text} strokeWidth={2.4} />
             </Pressable>
           </View>
@@ -146,7 +162,7 @@ export const SosSheet = () => {
                 <Text style={s.headline}>{head}</Text>
                 <Text style={s.footnote}>{note}</Text>
               </View>
-              <ChevronRight size={18} color={t.color.muted} strokeWidth={2.2} />
+              <Forward size={18} color={t.color.muted} strokeWidth={2.2} />
             </Pressable>
           ))}
         </View>
@@ -157,17 +173,21 @@ export const SosSheet = () => {
 
 export const BareScreen = ({ children }: { children: React.ReactNode }) => {
   const s = useStyles();
-  return <View style={s.screen}>{children}</View>;
+  const englishOnly = useEnglishOnly();
+  return <View style={s.screen}>{englishOnly ? <EnglishContent>{children}</EnglishContent> : children}</View>;
 };
 
 /** Chromed screen shell: app bar + sync banner above content. Tab bar comes from the navigator. */
 export const Chromed = ({ title, sub, back, children }: { title: string; sub?: string; back?: boolean; children: React.ReactNode }) => {
   const s = useStyles();
+  // An untranslated screen keeps its content English and left-to-right (see english-only.tsx);
+  // the bar, banner and SOS sheet around it follow the app's language.
+  const englishOnly = useEnglishOnly();
   return (
     <View style={s.screen}>
       <AppBar title={title} sub={sub} back={back} />
       <SyncBanner />
-      {children}
+      {englishOnly ? <EnglishContent>{children}</EnglishContent> : children}
       <SosSheet />
     </View>
   );

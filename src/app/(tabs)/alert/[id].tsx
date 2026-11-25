@@ -12,11 +12,12 @@ import { useApp } from '../../../state/app';
 import { database } from '../../../lib/db';
 import { AlertModel } from '../../../lib/db/models/AlertModel';
 import { markAlertRead } from '../../../lib/alert-state';
+import { localizeDigits } from '../../../lib/i18n';
 
 function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
   const t = useTheme();
   const s = useStyles();
-  const { lang } = useApp();
+  const { lang, tr } = useApp();
   const alert = alerts[0];
   const checklist = alert?.checklist ?? [];
   const [done, setDone] = useState<boolean[]>(checklist.map(() => false));
@@ -30,21 +31,21 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
 
   if (!alert) {
     return (
-      <Chromed title="Alert" back>
+      <Chromed title={tr('alert.title')} back>
         <View style={{ padding: t.space.lg }}>
-          <Text style={s.callout}>This alert isn&apos;t on this phone yet. Connect to sync.</Text>
+          <Text style={s.callout}>{tr('alert.missing')}</Text>
         </View>
       </Chromed>
     );
   }
 
   const facts: [string, string][] = [];
-  if (alert.downstreamSummary) facts.push(['Area', alert.downstreamSummary]);
+  if (alert.downstreamSummary) facts.push([tr('alert.area'), alert.downstreamSummary]);
   const window = [alert.windowStart, alert.windowEnd].filter(Boolean).join(' – ');
-  if (window) facts.push(['Window', window]);
+  if (window) facts.push([tr('alert.window'), localizeDigits(window, lang)]);
 
   return (
-    <Chromed title="Alert" sub={alert.downstreamSummary ?? undefined} back>
+    <Chromed title={tr('alert.title')} sub={alert.downstreamSummary ?? undefined} back>
       <ScrollView style={s.scroll}>
         <View style={{ padding: t.space.lg, gap: 10 }}>
           <TierBadge tier={alert.tier} />
@@ -69,7 +70,7 @@ function AlertDetail({ alerts }: { alerts: AlertModel[] }) {
 
         {checklist.length ? (
           <>
-            <SectionLabel>Do these now</SectionLabel>
+            <SectionLabel>{tr('alert.doNow')}</SectionLabel>
             {checklist.map((c, i) => (
               <CheckRow
                 key={c}

@@ -13,6 +13,7 @@ import { LakeModel } from "../../lib/db/models/LakeModel";
 import { AlertModel } from "../../lib/db/models/AlertModel";
 import { ProtocolModel } from "../../lib/db/models/ProtocolModel";
 import { openAppSettings } from "../../lib/battery-settings";
+import type { StringKey } from "../../lib/strings";
 import {
   disablePushNotifications,
   enablePushNotifications,
@@ -33,17 +34,18 @@ function SyncCounts({
   protocols: ProtocolModel[];
 }) {
   const s = useStyles();
+  const { tr } = useApp();
   const rows: [string, number][] = [
-    ["Lakes", lakes.length],
-    ["Alerts", alerts.length],
-    ["Protocols", protocols.length],
+    [tr("settings.lakes"), lakes.length],
+    [tr("settings.alerts"), alerts.length],
+    [tr("settings.protocols"), protocols.length],
   ];
   return (
     <>
       {rows.map(([k, v]) => (
         <View key={k} style={s.settingsRow}>
           <Text style={[s.bodyStrong, { flex: 1 }]}>{k}</Text>
-          <Text style={s.footnote}>{v} synced</Text>
+          <Text style={s.footnote}>{tr("settings.synced", { n: v })}</Text>
         </View>
       ))}
     </>
@@ -56,29 +58,30 @@ const ObservedSyncCounts = withObservables([], () => ({
   protocols: database.get<ProtocolModel>("protocols").query().observe(),
 }))(SyncCounts);
 
-const THEME_OPTIONS = ["Light", "Dark", "System"] as const;
+const THEME_ORDER = ["light", "dark", "system"] as const;
+
+type PushError = { message: string } | { key: StringKey };
+const pushErrorFrom = (err: unknown, fallback: StringKey): PushError =>
+  err instanceof Error ? { message: err.message } : { key: fallback };
 
 export default function Settings() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
-  const { mode, lang, setLang, themeName, setThemeName } = useApp();
+  const { mode, lang, setLang, themeName, setThemeName, tr } = useApp();
+  const themeLabels = [tr("settings.light"), tr("settings.dark"), tr("settings.system")];
   const name = useAuthStore((st) => st.name);
   const logout = useAuthStore((st) => st.logout);
   const [pushEnabled, setPushEnabled] = React.useState(false);
   const [pushBusy, setPushBusy] = React.useState(false);
-  const [pushError, setPushError] = React.useState<string>();
+  // The error is kept as a message from the library or as a string key, and translated where it
+  // is shown, so it also follows a language switch while it is on screen.
+  const [pushError, setPushError] = React.useState<PushError>();
 
   React.useEffect(() => {
     void getPushNotificationsEnabled()
       .then(setPushEnabled)
-      .catch((err: unknown) => {
-        setPushError(
-          err instanceof Error
-            ? err.message
-            : "Could not read notification settings.",
-        );
-      });
+      .catch((err: unknown) => setPushError(pushErrorFrom(err, "settings.readFail")));
   }, []);
 
   const togglePush = async () => {
@@ -92,14 +95,10 @@ export default function Settings() {
       } else {
         const enabled = await enablePushNotifications();
         setPushEnabled(enabled);
-        if (!enabled) setPushError("Notification permission was not granted.");
+        if (!enabled) setPushError({ key: "settings.notGranted" });
       }
     } catch (err) {
-      setPushError(
-        err instanceof Error
-          ? err.message
-          : "Could not update notification settings.",
-      );
+      setPushError(pushErrorFrom(err, "permission.updateFail"));
     } finally {
       setPushBusy(false);
     }
@@ -107,12 +106,12 @@ export default function Settings() {
 
   return (
     <Chromed
-      title="Settings"
-      sub={mode === "chw" ? `${name ?? "Health worker"} · LHW` : "No account"}
+      title={tr("settings.title")}
+      sub={mode === "chw" ? `${name ?? tr("settings.worker")} · LHW` : tr("settings.noAccount")}
       back
     >
       <ScrollView style={s.scroll}>
-        <SectionLabel>Language</SectionLabel>
+        <SectionLabel>{tr("settings.language")}</SectionLabel>
         <View style={{ paddingHorizontal: t.space.lg }}>
           <Seg
             options={["English", "اردو"]}
@@ -121,31 +120,21 @@ export default function Settings() {
           />
         </View>
 
-        <SectionLabel>Appearance</SectionLabel>
+        <SectionLabel>{tr("settings.appearance")}</SectionLabel>
         <View style={{ paddingHorizontal: t.space.lg }}>
           <Seg
-            options={[...THEME_OPTIONS]}
-            value={
-              themeName === "light"
-                ? "Light"
-                : themeName === "dark"
-                  ? "Dark"
-                  : "System"
-            }
-            onChange={(v) =>
-              setThemeName(
-                v === "Light" ? "light" : v === "Dark" ? "dark" : "system",
-              )
-            }
+            options={themeLabels}
+            value={themeLabels[THEME_ORDER.indexOf(themeName)]}
+            onChange={(v) => setThemeName(THEME_ORDER[themeLabels.indexOf(v)] ?? "system")}
           />
         </View>
 
-        <SectionLabel>Local data</SectionLabel>
+        <SectionLabel>{tr("settings.localData")}</SectionLabel>
         <ObservedSyncCounts />
 
         {Platform.OS === "android" ? (
           <>
-            <SectionLabel>Hazard notifications</SectionLabel>
+            <SectionLabel>{tr("settings.hazardNotifications")}</SectionLabel>
             <View
               style={{
                 paddingHorizontal: t.space.lg,
@@ -153,32 +142,28 @@ export default function Settings() {
               }}
             >
               <View style={[s.settingsRow, { alignItems: "center" }]}>
-                <View style={{ flex: 1, paddingRight: t.space.md }}>
-                  <Text style={s.bodyStrong}>Push alerts</Text>
+                <View style={{ flex: 1, paddingEnd: t.space.md }}>
+                  <Text style={s.bodyStrong}>{tr("settings.push")}</Text>
                   <Text style={s.footnote}>
                     {pushBusy
-                      ? "Updating…"
+                      ? tr("settings.pushUpdating")
                       : pushEnabled
-                        ? "Enabled on this device"
-                        : "Disabled on this device"}
+                        ? tr("settings.pushOn")
+                        : tr("settings.pushOff")}
                   </Text>
                 </View>
-                <Toggle label="Push alerts" on={pushEnabled} onPress={() => void togglePush()} />
+                <Toggle label={tr("settings.push")} on={pushEnabled} onPress={() => void togglePush()} />
               </View>
               {pushError ? (
-                <Text style={s.fieldErrorText}>{pushError}</Text>
+                <Text style={s.fieldErrorText}>{"key" in pushError ? tr(pushError.key) : pushError.message}</Text>
               ) : null}
               {pushEnabled ? (
                 <View style={{ paddingTop: t.space.sm, gap: 8 }}>
-                  <Text style={s.bodyStrong}>Keep alerts working when the app is closed</Text>
-                  <Text style={s.footnote}>
-                    Some phones stop an app when you swipe it away, and a stopped app cannot
-                    receive alerts. In app settings, open Battery and choose “Don’t optimize”
-                    or “Unrestricted” for CryoHealth.
-                  </Text>
+                  <Text style={s.bodyStrong}>{tr("settings.keepWorking")}</Text>
+                  <Text style={s.footnote}>{tr("settings.keepWorkingBody")}</Text>
                   <BtnSecondary
-                    label="Open app settings"
-                    onPress={() => void openAppSettings().catch(() => setPushError("Could not open app settings."))}
+                    label={tr("settings.openAppSettings")}
+                    onPress={() => void openAppSettings().catch(() => setPushError({ key: "settings.openFail" }))}
                   />
                 </View>
               ) : null}
@@ -186,7 +171,7 @@ export default function Settings() {
           </>
         ) : null}
 
-        <SectionLabel>Account</SectionLabel>
+        <SectionLabel>{tr("settings.account")}</SectionLabel>
         <View
           style={{
             paddingHorizontal: t.space.lg,
@@ -196,10 +181,10 @@ export default function Settings() {
         >
           {mode === "chw" ? (
             // logout() clears the stored token, which also switches the app back to public mode.
-            <BtnSecondary label="Sign out" onPress={() => void logout()} />
+            <BtnSecondary label={tr("settings.signOut")} onPress={() => void logout()} />
           ) : (
             <BtnSecondary
-              label="Log in (health workers only)"
+              label={tr("settings.logIn")}
               onPress={() => router.push("/login")}
             />
           )}

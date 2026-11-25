@@ -1,4 +1,5 @@
 import React from 'react';
+import { EnglishOnly } from '../components/english-only';
 import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { WifiOff } from 'lucide-react-native';
@@ -12,7 +13,7 @@ import { login } from '../lib/cryohealth-api';
 import { runSync } from '../lib/sync';
 import { ApiError } from '../lib/api-client';
 
-export default function Login() {
+function Login() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
@@ -89,5 +90,14 @@ export default function Login() {
       </ScrollView>
       </KeyboardAvoid>
     </BareScreen>
+  );
+}
+
+// Not translated yet: stays English and left-to-right while the app is in Urdu (see english-only.tsx).
+export default function LoginRoute() {
+  return (
+    <EnglishOnly>
+      <Login />
+    </EnglishOnly>
   );
 }

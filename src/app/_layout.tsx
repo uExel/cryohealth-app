@@ -9,7 +9,7 @@ import {
   Archivo_800ExtraBold,
 } from "@expo-google-fonts/archivo";
 import { NotoNastaliqUrdu_400Regular } from "@expo-google-fonts/noto-nastaliq-urdu";
-import { AppProvider, useApp } from "../state/app";
+import { AppProvider, LayoutDirection, useApp } from "../state/app";
 import { useAuthStore } from "../state/auth";
 import { queryClient } from "../lib/query-client";
 import { startSyncEngine } from "../lib/sync";
@@ -144,20 +144,23 @@ export default function RootLayout() {
       <AppProvider>
         <AppEffects />
         <StatusBar style="auto" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: "fade",
-            animationDuration: 180,
-          }}
-        >
-          <Stack.Screen name="(tabs)" />
-          {/* A warning never animates in (theme.motion.critical). */}
-          <Stack.Screen
-            name="critical"
-            options={{ presentation: "fullScreenModal", animation: "none" }}
-          />
-        </Stack>
+        {/* Urdu lays the whole tree out right-to-left, live, with no restart. */}
+        <LayoutDirection>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: "fade",
+              animationDuration: 180,
+            }}
+          >
+            <Stack.Screen name="(tabs)" />
+            {/* A warning never animates in (theme.motion.critical). */}
+            <Stack.Screen
+              name="critical"
+              options={{ presentation: "fullScreenModal", animation: "none" }}
+            />
+          </Stack>
+        </LayoutDirection>
       </AppProvider>
     </QueryClientProvider>
   );

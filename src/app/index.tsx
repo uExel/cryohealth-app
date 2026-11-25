@@ -7,12 +7,14 @@ import { useRouter } from 'expo-router';
 import { WifiOff, RefreshCw } from 'lucide-react-native';
 import { Logo, Wordmark } from '../components/chrome';
 import { useApp } from '../state/app';
+import { useTheme } from '../design/theme';
 import { useAuthStore } from '../state/auth';
 import { shouldShowBatteryPrompt } from '../lib/battery-settings';
 
 export default function Splash() {
   const router = useRouter();
-  const { net } = useApp();
+  const { net, rtl, tr } = useApp();
+  const t = useTheme();
   const authStatus = useAuthStore((s) => s.status);
   const offline = net === 'offline' || net === 'failed' || net === 'stale';
 
@@ -41,8 +43,13 @@ export default function Splash() {
         </View>
         <Wordmark size={40} color="#ffffff" />
         <View style={{ height: 2, backgroundColor: 'rgba(255,255,255,0.4)', marginTop: 16, marginBottom: 14, width: 120 }} />
-        <Text style={{ fontFamily: 'Archivo-Regular', fontSize: 15, lineHeight: 22, color: 'rgba(255,255,255,0.9)', maxWidth: 240 }}>
-          Glacier hazard warnings and health guidance for Gilgit-Baltistan.
+        <Text
+          style={[
+            rtl ? t.typeUrdu.footnote : { fontFamily: 'Archivo-Regular', fontSize: 15, lineHeight: 22 },
+            { color: 'rgba(255,255,255,0.9)', maxWidth: 240 },
+          ]}
+        >
+          {tr('splash.tagline')}
         </Text>
       </View>
       <View style={{ paddingHorizontal: 26, paddingBottom: 34 }}>
@@ -55,8 +62,13 @@ export default function Splash() {
           ) : (
             <RefreshCw size={15} color="rgba(255,255,255,0.9)" strokeWidth={2.4} />
           )}
-          <Text style={{ fontFamily: 'Archivo-SemiBold', fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
-            {offline ? 'Offline — starting with saved data' : 'Checking alerts…'}
+          <Text
+            style={[
+              rtl ? t.typeUrdu.footnote : { fontFamily: 'Archivo-SemiBold', fontSize: 13 },
+              { color: 'rgba(255,255,255,0.9)' },
+            ]}
+          >
+            {offline ? tr('splash.offline') : tr('splash.checking')}
           </Text>
         </View>
       </View>

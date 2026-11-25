@@ -5,28 +5,25 @@ import { BareScreen, Logo, Wordmark } from "../components/chrome";
 import { BtnPrimary, BtnSecondary } from "../components/ui";
 import { useStyles } from "../design/styles";
 import { useTheme } from "../design/theme";
+import { useApp } from "../state/app";
 
 export default function Welcome() {
   const t = useTheme();
   const s = useStyles();
   const router = useRouter();
+  const { tr } = useApp();
   return (
     <BareScreen>
       <View style={[s.padXWide, { flex: 1, paddingTop: 84, gap: 12 }]}>
         <Logo size={52} />
         <Wordmark size={28} />
-        <Text style={s.title1}>Alerts work without an account</Text>
-        <Text style={s.body}>
-          CryoHealth warns you about glacial lakes across Gilgit-Baltistan. No
-          phone number, no sign up.
-        </Text>
-        <Text style={s.callout}>
-          An account is only for health workers who record cases.
-        </Text>
+        <Text style={s.title1}>{tr("welcome.title")}</Text>
+        <Text style={s.body}>{tr("welcome.body")}</Text>
+        <Text style={s.callout}>{tr("welcome.note")}</Text>
 
         <View style={{ marginTop: "auto", marginBottom: t.space.xxl, gap: 10 }}>
           <BtnPrimary
-            label="Start with alerts"
+            label={tr("welcome.start")}
             onPress={() =>
               router.replace(
                 Platform.OS === "android" ? "/permission" : "/home",
@@ -34,7 +31,7 @@ export default function Welcome() {
             }
           />
           <BtnSecondary
-            label="Health worker log in"
+            label={tr("welcome.login")}
             onPress={() => router.push("/login")}
           />
         </View>
