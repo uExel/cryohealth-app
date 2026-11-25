@@ -1,72 +1,65 @@
-# HANDOFF — CryoHealth-app — 2026-11-23
-Session: audit-open-issues-hydrate-fix  Model: claude-sonnet-5-5  Branch: fix/issue-2-hydrate-never-stuck-loading  Goal: #1  Task: #2 (remaining slice: hydrate hardening)
-Prior session archived: docs/ai/sessions/2026-09-27-alerts-root-cause-protocol-library-handoff.md
+# HANDOFF — CryoHealth-app — 2026-11-25
+Session: shabir-dev-to-main  Model: claude-sonnet-5-5  Branch: chore/jest-clean-exit  Goal: #1  Task: #2 (remaining: airplane-mode device check)
+Prior session archived: docs/ai/sessions/2026-11-25-issue-2-auth-login-tests-handoff.md
 
 ## State
-Audited the four open issues against `origin/main` (01527f1). One confirmed code defect, fixed on
-this branch: `hydrate()` in `src/state/auth.ts` could reject and leave `status` on `'loading'`.
+This PR brings `shabir_dev` into `main`: Android FCM push notifications with release signing, unread
+alert highlighting and the unread-critical badge, the 2.1.0 release bump, the jest setup, and the
+auth and login tests from #10. `main` already has the `hydrate()` fix (#9, merge commit 8ff2a2f),
+so `auth.ts` is identical on both sides.
 
-Reproduced on `main` by loading the real `auth.ts` with a mocked `expo-secure-store`: a saved
-identity that is not JSON, is JSON `null`, or a keystore read that throws all made `hydrate()`
-reject with `status` still `'loading'`. Impact is low, which is why it was not a crash: the splash
-(`src/app/index.tsx`) is a fixed 1.8 s timer, `_layout.tsx` catches the rejection, and the app
-treats `'loading'` like a guest. But nothing could tell "still reading" from "gave up", and an
-unknown role or missing name was accepted as an authenticated session.
+It is opened from `chore/jest-clean-exit` (cut from `shabir_dev`) rather than from `shabir_dev`
+itself, so the tidy-up commit does not land on a branch another developer pushes to.
 
-The fix: `hydrate()` never rejects. A keystore read error or a saved login that is not JSON, not an
-object, has a role outside the four API roles, or has no name all end as `guest`. Nothing is
-deleted from SecureStore, so a transient read failure does not cost the user their session.
-
-## Issue audit (no issue closed)
-- #2: mostly built (WatermelonDB offline store, JWT auth). This PR is the remaining defect. Its
-  verification command `npm test` still does not exist on `main`; adding jest is deliberately NOT
-  in this PR, because `shabir_dev` already carries the jest setup and a second copy would conflict.
-- #5: code is done on `main` (`GUIDANCE` removed, protocols synced, CHW protocol library).
-  Stays open: `COMPLAINT_TO_SLUG` is empty until a clinician maps the 4 complaints to the 11
-  production protocols. Not for an LLM to author.
-- #3: research spike, needs a real 4 GB phone and a go/no-go scorecard. Not a code fix.
-- #1: umbrella goal, needs devices and clinician sign-off.
-- PR #4 (settings for android, by another contributor) is conflicting and stale. Not touched.
+Issue #2 stays open: the airplane-mode cold launch on a real 2-4 GB phone has not been done.
 
 ## Done this session
-- `src/state/auth.ts`: `parseIdentity()` plus a `hydrate()` that always settles on `authenticated`
-  or `guest`. The role list is now one `ROLES` const, and `Role` is derived from it (same type).
-- Archived the previous handoff under `docs/ai/sessions/`.
+- Merged #9 into `main` and #10 into `shabir_dev`, each after an independent verifier (not the
+  author) ran it: PASS and PASS+NOTES. Both merges used `--match-head-commit`.
+- Deleted the merged branches `fix/issue-2-hydrate-never-stuck-loading` and `test/2-auth-login-tests`
+  (local and origin). Left alone: `fix/2-auth-hydrate-and-tests` (#8, closed unmerged),
+  `fix/issue-2-push-routing-integration` (#7, closed unmerged, 3 commits found nowhere else),
+  `shoaib_android` (#4), `store-assets`.
+- Traced and fixed Jest's "worker process has failed to exit gracefully". Cause: WatermelonDB turns
+  Loki autosave on by default (`autosave: true, autosaveInterval: 500`, a `setInterval` it never
+  clears and the adapter has no close). `alert-state.test.ts` builds a real in-memory Loki database,
+  so every parallel run kept a worker alive. Fix: `extraLokiOptions: { autosave: false }` in that
+  test's adapter. Test-only; the app's own database setup is unchanged.
+- Tightened the login timeout test: it now asserts the request is still pending at 29.999 s. A
+  15 s or 31 s timeout in `api-client.ts` now fails it (before, 15 s passed).
 
 ## Not done / deferred
-- No regression test is committed: there is no test runner on `main` and adding one is out of
-  scope here. The check below was a throwaway script, not part of the repo.
-- Not run on a device or emulator (none attached). Bundle compile only.
-- Closed PR #8 solved the same bug and added jest; it was closed unmerged on 2026-11-12. This PR
-  takes only its `auth.ts` slice.
+- Airplane-mode cold launch on a real device (#2). No device attached.
+- #1: IMCI triage engine, Urdu and RTL, clinical advisor sign-off, field test. #5: complaint to
+  protocol mapping needs a clinician. #3: Urdu benchmark spike.
+- FCM push, release signing and the 2.1.0 build have not been run on a device this session.
 
 ## Next action
-Review and merge this PR. If a test runner lands on `main` (via `shabir_dev`), add `hydrate()`
-cases for the 12 inputs listed under Verification status.
+A human reviews and confirms the merge of this PR into `main`. Then pick #1 (triage engine or Urdu
+and RTL) or the airplane-mode check for #2.
 
 ## Open questions for a human
+- `google-services.json` (Firebase Android client config, includes an `api_key`) is committed. Is the
+  key restricted to this app's package name and signing certificate in the Google Cloud console? — blocking: no
 - Which production protocol slug answers each COMMON_COMPLAINT (esp. diarrhoea plan A/B/C)? — blocking: no (#5)
-- Should `npm test` be added to `main` separately, or only through `shabir_dev`? — blocking: no
 
 ## Failed approaches (do not retry)
-- none this session. (Earlier, in the archived handoffs: enabling class-properties globally in
-  babel.config.js breaks the bundle.)
+- `jest --detectOpenHandles` on `alert-state.test.ts` hangs instead of reporting (the leaked interval
+  is the thing keeping it alive). Bisect by running each suite beside a clean partner with
+  `--maxWorkers=2` instead.
 
 ## Loops run
 - none
 
 ## Files touched
-src/state/auth.ts, docs/ai/HANDOFF.md,
-docs/ai/sessions/2026-09-27-alerts-root-cause-protocol-library-handoff.md
+src/lib/__tests__/alert-state.test.ts, src/lib/__tests__/login-api.test.ts, docs/ai/HANDOFF.md,
+docs/ai/sessions/2026-11-25-issue-2-auth-login-tests-handoff.md
 
 ## Verification status
-tests: n/a (no runner). Runtime repro of the real `auth.ts` with a mocked SecureStore, 12 inputs:
-nothing saved, valid chw, valid admin, token without identity, identity without token, not JSON,
-JSON null, array, unknown role, missing name, empty name, keystore throws. On `main`, three of
-them (not JSON, JSON null, keystore throws) reject and leave `status='loading'`. On this branch all
-12 resolve, the two valid ones to `authenticated` and the other ten to `guest`.
-review: `tsc --noEmit` 0 errors; `expo lint` 0 errors (the 1 existing `styles.ts` warning remains);
-`expo export --platform android` bundles (3591 modules)
+tests: `npm test` 6 suites, 46 tests pass, twice, with no worker-exit warning. Mutations of the
+login timeout (15 s, 31 s) now fail the timeout test.
+review: `tsc --noEmit` 0 errors; `expo lint` 0 errors (the 1 existing `src/design/styles.ts` warning remains)
+qa: not run on a device or emulator
 
 ## Resume with
-/uexel:orient   (then: review this PR, or #5 for the complaint mapping)
+/uexel:orient   (then: #1 triage engine or Urdu/RTL, or the airplane-mode check for #2)

@@ -17,6 +17,8 @@ export type AlertCardData = {
   chips?: string[];
   cleared?: boolean;
   acked?: string;
+  /** Not opened yet on this phone: soft accent fill + a NEW word (never colour or a dot alone). */
+  unread?: boolean;
 };
 
 /** Tier icons are fixed (DESIGN_SYSTEM §11); critical uses the heavier stroke. */
@@ -93,13 +95,20 @@ export const AlertCard = ({ a, onPress }: { a: AlertCardData; onPress?: () => vo
   const t = useTheme();
   const s = useStyles();
   return (
-    <Pressable style={[s.alertCard, a.cleared && s.alertCleared]} onPress={onPress}>
+    <Pressable
+      style={[s.alertCard, a.cleared && s.alertCleared, a.unread && { backgroundColor: t.color.accentSoft }]}
+      onPress={onPress}
+      accessibilityLabel={a.unread ? `Unread. ${a.title}` : a.title}
+    >
       <View style={[s.alertBar, { backgroundColor: tierColor(t, a.tier) }]} />
       <View style={s.alertBody}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TierBadge tier={a.tier} />
           {a.cleared ? (
             <Text style={s.label}>CLEARED</Text>
+          ) : null}
+          {a.unread ? (
+            <Text style={[s.label, { color: t.color.accentInk }]}>NEW</Text>
           ) : null}
           <Text style={s.alertMeta}>{a.when}</Text>
         </View>

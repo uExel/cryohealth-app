@@ -10,6 +10,7 @@
 # macOS
 # typescript
 *.jks
+*.keystore
 *.key
 *.mobileprovision
 *.orig.*
@@ -37,3 +38,4 @@ web-build/
 yarn-debug.*
 yarn-error.*
 .gstack/
+graphify-out

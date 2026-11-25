@@ -11,9 +11,20 @@ import {
  *  data migration needed — populated fresh by the first sync after upgrade.
  *  v3 -> v4: lakes `server_updated_at` replaces `updated_at`, a name WatermelonDB reserves
  *  for its own numeric timestamp (cryohealth-app#6). Migrations can't drop columns, so the
- *  old one stays in SQLite unread; the next pull sync fills the new one. */
+ *  old one stays in SQLite unread; the next pull sync fills the new one.
+ *  v4 -> v5: new `alert_reads` table (which alerts the user has opened). Locally authored,
+ *  so unlike the caches it is never wiped by a pull. Starts empty (everything unread). */
 export const migrations = schemaMigrations({
   migrations: [
+    {
+      toVersion: 5,
+      steps: [
+        createTable({
+          name: "alert_reads",
+          columns: [{ name: "remote_id", type: "string", isIndexed: true }],
+        }),
+      ],
+    },
     {
       toVersion: 4,
       steps: [

@@ -8,6 +8,7 @@ import { WifiOff, RefreshCw } from 'lucide-react-native';
 import { Logo, Wordmark } from '../components/chrome';
 import { useApp } from '../state/app';
 import { useAuthStore } from '../state/auth';
+import { shouldShowBatteryPrompt } from '../lib/battery-settings';
 
 export default function Splash() {
   const router = useRouter();
@@ -15,15 +16,20 @@ export default function Splash() {
   const authStatus = useAuthStore((s) => s.status);
   const offline = net === 'offline' || net === 'failed' || net === 'stale';
 
+  // Wait for the saved session to load (never route on 'loading', which would send a
+  // signed-in user through welcome), but keep the mark up briefly so it doesn't flash.
   useEffect(() => {
-    const id = setTimeout(() => {
+    if (authStatus === 'loading') return;
+    const id = setTimeout(async () => {
       // A restored session (SecureStore) skips straight past welcome/login.
       if (authStatus === 'authenticated') {
         router.replace('/home');
-      } else {
-        router.replace('/welcome');
+        return;
       }
-    }, 1800);
+      // First launch on Android: ask for battery access before anything else, once.
+      const askBattery = await shouldShowBatteryPrompt().catch(() => false);
+      router.replace(askBattery ? '/battery' : '/welcome');
+    }, 600);
     return () => clearTimeout(id);
   }, [router, authStatus]);
 
@@ -41,7 +47,7 @@ export default function Splash() {
       </View>
       <View style={{ paddingHorizontal: 26, paddingBottom: 34 }}>
         <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.28)', marginBottom: 12 }}>
-          <View style={{ height: 4, width: '46%', backgroundColor: '#ffffff' }} />
+          <View style={{ height: 4, width: authStatus === 'loading' ? '40%' : '100%', backgroundColor: '#ffffff' }} />
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {offline ? (

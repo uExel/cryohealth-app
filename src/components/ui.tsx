@@ -1,6 +1,6 @@
 /** Form + action primitives. All geometry comes from design/styles.ts — no parallel styles. */
 import React from 'react';
-import { Pressable, Text, TextInput, View, ViewStyle } from 'react-native';
+import { Pressable, Text, TextInput, TextInputProps, View, ViewStyle } from 'react-native';
 import { Check, Phone } from 'lucide-react-native';
 import { useTheme } from '../design/theme';
 import { useStyles } from '../design/styles';
@@ -49,18 +49,23 @@ export const BtnDanger = ({ label, onPress, style }: BtnProps) => {
 export const BtnText = ({ label, onPress, style }: BtnProps) => {
   const s = useStyles();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={[s.btnText, style]}>
+    <Pressable accessibilityRole="button" hitSlop={8} onPress={onPress} style={[s.btnText, style]}>
       <Text style={s.btnTextLabel}>{label}</Text>
     </Pressable>
   );
 };
 
+type FieldInputProps = Pick<
+  TextInputProps,
+  'keyboardType' | 'autoCapitalize' | 'autoCorrect' | 'autoComplete' | 'returnKeyType' | 'onSubmitEditing' | 'maxLength' | 'inputMode'
+>;
+
 export const Field = ({
-  label, value, placeholder, prefix, error, secure, onChangeText,
+  label, value, placeholder, prefix, error, secure, onChangeText, ...input
 }: {
   label: string; value?: string; placeholder?: string; prefix?: string; error?: string; secure?: boolean;
   onChangeText?: (v: string) => void;
-}) => {
+} & FieldInputProps) => {
   const t = useTheme();
   const s = useStyles();
   return (
@@ -79,6 +84,8 @@ export const Field = ({
           placeholderTextColor={t.color.muted}
           secureTextEntry={secure}
           onChangeText={onChangeText}
+          accessibilityLabel={label}
+          {...input}
         />
       </View>
       {error ? <Text style={s.fieldErrorText}>{error}</Text> : null}
@@ -98,10 +105,10 @@ export const CheckRow = ({ label, done, onPress, first }: { label: string; done:
   );
 };
 
-export const Toggle = ({ on, onPress }: { on: boolean; onPress: () => void }) => {
+export const Toggle = ({ on, onPress, label }: { on: boolean; onPress: () => void; label: string }) => {
   const s = useStyles();
   return (
-    <Pressable accessibilityRole="switch" accessibilityState={{ checked: on }} onPress={onPress} style={[s.toggleTrack, on && s.toggleTrackOn]}>
+    <Pressable accessibilityRole="switch" accessibilityLabel={label} hitSlop={8} accessibilityState={{ checked: on }} onPress={onPress} style={[s.toggleTrack, on && s.toggleTrackOn]}>
       <View style={[s.toggleKnob, on && s.toggleKnobOn]} />
     </Pressable>
   );

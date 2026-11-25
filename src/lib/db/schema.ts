@@ -4,7 +4,7 @@ import { appSchema, tableSchema } from "@nozbe/watermelondb";
  *  replaced on each pull sync; `chw_cases` is the only locally-authored table (queued
  *  until pushed). */
 export const schema = appSchema({
-  version: 4,
+  version: 5,
   tables: [
     tableSchema({
       name: "lakes",
@@ -72,6 +72,13 @@ export const schema = appSchema({
         { name: "steps_json", type: "string", isOptional: true },
         { name: "synced_at", type: "number" },
       ],
+    }),
+    // Locally-authored, never wiped by sync: `alerts` is destroyed and recreated on every
+    // pull, so "this user opened this alert" lives here, keyed by the server's alert id.
+    // A row's existence means read; unread alerts have no row.
+    tableSchema({
+      name: "alert_reads",
+      columns: [{ name: "remote_id", type: "string", isIndexed: true }],
     }),
   ],
 });
