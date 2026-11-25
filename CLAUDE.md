@@ -18,7 +18,7 @@ npm run lint
 npm run typecheck     # tsc --noEmit
 ```
 
-No test script defined in this repo.
+`npm test` runs Jest (`jest-expo/android`); tests live in `__tests__/` folders next to the code (`src/lib/__tests__`, `src/state/__tests__`).
 
 ## Map
 
