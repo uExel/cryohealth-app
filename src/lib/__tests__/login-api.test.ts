@@ -97,8 +97,15 @@ describe("login() against the API", () => {
             init.signal.addEventListener("abort", () => reject(new Error("aborted")));
           }),
       );
-      const pending = login("amina", "1234").catch((e) => e);
-      await jest.advanceTimersByTimeAsync(30_000);
+      let settled = false;
+      const pending = login("amina", "1234")
+        .catch((e) => e)
+        .finally(() => {
+          settled = true;
+        });
+      await jest.advanceTimersByTimeAsync(29_999);
+      expect(settled).toBe(false);
+      await jest.advanceTimersByTimeAsync(1);
       const err = await pending;
       expect(err).toBeInstanceOf(ApiError);
       expect(err.status).toBe(0);

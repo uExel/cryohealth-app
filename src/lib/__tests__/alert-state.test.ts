@@ -10,7 +10,14 @@ jest.mock("../db", () => {
   const { schema: s } = jest.requireActual("../db/schema");
   return {
     database: new Db({
-      adapter: new Loki({ schema: s, useWebWorker: false, useIncrementalIndexedDB: false }),
+      // WatermelonDB turns Loki autosave on by default (a 500 ms setInterval it never clears),
+      // which keeps the Jest worker alive after the suite ends.
+      adapter: new Loki({
+        schema: s,
+        useWebWorker: false,
+        useIncrementalIndexedDB: false,
+        extraLokiOptions: { autosave: false },
+      }),
       modelClasses: [
         jest.requireActual("../db/models/LakeModel").LakeModel,
         jest.requireActual("../db/models/AlertModel").AlertModel,
